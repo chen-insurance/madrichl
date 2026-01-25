@@ -33,10 +33,10 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center">
-                <span className="text-primary font-display font-bold text-lg">ב</span>
+                <span className="text-primary font-display font-bold text-lg">מ</span>
               </div>
               <div>
-                <h2 className="font-display font-bold text-lg">ביטוח פלוס</h2>
+                <h2 className="font-display font-bold text-lg">המדריך</h2>
               </div>
             </Link>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
@@ -101,7 +101,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-primary-foreground/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-primary-foreground/60">
-              © {currentYear} ביטוח פלוס. כל הזכויות שמורות.
+              © {currentYear} המדריך. כל הזכויות שמורות.
             </p>
             <p className="text-sm text-primary-foreground/60">
               האתר אינו מהווה ייעוץ פיננסי או ביטוחי
