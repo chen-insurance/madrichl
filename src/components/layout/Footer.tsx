@@ -36,12 +36,13 @@ const Footer = () => {
                 <span className="text-primary font-display font-bold text-lg">מ</span>
               </div>
               <div>
-                <h2 className="font-display font-bold text-lg">המדריך</h2>
+                <h2 className="font-display font-bold text-lg">המדריך לצרכן</h2>
+                <p className="text-xs text-primary-foreground/60">מגזין ביטוח ופיננסים</p>
               </div>
             </Link>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
-              האתר המוביל בישראל לחדשות ביטוח, פנסיה וחיסכון. 
-              מביאים לכם את העדכונים החשובים ביותר מעולם הביטוח.
+              המקור המהימן שלך למידע על ביטוח ופיננסים בישראל.
+              מדריכים, חדשות וניתוחים לטובת הצרכן.
             </p>
           </div>
 
@@ -101,7 +102,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-primary-foreground/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-primary-foreground/60">
-              © {currentYear} המדריך. כל הזכויות שמורות.
+              © {currentYear} המדריך לצרכן. כל הזכויות שמורות.
             </p>
             <p className="text-sm text-primary-foreground/60">
               האתר אינו מהווה ייעוץ פיננסי או ביטוחי

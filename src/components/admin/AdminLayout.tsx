@@ -59,7 +59,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               <span className="text-primary font-display font-bold text-lg">מ</span>
             </div>
             <div>
-              <h1 className="font-display font-bold text-lg text-foreground">המדריך</h1>
+              <h1 className="font-display font-bold text-lg text-foreground">המדריך לצרכן</h1>
               <p className="text-xs text-muted-foreground">ממשק ניהול</p>
             </div>
           </Link>

@@ -25,8 +25,8 @@ const Header = () => {
               <span className="text-primary font-display font-bold text-lg md:text-xl">מ</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-display font-bold text-lg md:text-xl text-foreground">המדריך</h1>
-              <p className="text-xs text-muted-foreground">חדשות הביטוח של ישראל</p>
+              <h1 className="font-display font-bold text-lg md:text-xl text-foreground">המדריך לצרכן</h1>
+              <p className="text-xs text-muted-foreground">מגזין ביטוח ופיננסים</p>
             </div>
           </Link>
 
