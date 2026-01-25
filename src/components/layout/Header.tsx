@@ -22,10 +22,10 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-gold rounded-lg flex items-center justify-center shadow-gold">
-              <span className="text-primary font-display font-bold text-lg md:text-xl">ב</span>
+              <span className="text-primary font-display font-bold text-lg md:text-xl">מ</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-display font-bold text-lg md:text-xl text-foreground">ביטוח פלוס</h1>
+              <h1 className="font-display font-bold text-lg md:text-xl text-foreground">המדריך</h1>
               <p className="text-xs text-muted-foreground">חדשות הביטוח של ישראל</p>
             </div>
           </Link>
@@ -45,9 +45,11 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="gold" size="sm">
-              הרשמה לניוזלטר
-            </Button>
+            <Link to="/admin">
+              <Button variant="outline" size="sm">
+                כניסת מנהלים
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}

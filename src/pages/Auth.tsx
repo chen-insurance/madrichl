@@ -1,0 +1,161 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+import { Loader2 } from "lucide-react";
+
+const authSchema = z.object({
+  email: z.string().trim().email({ message: "כתובת אימייל לא תקינה" }),
+  password: z.string().min(6, { message: "הסיסמה חייבת להכיל לפחות 6 תווים" }),
+});
+
+const Auth = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn, signUp, user, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/admin");
+    }
+  }, [user, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const validation = authSchema.safeParse({ email, password });
+    if (!validation.success) {
+      toast({
+        title: "שגיאה",
+        description: validation.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password);
+        if (error) {
+          if (error.message.includes("Invalid login credentials")) {
+            throw new Error("פרטי התחברות שגויים");
+          }
+          throw error;
+        }
+        navigate("/admin");
+      } else {
+        const { error } = await signUp(email, password);
+        if (error) {
+          if (error.message.includes("User already registered")) {
+            throw new Error("משתמש זה כבר רשום במערכת");
+          }
+          throw error;
+        }
+        toast({
+          title: "הרשמה הצליחה!",
+          description: "כעת ניתן להתחבר למערכת",
+        });
+        setIsLogin(true);
+      }
+    } catch (error) {
+      toast({
+        title: "שגיאה",
+        description: error instanceof Error ? error.message : "אירעה שגיאה בלתי צפויה",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-navy p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-gold rounded-xl flex items-center justify-center shadow-gold">
+            <span className="text-primary font-display font-bold text-2xl">מ</span>
+          </div>
+          <CardTitle className="font-display text-2xl">
+            {isLogin ? "כניסה לממשק הניהול" : "הרשמה לממשק הניהול"}
+          </CardTitle>
+          <CardDescription>
+            {isLogin ? "התחברו כדי לנהל את תוכן האתר" : "צרו חשבון חדש"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">אימייל</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email@example.com"
+                dir="ltr"
+                className="text-left"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">סיסמה</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                dir="ltr"
+                className="text-left"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="gold"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isLogin ? (
+                "התחברות"
+              ) : (
+                "הרשמה"
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {isLogin ? "אין לך חשבון? הירשם" : "יש לך חשבון? התחבר"}
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Auth;
