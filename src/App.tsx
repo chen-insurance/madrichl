@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Article from "./pages/Article";
+import Contact from "./pages/Contact";
 import ArticlesList from "./pages/admin/ArticlesList";
 import ArticleEditor from "./pages/admin/ArticleEditor";
 import Settings from "./pages/admin/Settings";
@@ -23,6 +25,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/news/:slug" element={<Article />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<ArticlesList />} />
             <Route path="/admin/articles/:id" element={<ArticleEditor />} />
             <Route path="/admin/settings" element={<Settings />} />

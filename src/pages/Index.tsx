@@ -1,9 +1,11 @@
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
 import NewsletterSection from "@/components/home/NewsletterSection";
+import TrustSignals from "@/components/home/TrustSignals";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 
 const Index = () => {
@@ -12,9 +14,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>המדריך לצרכן | מגזין ביטוח ופיננסים</title>
+        <meta
+          name="description"
+          content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן."
+        />
+        <link rel="canonical" href="https://the-guide.co.il" />
+      </Helmet>
+
       <Header />
       <main className="flex-1">
         <HeroSection />
+        <TrustSignals />
         <CategorySection />
         <LatestArticles />
         <NewsletterSection />
