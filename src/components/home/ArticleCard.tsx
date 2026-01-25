@@ -33,13 +33,14 @@ const ArticleCard = ({
   if (variant === "horizontal") {
     return (
       <Link
-        to={`/article/${slug}`}
+        to={`/news/${slug}`}
         className="group flex gap-4 bg-card rounded-xl p-4 shadow-soft hover:shadow-medium transition-all duration-300"
       >
         <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
           <img
             src={featured_image || placeholderImage}
             alt={title}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </div>
@@ -62,7 +63,7 @@ const ArticleCard = ({
   if (variant === "compact") {
     return (
       <Link
-        to={`/article/${slug}`}
+        to={`/news/${slug}`}
         className="group block py-4 border-b border-border last:border-b-0"
       >
         <h3 className="font-display font-medium text-foreground text-sm leading-snug mb-1 group-hover:text-accent transition-colors line-clamp-2">
@@ -78,13 +79,14 @@ const ArticleCard = ({
 
   return (
     <Link
-      to={`/article/${slug}`}
+      to={`/news/${slug}`}
       className="group block bg-card rounded-xl overflow-hidden shadow-soft hover:shadow-medium transition-all duration-300"
     >
       <div className="aspect-[16/10] overflow-hidden">
         <img
           src={featured_image || placeholderImage}
           alt={title}
+          loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>

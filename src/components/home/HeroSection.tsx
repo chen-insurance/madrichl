@@ -63,13 +63,14 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Featured Article */}
           <Link
-            to={`/article/${mainArticle.slug}`}
+            to={`/news/${mainArticle.slug}`}
             className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300"
           >
             <div className="aspect-[16/10] md:aspect-[16/9] overflow-hidden">
               <img
                 src={mainArticle.featured_image}
                 alt={mainArticle.title}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
@@ -96,7 +97,7 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
             {secondary.map((article, index) => (
               <Link
                 key={article.id}
-                to={`/article/${article.slug}`}
+                to={`/news/${article.slug}`}
                 className="group flex gap-4 bg-card rounded-xl p-4 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -104,6 +105,7 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
                   <img
                     src={article.featured_image}
                     alt={article.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
