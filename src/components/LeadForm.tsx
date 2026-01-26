@@ -8,11 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Shield } from "lucide-react";
+import { getTrafficData } from "@/hooks/useTrafficSource";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "שם חייב להכיל לפחות 2 תווים").max(100, "שם ארוך מדי"),
   phone: z.string().trim().regex(/^05\d{8}$/, "מספר טלפון לא תקין (דוגמה: 0501234567)"),
-  email: z.string().trim().email("כתובת אימייל לא תקינה").max(255, "אימייל ארוך מדי"),
+  email: z.string().trim().email("כתובת אימייל לא תקינה").max(255, "אימייל ארוך מדי").optional().or(z.literal("")),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
@@ -25,14 +26,13 @@ interface LeadFormProps {
 }
 
 const LeadForm = ({ 
-  title = "רוצים לחסוך בביטוח?",
-  subtitle = "השאירו פרטים ונחזור אליכם עם הצעה מותאמת אישית",
+  title = "בדוק את זכאותך",
+  subtitle = "השאירו פרטים ונבדוק עבורכם ללא עלות",
   variant = "card",
   sourceUrl 
 }: LeadFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [utmData, setUtmData] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const {
@@ -42,40 +42,74 @@ const LeadForm = ({
     reset,
   } = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
+    defaultValues: {
+      email: "",
+    },
   });
 
-  // Capture UTM parameters from session storage
-  useEffect(() => {
-    const storedUtm = sessionStorage.getItem("utm_data");
-    if (storedUtm) {
-      try {
-        setUtmData(JSON.parse(storedUtm));
-      } catch (e) {
-        console.error("Failed to parse UTM data");
+  const sendWebhook = async (leadData: Record<string, unknown>) => {
+    try {
+      // Fetch webhook URL from site_settings
+      const { data: settings } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "webhook_url")
+        .maybeSingle();
+
+      const webhookUrl = settings?.value;
+      
+      if (webhookUrl && webhookUrl.trim()) {
+        // Send webhook in background - don't block the user experience
+        fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(leadData),
+        }).catch((err) => {
+          console.error("Webhook failed:", err);
+        });
       }
+    } catch (err) {
+      console.error("Failed to fetch webhook URL:", err);
     }
-  }, []);
+  };
 
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("leads").insert({
+      // Get traffic data from session storage
+      const trafficData = getTrafficData();
+      const currentUrl = sourceUrl || window.location.href;
+
+      // Prepare the full lead data - email is required in DB, use empty string if not provided
+      const leadData = {
         name: data.name,
-        email: data.email,
+        email: data.email || "",
         phone: data.phone,
-        source_url: sourceUrl || window.location.href,
-        utm_data: utmData,
-      });
+        source_url: currentUrl,
+        utm_data: trafficData || {},
+      };
+
+      // Insert into database
+      const { error } = await supabase.from("leads").insert([leadData]);
 
       if (error) throw error;
+
+      // Send webhook (non-blocking)
+      sendWebhook({
+        ...leadData,
+        submitted_at: new Date().toISOString(),
+      });
 
       setIsSuccess(true);
       reset();
       toast({
-        title: "הפרטים נשלחו בהצלחה!",
-        description: "נציג יחזור אליך בהקדם",
+        title: "תודה! הפרטים התקבלו",
+        description: "ניצור איתך קשר בהקדם",
       });
     } catch (error) {
+      console.error("Lead submission error:", error);
       toast({
         title: "שגיאה בשליחה",
         description: "אנא נסו שוב מאוחר יותר",
@@ -88,9 +122,9 @@ const LeadForm = ({
 
   const baseClasses = "rounded-xl";
   const variantClasses = {
-    sidebar: "bg-accent/5 border border-accent/20 p-5",
-    inline: "bg-secondary/50 border border-border p-6 my-8",
-    card: "bg-card shadow-medium p-6",
+    sidebar: "bg-secondary/50 border border-border p-5",
+    inline: "bg-secondary/30 border border-border p-6 my-8",
+    card: "bg-secondary/30 border border-border shadow-soft p-6",
   };
 
   if (isSuccess) {
@@ -103,7 +137,7 @@ const LeadForm = ({
           תודה רבה!
         </h3>
         <p className="text-muted-foreground text-sm">
-          נציג יחזור אליך תוך 24 שעות
+          ניצור איתך קשר בהקדם
         </p>
       </div>
     );
@@ -140,7 +174,7 @@ const LeadForm = ({
           <Input
             id="phone"
             type="tel"
-            placeholder="0501234567"
+            placeholder="050-0000000"
             dir="ltr"
             className={`text-right ${errors.phone ? "border-destructive" : ""}`}
             {...register("phone")}
@@ -151,7 +185,9 @@ const LeadForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">אימייל</Label>
+          <Label htmlFor="email">
+            מייל <span className="text-muted-foreground">(אופציונלי)</span>
+          </Label>
           <Input
             id="email"
             type="email"
@@ -167,8 +203,7 @@ const LeadForm = ({
 
         <Button
           type="submit"
-          variant="gold"
-          className="w-full"
+          className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -177,7 +212,7 @@ const LeadForm = ({
               שולח...
             </>
           ) : (
-            "שלחו לי הצעה"
+            "בדוק זכאותך כעת"
           )}
         </Button>
 
