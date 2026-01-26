@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { he } from "date-fns/locale";
+import { format } from "date-fns";
 
 interface ArticleCardProps {
   id: string;
@@ -23,10 +21,7 @@ const ArticleCard = ({
   category,
   variant = "default",
 }: ArticleCardProps) => {
-  const timeAgo = formatDistanceToNow(new Date(published_at), {
-    addSuffix: true,
-    locale: he,
-  });
+  const formattedDate = format(new Date(published_at), "dd/MM/yyyy");
 
   const placeholderImage = "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop";
 
@@ -51,10 +46,7 @@ const ArticleCard = ({
           <h3 className="font-display font-semibold text-foreground text-sm leading-snug mb-1 line-clamp-2 group-hover:text-accent transition-colors">
             {title}
           </h3>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="w-3 h-3" />
-            <span>{timeAgo}</span>
-          </div>
+          <span className="text-xs text-muted-foreground">{formattedDate}</span>
         </div>
       </Link>
     );
@@ -69,10 +61,7 @@ const ArticleCard = ({
         <h3 className="font-display font-medium text-foreground text-sm leading-snug mb-1 group-hover:text-accent transition-colors line-clamp-2">
           {title}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="w-3 h-3" />
-          <span>{timeAgo}</span>
-        </div>
+        <span className="text-xs text-muted-foreground">{formattedDate}</span>
       </Link>
     );
   }
@@ -102,10 +91,7 @@ const ArticleCard = ({
         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
           {excerpt}
         </p>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="w-3 h-3" />
-          <span>{timeAgo}</span>
-        </div>
+        <span className="text-xs text-muted-foreground">{formattedDate}</span>
       </div>
     </Link>
   );

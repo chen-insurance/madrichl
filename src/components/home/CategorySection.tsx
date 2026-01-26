@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Shield, Heart, Car, Building2, Users, PiggyBank } from "lucide-react";
+import { Shield, Heart, Car, Building2, Users, PiggyBank } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
 interface Category {
@@ -8,7 +8,6 @@ interface Category {
   description: string;
   icon: LucideIcon;
   href: string;
-  articleCount: number;
 }
 
 const CategorySection = () => {
@@ -19,7 +18,6 @@ const CategorySection = () => {
       description: "פוליסות חיים, ריסק ועוד",
       icon: Shield,
       href: "/life-insurance",
-      articleCount: 42,
     },
     {
       id: "health",
@@ -27,7 +25,6 @@ const CategorySection = () => {
       description: "בריאות, סיעודי ונסיעות",
       icon: Heart,
       href: "/health-insurance",
-      articleCount: 38,
     },
     {
       id: "car",
@@ -35,7 +32,6 @@ const CategorySection = () => {
       description: "חובה, מקיף וצד ג׳",
       icon: Car,
       href: "/car-insurance",
-      articleCount: 31,
     },
     {
       id: "property",
@@ -43,7 +39,6 @@ const CategorySection = () => {
       description: "דירה, עסק ותכולה",
       icon: Building2,
       href: "/property-insurance",
-      articleCount: 27,
     },
     {
       id: "pension",
@@ -51,7 +46,6 @@ const CategorySection = () => {
       description: "קרנות פנסיה וגמל",
       icon: PiggyBank,
       href: "/pension",
-      articleCount: 45,
     },
     {
       id: "employers",
@@ -59,7 +53,6 @@ const CategorySection = () => {
       description: "אחריות מקצועית ועובדים",
       icon: Users,
       href: "/employer-insurance",
-      articleCount: 19,
     },
   ];
 
@@ -89,12 +82,9 @@ const CategorySection = () => {
               <h3 className="font-display font-semibold text-foreground mb-1">
                 {category.title}
               </h3>
-              <p className="text-xs text-muted-foreground mb-2">
+              <p className="text-xs text-muted-foreground">
                 {category.description}
               </p>
-              <span className="text-xs font-medium text-accent">
-                {category.articleCount} כתבות
-              </span>
             </Link>
           ))}
         </div>

@@ -5,7 +5,6 @@ import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
 import NewsletterSection from "@/components/home/NewsletterSection";
-import TrustSignals from "@/components/home/TrustSignals";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 
 const Index = () => {
@@ -26,7 +25,6 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <HeroSection />
-        <TrustSignals />
         <CategorySection />
         <LatestArticles />
         <NewsletterSection />
