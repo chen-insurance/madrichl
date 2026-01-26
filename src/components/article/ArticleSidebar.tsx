@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import LeadForm from "@/components/LeadForm";
-import { formatDistanceToNow } from "date-fns";
-import { he } from "date-fns/locale";
+import { format } from "date-fns";
 
 interface ArticleSidebarProps {
   currentSlug?: string;
@@ -31,7 +30,7 @@ const ArticleSidebar = ({ currentSlug }: ArticleSidebarProps) => {
     <aside className="space-y-6 sticky top-24">
       {/* Lead Form */}
       <LeadForm
-        title="בדיקת ביטוח חינם"
+        title="בדוק את זכאותך"
         subtitle="גלו כמה אתם יכולים לחסוך"
         variant="sidebar"
       />
@@ -57,10 +56,7 @@ const ArticleSidebar = ({ currentSlug }: ArticleSidebarProps) => {
                 </h4>
                 {article.published_at && (
                   <span className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(article.published_at), {
-                      addSuffix: true,
-                      locale: he,
-                    })}
+                    {format(new Date(article.published_at), "dd/MM/yyyy")}
                   </span>
                 )}
               </div>

@@ -8,11 +8,11 @@ import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/article/Breadcrumbs";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import InArticleCTA from "@/components/article/InArticleCTA";
-import { formatDistanceToNow, format } from "date-fns";
+import LeadForm from "@/components/LeadForm";
+import { format } from "date-fns";
 import { he } from "date-fns/locale";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import { Loader2, Calendar } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
-import { Fragment } from "react";
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -26,7 +26,7 @@ const Article = () => {
         .select("*")
         .eq("slug", slug)
         .eq("is_published", true)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -130,25 +130,12 @@ const Article = () => {
 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground pb-6 border-b border-border">
                   {article.published_at && (
-                    <>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          {format(new Date(article.published_at), "dd בMMMM yyyy", {
-                            locale: he,
-                          })}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>
-                          {formatDistanceToNow(new Date(article.published_at), {
-                            addSuffix: true,
-                            locale: he,
-                          })}
-                        </span>
-                      </div>
-                    </>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        {format(new Date(article.published_at), "dd/MM/yyyy")}
+                      </span>
+                    </div>
                   )}
                 </div>
               </header>
@@ -163,8 +150,17 @@ const Article = () => {
                 {secondPart && <ReactMarkdown>{secondPart}</ReactMarkdown>}
               </div>
 
+              {/* Bottom Lead Form (Mobile & Desktop) */}
+              <div className="mt-12">
+                <LeadForm
+                  title="בדוק את זכאותך עכשיו"
+                  subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
+                  variant="card"
+                />
+              </div>
+
               {/* Article Footer */}
-              <div className="mt-12 pt-8 border-t border-border">
+              <div className="mt-8 pt-8 border-t border-border">
                 <p className="text-sm text-muted-foreground text-center">
                   המידע במאמר זה נועד למטרות מידע כללי בלבד ואינו מהווה ייעוץ מקצועי.
                 </p>
