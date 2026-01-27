@@ -30,22 +30,16 @@ const articleSchema = z.object({
   seo_description: z.string().optional(),
   author_name: z.string().optional(),
   author_bio: z.string().optional(),
-  category: z.string().optional(),
+  category_id: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
-// Available categories for articles
-const CATEGORIES = [
-  { value: "כללי", label: "כללי" },
-  { value: "ביטוח חיים", label: "ביטוח חיים" },
-  { value: "ביטוח בריאות", label: "ביטוח בריאות" },
-  { value: "ביטוח רכב", label: "ביטוח רכב" },
-  { value: "ביטוח רכוש", label: "ביטוח רכוש" },
-  { value: "פנסיה", label: "פנסיה" },
-  { value: "ביטוח מעסיקים", label: "ביטוח מעסיקים" },
-  { value: "פיננסים", label: "פיננסים" },
-];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 const ArticleEditor = () => {
   const { id } = useParams();
@@ -64,7 +58,20 @@ const ArticleEditor = () => {
     seo_description: "",
     author_name: "מערכת המדריך",
     author_bio: "צוות המומחים של המדריך לצרכן מביא לכם מידע מקצועי ואובייקטיבי בתחום הביטוח והפיננסים.",
-    category: "כללי",
+    category_id: "",
+  });
+
+  // Fetch categories for dropdown
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug")
+        .order("name");
+      if (error) throw error;
+      return data as Category[];
+    },
   });
   const [isPublished, setIsPublished] = useState(false);
 
@@ -96,7 +103,7 @@ const ArticleEditor = () => {
         seo_description: article.seo_description || "",
         author_name: article.author_name || "מערכת המדריך",
         author_bio: article.author_bio || "צוות המומחים של המדריך לצרכן מביא לכם מידע מקצועי ואובייקטיבי בתחום הביטוח והפיננסים.",
-        category: article.category || "כללי",
+        category_id: article.category_id || "",
       });
       setIsPublished(article.is_published);
     }
@@ -124,6 +131,9 @@ const ArticleEditor = () => {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async (data: ArticleFormData & { is_published: boolean }) => {
+      // Find category name for the legacy category field
+      const selectedCategory = categories?.find(c => c.id === data.category_id);
+      
       if (isNew) {
         const { data: newArticle, error } = await supabase
           .from("articles")
@@ -137,7 +147,8 @@ const ArticleEditor = () => {
             seo_description: data.seo_description || null,
             author_name: data.author_name || null,
             author_bio: data.author_bio || null,
-            category: data.category || null,
+            category_id: data.category_id || null,
+            category: selectedCategory?.name || null,
             is_published: data.is_published,
             published_at: data.is_published ? new Date().toISOString() : null,
           })
@@ -158,7 +169,8 @@ const ArticleEditor = () => {
             seo_description: data.seo_description || null,
             author_name: data.author_name || null,
             author_bio: data.author_bio || null,
-            category: data.category || null,
+            category_id: data.category_id || null,
+            category: selectedCategory?.name || null,
             is_published: data.is_published,
             published_at: data.is_published ? new Date().toISOString() : null,
           })
@@ -326,18 +338,18 @@ const ArticleEditor = () => {
                 <div className="space-y-2">
                   <Label htmlFor="category">קטגוריה</Label>
                   <Select
-                    value={formData.category}
+                    value={formData.category_id}
                     onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, category: value }))
+                      setFormData((prev) => ({ ...prev, category_id: value }))
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="בחר קטגוריה" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
+                      {categories?.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
