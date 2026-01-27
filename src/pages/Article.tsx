@@ -1,16 +1,19 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/article/Breadcrumbs";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
+import ArticleSchema from "@/components/article/ArticleSchema";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import InArticleCTA from "@/components/article/InArticleCTA";
+import AuthorBox from "@/components/article/AuthorBox";
+import RelatedArticles from "@/components/article/RelatedArticles";
+import MarkdownContent from "@/components/article/MarkdownContent";
 import LeadForm from "@/components/LeadForm";
 import { format } from "date-fns";
-import { he } from "date-fns/locale";
 import { Loader2, Calendar } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 
@@ -70,9 +73,17 @@ const Article = () => {
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
+  // Breadcrumb data for UI and Schema
+  const categoryLabel = article.category || "חדשות";
   const breadcrumbItems = [
-    { label: "חדשות", href: "/news" },
+    { label: categoryLabel, href: `/category/${encodeURIComponent(categoryLabel)}` },
     { label: article.title },
+  ];
+
+  const breadcrumbSchemaItems = [
+    { name: "ראשי", url: "/" },
+    { name: categoryLabel, url: `/category/${encodeURIComponent(categoryLabel)}` },
+    { name: article.title, url: `/news/${article.slug}` },
   ];
 
   return (
@@ -95,6 +106,10 @@ const Article = () => {
         <link rel="canonical" href={`https://the-guide.co.il/news/${article.slug}`} />
       </Helmet>
 
+      {/* Structured Data */}
+      <ArticleSchema article={article} />
+      <BreadcrumbSchema items={breadcrumbSchemaItems} />
+
       <Header />
 
       <main className="flex-1 py-8 md:py-12">
@@ -104,20 +119,26 @@ const Article = () => {
           <div className="grid lg:grid-cols-[1fr_320px] gap-8 lg:gap-12">
             {/* Main Content */}
             <article className="min-w-0">
-              {/* Featured Image */}
+              {/* Featured Image - with aspect-ratio for CLS prevention, eager loading for LCP */}
               {article.featured_image && (
                 <div className="aspect-video rounded-xl overflow-hidden mb-8 bg-secondary">
                   <img
                     src={article.featured_image}
                     alt={article.title}
                     className="w-full h-full object-cover"
-                    loading="lazy"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 </div>
               )}
 
               {/* Article Header */}
               <header className="mb-8">
+                {article.category && (
+                  <span className="inline-block text-sm font-medium text-accent bg-accent/10 px-3 py-1 rounded-full mb-4">
+                    {article.category}
+                  </span>
+                )}
                 <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-4">
                   {article.title}
                 </h1>
@@ -137,18 +158,29 @@ const Article = () => {
                       </span>
                     </div>
                   )}
+                  {article.author_name && (
+                    <span className="text-foreground font-medium">
+                      מאת: {article.author_name}
+                    </span>
+                  )}
                 </div>
               </header>
 
-              {/* Article Content */}
+              {/* Article Content with custom heading IDs for TOC */}
               <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-li:text-foreground">
-                {firstPart && <ReactMarkdown>{firstPart}</ReactMarkdown>}
+                {firstPart && <MarkdownContent content={firstPart} />}
 
                 {/* In-Article CTA after 2nd paragraph */}
                 {contentParagraphs.length > 2 && <InArticleCTA />}
 
-                {secondPart && <ReactMarkdown>{secondPart}</ReactMarkdown>}
+                {secondPart && <MarkdownContent content={secondPart} />}
               </div>
+
+              {/* Author Box - E-E-A-T */}
+              <AuthorBox
+                authorName={article.author_name}
+                authorBio={article.author_bio}
+              />
 
               {/* Bottom Lead Form (Mobile & Desktop) */}
               <div className="mt-12">
@@ -159,6 +191,12 @@ const Article = () => {
                 />
               </div>
 
+              {/* Related Articles - Category-based internal linking */}
+              <RelatedArticles
+                currentSlug={slug}
+                category={article.category}
+              />
+
               {/* Article Footer */}
               <div className="mt-8 pt-8 border-t border-border">
                 <p className="text-sm text-muted-foreground text-center">
@@ -168,7 +206,7 @@ const Article = () => {
             </article>
 
             {/* Sidebar */}
-            <ArticleSidebar currentSlug={slug} />
+            <ArticleSidebar currentSlug={slug} articleContent={article.content} />
           </div>
         </div>
       </main>
