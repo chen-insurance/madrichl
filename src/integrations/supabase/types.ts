@@ -103,6 +103,42 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_tracks: {
+        Row: {
+          created_at: string
+          id: string
+          last_updated: string
+          last_year_return: number | null
+          management_fee: number | null
+          name: string
+          provider: string
+          type: string
+          ytd_return: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_updated?: string
+          last_year_return?: number | null
+          management_fee?: number | null
+          name: string
+          provider: string
+          type: string
+          ytd_return?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_updated?: string
+          last_year_return?: number | null
+          management_fee?: number | null
+          name?: string
+          provider?: string
+          type?: string
+          ytd_return?: number | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string

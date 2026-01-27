@@ -23,13 +23,17 @@ interface LeadFormProps {
   subtitle?: string;
   variant?: "sidebar" | "inline" | "card";
   sourceUrl?: string;
+  prefilledContext?: string;
+  onSuccess?: () => void;
 }
 
 const LeadForm = ({ 
   title = "בדוק את זכאותך",
   subtitle = "השאירו פרטים ונבדוק עבורכם ללא עלות",
   variant = "card",
-  sourceUrl 
+  sourceUrl,
+  prefilledContext,
+  onSuccess,
 }: LeadFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -88,7 +92,10 @@ const LeadForm = ({
         email: data.email || "",
         phone: data.phone,
         source_url: currentUrl,
-        utm_data: trafficData || {},
+        utm_data: {
+          ...(trafficData || {}),
+          context: prefilledContext || null,
+        },
       };
 
       // Insert into database
@@ -108,6 +115,7 @@ const LeadForm = ({
         title: "תודה! הפרטים התקבלו",
         description: "ניצור איתך קשר בהקדם",
       });
+      onSuccess?.();
     } catch (error) {
       console.error("Lead submission error:", error);
       toast({

@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Settings, LogOut, Home } from "lucide-react";
+import { Loader2, FileText, Settings, LogOut, Home, BarChart3 } from "lucide-react";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -38,6 +38,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const navItems = [
     { label: "מאמרים", href: "/admin", icon: FileText },
+    { label: "מסלולי השקעה", href: "/admin/tracks", icon: BarChart3 },
     { label: "הגדרות", href: "/admin/settings", icon: Settings },
   ];
 
