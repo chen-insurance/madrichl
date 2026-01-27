@@ -1,18 +1,41 @@
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Fetch categories dynamically
+  const { data: categories } = useQuery({
+    queryKey: ["public-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug")
+        .order("name");
+      if (error) throw error;
+      return data as Category[];
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Build navigation items from categories
   const navItems = [
     { label: "ראשי", href: "/" },
-    { label: "ביטוח רכב", href: "/news?category=car-insurance" },
-    { label: "ביטוח בריאות", href: "/news?category=health-insurance" },
-    { label: "ביטוח חיים", href: "/news?category=life-insurance" },
-    { label: "פנסיה", href: "/news?category=pension" },
+    ...(categories?.map((cat) => ({
+      label: cat.name,
+      href: `/news?category=${cat.slug}`,
+    })) || []),
     { label: "צור קשר", href: "/contact" },
   ];
 
