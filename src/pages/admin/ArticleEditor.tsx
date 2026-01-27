@@ -9,6 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { z } from "zod";
@@ -21,9 +28,24 @@ const articleSchema = z.object({
   featured_image: z.string().url().optional().or(z.literal("")),
   seo_title: z.string().optional(),
   seo_description: z.string().optional(),
+  author_name: z.string().optional(),
+  author_bio: z.string().optional(),
+  category: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
+
+// Available categories for articles
+const CATEGORIES = [
+  { value: "כללי", label: "כללי" },
+  { value: "ביטוח חיים", label: "ביטוח חיים" },
+  { value: "ביטוח בריאות", label: "ביטוח בריאות" },
+  { value: "ביטוח רכב", label: "ביטוח רכב" },
+  { value: "ביטוח רכוש", label: "ביטוח רכוש" },
+  { value: "פנסיה", label: "פנסיה" },
+  { value: "ביטוח מעסיקים", label: "ביטוח מעסיקים" },
+  { value: "פיננסים", label: "פיננסים" },
+];
 
 const ArticleEditor = () => {
   const { id } = useParams();
@@ -40,6 +62,9 @@ const ArticleEditor = () => {
     featured_image: "",
     seo_title: "",
     seo_description: "",
+    author_name: "מערכת המדריך",
+    author_bio: "צוות המומחים של המדריך לצרכן מביא לכם מידע מקצועי ואובייקטיבי בתחום הביטוח והפיננסים.",
+    category: "כללי",
   });
   const [isPublished, setIsPublished] = useState(false);
 
@@ -69,6 +94,9 @@ const ArticleEditor = () => {
         featured_image: article.featured_image || "",
         seo_title: article.seo_title || "",
         seo_description: article.seo_description || "",
+        author_name: article.author_name || "מערכת המדריך",
+        author_bio: article.author_bio || "צוות המומחים של המדריך לצרכן מביא לכם מידע מקצועי ואובייקטיבי בתחום הביטוח והפיננסים.",
+        category: article.category || "כללי",
       });
       setIsPublished(article.is_published);
     }
@@ -107,6 +135,9 @@ const ArticleEditor = () => {
             featured_image: data.featured_image || null,
             seo_title: data.seo_title || null,
             seo_description: data.seo_description || null,
+            author_name: data.author_name || null,
+            author_bio: data.author_bio || null,
+            category: data.category || null,
             is_published: data.is_published,
             published_at: data.is_published ? new Date().toISOString() : null,
           })
@@ -125,6 +156,9 @@ const ArticleEditor = () => {
             featured_image: data.featured_image || null,
             seo_title: data.seo_title || null,
             seo_description: data.seo_description || null,
+            author_name: data.author_name || null,
+            author_bio: data.author_bio || null,
+            category: data.category || null,
             is_published: data.is_published,
             published_at: data.is_published ? new Date().toISOString() : null,
           })
@@ -257,18 +291,41 @@ const ArticleEditor = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="slug">כתובת URL</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, slug: e.target.value }))
-                  }
-                  placeholder="article-url-slug"
-                  dir="ltr"
-                  className="text-left"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="slug">כתובת URL</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                    }
+                    placeholder="article-url-slug"
+                    dir="ltr"
+                    className="text-left"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">קטגוריה</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, category: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="בחר קטגוריה" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -326,6 +383,42 @@ const ArticleEditor = () => {
                     />
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Author (E-E-A-T) */}
+          <Card>
+            <CardHeader>
+              <CardTitle>מחבר (E-E-A-T)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="author_name">שם המחבר</Label>
+                <Input
+                  id="author_name"
+                  value={formData.author_name}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, author_name: e.target.value }))
+                  }
+                  placeholder="מערכת המדריך"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="author_bio">ביוגרפיה קצרה</Label>
+                <Textarea
+                  id="author_bio"
+                  value={formData.author_bio}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, author_bio: e.target.value }))
+                  }
+                  placeholder="תיאור קצר של המחבר וניסיונו המקצועי..."
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  ביוגרפיה קצרה המציגה את המומחיות והניסיון של המחבר (חשוב ל-Google E-E-A-T)
+                </p>
               </div>
             </CardContent>
           </Card>

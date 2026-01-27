@@ -2,13 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import LeadForm from "@/components/LeadForm";
+import TableOfContents from "@/components/article/TableOfContents";
 import { format } from "date-fns";
 
 interface ArticleSidebarProps {
   currentSlug?: string;
+  articleContent?: string | null;
 }
 
-const ArticleSidebar = ({ currentSlug }: ArticleSidebarProps) => {
+const ArticleSidebar = ({ currentSlug, articleContent }: ArticleSidebarProps) => {
   // Fetch most read articles (for now, just latest published)
   const { data: popularArticles } = useQuery({
     queryKey: ["popular-articles", currentSlug],
@@ -28,6 +30,9 @@ const ArticleSidebar = ({ currentSlug }: ArticleSidebarProps) => {
 
   return (
     <aside className="space-y-6 sticky top-24">
+      {/* Table of Contents */}
+      <TableOfContents content={articleContent || null} />
+
       {/* Lead Form */}
       <LeadForm
         title="בדוק את זכאותך"
