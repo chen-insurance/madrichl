@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      article_views: {
+        Row: {
+          article_id: string
+          id: string
+          viewed_at: string
+          visitor_hash: string | null
+        }
+        Insert: {
+          article_id: string
+          id?: string
+          viewed_at?: string
+          visitor_hash?: string | null
+        }
+        Update: {
+          article_id?: string
+          id?: string
+          viewed_at?: string
+          visitor_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_views_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articles: {
         Row: {
           author_bio: string | null
@@ -21,6 +50,7 @@ export type Database = {
           category: string | null
           content: string | null
           created_at: string
+          embedding: string | null
           excerpt: string | null
           featured_image: string | null
           id: string
@@ -31,6 +61,7 @@ export type Database = {
           slug: string
           title: string
           updated_at: string
+          view_count: number | null
         }
         Insert: {
           author_bio?: string | null
@@ -38,6 +69,7 @@ export type Database = {
           category?: string | null
           content?: string | null
           created_at?: string
+          embedding?: string | null
           excerpt?: string | null
           featured_image?: string | null
           id?: string
@@ -48,6 +80,7 @@ export type Database = {
           slug: string
           title: string
           updated_at?: string
+          view_count?: number | null
         }
         Update: {
           author_bio?: string | null
@@ -55,6 +88,7 @@ export type Database = {
           category?: string | null
           content?: string | null
           created_at?: string
+          embedding?: string | null
           excerpt?: string | null
           featured_image?: string | null
           id?: string
@@ -65,6 +99,7 @@ export type Database = {
           slug?: string
           title?: string
           updated_at?: string
+          view_count?: number | null
         }
         Relationships: []
       }
@@ -98,6 +133,27 @@ export type Database = {
         }
         Relationships: []
       }
+      redirects: {
+        Row: {
+          created_at: string
+          id: string
+          new_slug: string
+          old_slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          new_slug: string
+          old_slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          new_slug?: string
+          old_slug?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           id: string
@@ -121,7 +177,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_trending_articles: {
+        Args: { p_exclude_slug?: string; p_limit?: number }
+        Returns: {
+          category: string
+          excerpt: string
+          featured_image: string
+          id: string
+          published_at: string
+          slug: string
+          title: string
+          view_count: number
+        }[]
+      }
+      match_articles: {
+        Args: {
+          exclude_slug?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          category: string
+          excerpt: string
+          featured_image: string
+          id: string
+          published_at: string
+          similarity: number
+          slug: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

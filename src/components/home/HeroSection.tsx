@@ -1,6 +1,7 @@
 import { ArrowLeft, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import OptimizedImage from "@/components/common/OptimizedImage";
 
 interface FeaturedArticle {
   id: string;
@@ -66,12 +67,13 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
             to={`/news/${mainArticle.slug}`}
             className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300"
           >
-            <div className="aspect-[16/10] md:aspect-[16/9] overflow-hidden">
-              <img
+            <div className="aspect-[16/10] md:aspect-[16/9] overflow-hidden relative">
+              <OptimizedImage
                 src={mainArticle.featured_image}
                 alt={mainArticle.title}
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                aspectRatio="video"
+                priority={true}
+                className="group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
             </div>
@@ -102,11 +104,11 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-lg">
-                  <img
+                  <OptimizedImage
                     src={article.featured_image}
                     alt={article.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    aspectRatio="square"
+                    className="group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
