@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,14 +12,30 @@ import InArticleCTA from "@/components/article/InArticleCTA";
 import AuthorBox from "@/components/article/AuthorBox";
 import RelatedArticles from "@/components/article/RelatedArticles";
 import MarkdownContent from "@/components/article/MarkdownContent";
+import OptimizedImage from "@/components/common/OptimizedImage";
 import LeadForm from "@/components/LeadForm";
 import { format } from "date-fns";
 import { Loader2, Calendar } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
+import { useArticleView } from "@/hooks/useArticleView";
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
   useHeadScripts();
+
+  // Check for redirect first
+  const { data: redirect, isLoading: isRedirectLoading } = useQuery({
+    queryKey: ["redirect-check", slug],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("redirects")
+        .select("new_slug")
+        .eq("old_slug", slug)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!slug,
+  });
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ["article", slug],
@@ -34,10 +50,18 @@ const Article = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!slug,
+    enabled: !!slug && !redirect,
   });
 
-  if (isLoading) {
+  // Track article view (with debounce)
+  useArticleView(article?.id);
+
+  // Handle redirect
+  if (redirect) {
+    return <Navigate to={`/news/${redirect.new_slug}`} replace />;
+  }
+
+  if (isLoading || isRedirectLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -121,13 +145,12 @@ const Article = () => {
             <article className="min-w-0">
               {/* Featured Image - with aspect-ratio for CLS prevention, eager loading for LCP */}
               {article.featured_image && (
-                <div className="aspect-video rounded-xl overflow-hidden mb-8 bg-secondary">
-                  <img
+                <div className="rounded-xl overflow-hidden mb-8">
+                  <OptimizedImage
                     src={article.featured_image}
                     alt={article.title}
-                    className="w-full h-full object-cover"
-                    loading="eager"
-                    fetchPriority="high"
+                    aspectRatio="video"
+                    priority={true}
                   />
                 </div>
               )}
@@ -191,10 +214,11 @@ const Article = () => {
                 />
               </div>
 
-              {/* Related Articles - Category-based internal linking */}
+              {/* Related Articles - Semantic similarity when available */}
               <RelatedArticles
                 currentSlug={slug}
                 category={article.category}
+                articleId={article.id}
               />
 
               {/* Article Footer */}

@@ -169,13 +169,30 @@ const ArticleEditor = () => {
         return updatedArticle;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       queryClient.invalidateQueries({ queryKey: ["article", id] });
       toast({
         title: isNew ? "נשמר בהצלחה" : "עודכן בהצלחה",
         description: isNew ? "המאמר נוצר בהצלחה" : "השינויים נשמרו",
       });
+      
+      // Generate embedding for semantic search (in background)
+      try {
+        await supabase.functions.invoke("generate-embedding", {
+          body: {
+            article_id: data.id,
+            title: data.title,
+            content: data.content,
+            excerpt: data.excerpt,
+          },
+        });
+        console.log("Embedding generation triggered for article", data.id);
+      } catch (embeddingError) {
+        console.log("Embedding generation skipped:", embeddingError);
+        // Don't show error - embedding is optional enhancement
+      }
+      
       if (isNew) {
         navigate(`/admin/articles/${data.id}`);
       }

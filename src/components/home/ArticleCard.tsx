@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import OptimizedImage from "@/components/common/OptimizedImage";
 
 interface ArticleCardProps {
   id: string;
@@ -32,11 +33,11 @@ const ArticleCard = ({
         className="group flex gap-4 bg-card rounded-xl p-4 shadow-soft hover:shadow-medium transition-all duration-300"
       >
         <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
-          <img
+          <OptimizedImage
             src={featured_image || placeholderImage}
             alt={title}
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            aspectRatio="video"
+            className="group-hover:scale-105 transition-transform duration-300"
           />
         </div>
         <div className="flex-1 flex flex-col justify-center min-w-0">
@@ -71,14 +72,12 @@ const ArticleCard = ({
       to={`/news/${slug}`}
       className="group block bg-card rounded-xl overflow-hidden shadow-soft hover:shadow-medium transition-all duration-300"
     >
-      <div className="aspect-[16/10] overflow-hidden">
-        <img
-          src={featured_image || placeholderImage}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-      </div>
+      <OptimizedImage
+        src={featured_image || placeholderImage}
+        alt={title}
+        aspectRatio="video"
+        className="group-hover:scale-105 transition-transform duration-300"
+      />
       <div className="p-5">
         {category && (
           <span className="inline-block text-xs font-semibold text-accent mb-2">

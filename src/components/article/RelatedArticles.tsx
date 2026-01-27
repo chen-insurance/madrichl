@@ -2,17 +2,51 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import OptimizedImage from "@/components/common/OptimizedImage";
 
 interface RelatedArticlesProps {
   currentSlug?: string;
   category?: string | null;
+  articleId?: string;
 }
 
-const RelatedArticles = ({ currentSlug, category }: RelatedArticlesProps) => {
+const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesProps) => {
   const { data: relatedArticles } = useQuery({
-    queryKey: ["related-articles", currentSlug, category],
+    queryKey: ["related-articles", currentSlug, category, articleId],
     queryFn: async () => {
-      // First try to get articles from the same category
+      // First, try semantic similarity if article has embedding
+      if (articleId) {
+        try {
+          // Get current article's embedding
+          const { data: currentArticle } = await supabase
+            .from("articles")
+            .select("embedding")
+            .eq("id", articleId)
+            .maybeSingle();
+
+          if (currentArticle?.embedding) {
+            // Use vector similarity search
+            const { data: semanticResults, error: semanticError } = await supabase.rpc(
+              "match_articles",
+              {
+                query_embedding: currentArticle.embedding,
+                match_threshold: 0.5,
+                match_count: 3,
+                exclude_slug: currentSlug || null,
+              }
+            );
+
+            if (!semanticError && semanticResults && semanticResults.length >= 3) {
+              console.log("Using semantic similarity for related articles");
+              return semanticResults;
+            }
+          }
+        } catch (err) {
+          console.log("Semantic search not available, falling back to category-based");
+        }
+      }
+
+      // Fallback: Category-based matching
       let query = supabase
         .from("articles")
         .select("id, title, slug, published_at, featured_image, excerpt, category")
@@ -39,8 +73,8 @@ const RelatedArticles = ({ currentSlug, category }: RelatedArticlesProps) => {
       const existingIds = categoryArticles?.map((a) => a.id) || [];
       const needed = 3 - (categoryArticles?.length || 0);
 
-      if (needed > 0) {
-        const { data: otherArticles, error: otherError } = await supabase
+      if (needed > 0 && existingIds.length > 0) {
+        const { data: otherArticles } = await supabase
           .from("articles")
           .select("id, title, slug, published_at, featured_image, excerpt, category")
           .eq("is_published", true)
@@ -48,8 +82,6 @@ const RelatedArticles = ({ currentSlug, category }: RelatedArticlesProps) => {
           .not("id", "in", `(${existingIds.join(",")})`)
           .order("published_at", { ascending: false })
           .limit(needed);
-
-        if (otherError) throw otherError;
 
         return [...(categoryArticles || []), ...(otherArticles || [])];
       }
@@ -74,14 +106,12 @@ const RelatedArticles = ({ currentSlug, category }: RelatedArticlesProps) => {
             className="group bg-card rounded-xl overflow-hidden shadow-soft hover:shadow-md transition-shadow border border-border"
           >
             {article.featured_image && (
-              <div className="aspect-video overflow-hidden bg-secondary">
-                <img
-                  src={article.featured_image}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
+              <OptimizedImage
+                src={article.featured_image}
+                alt={article.title}
+                aspectRatio="video"
+                className="group-hover:scale-105 transition-transform duration-300"
+              />
             )}
             <div className="p-4">
               {article.category && (
