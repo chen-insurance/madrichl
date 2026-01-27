@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import ArticlesList from "./pages/admin/ArticlesList";
 import ArticleEditor from "./pages/admin/ArticleEditor";
 import Settings from "./pages/admin/Settings";
+import FinancialTracks from "./pages/admin/FinancialTracks";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/admin" element={<ArticlesList />} />
               <Route path="/admin/articles/:id" element={<ArticleEditor />} />
               <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/tracks" element={<FinancialTracks />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
