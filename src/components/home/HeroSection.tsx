@@ -121,17 +121,6 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
                 </div>
               </Link>
             ))}
-
-            {/* Newsletter CTA Card */}
-            <div className="bg-gradient-navy rounded-xl p-5 text-cream animate-fade-in" style={{ animationDelay: "200ms" }}>
-              <h3 className="font-display font-bold text-lg mb-2">הישארו מעודכנים</h3>
-              <p className="text-cream/70 text-sm mb-4">
-                קבלו את החדשות החשובות ישירות למייל
-              </p>
-              <Button variant="gold" size="sm" className="w-full">
-                הרשמה לניוזלטר
-              </Button>
-            </div>
           </div>
         </div>
       </div>
