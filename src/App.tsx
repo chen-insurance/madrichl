@@ -20,6 +20,7 @@ import Categories from "./pages/admin/Categories";
 import Dashboard from "./pages/admin/Dashboard";
 import Media from "./pages/admin/Media";
 import HomepageSettings from "./pages/admin/HomepageSettings";
+import Leads from "./pages/admin/Leads";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/admin/categories" element={<Categories />} />
               <Route path="/admin/homepage" element={<HomepageSettings />} />
               <Route path="/admin/tracks" element={<FinancialTracks />} />
+              <Route path="/admin/leads" element={<Leads />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
