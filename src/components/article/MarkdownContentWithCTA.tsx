@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import QuizWidget from "@/components/quiz/QuizWidget";
+import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
 
 interface CTABlock {
   id: string;
@@ -65,6 +66,10 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
     const parts = content.split(regex);
 
     return parts.map((part) => {
+      // Check for insurance calculator shortcode
+      if (part === "{{insurance_calculator}}") {
+        return { type: "insurance_calculator" as const };
+      }
       const quizMatch = part.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
       if (quizMatch) {
         return { type: "quiz" as const, quizId: quizMatch[1] };
@@ -93,6 +98,14 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
   return (
     <>
       {contentParts.map((part, index) => {
+        if (part.type === "insurance_calculator") {
+          return (
+            <div key={`calc-${index}`} className="my-8 not-prose">
+              <LifeInsuranceCalc />
+            </div>
+          );
+        }
+
         if (part.type === "quiz" && part.quizId) {
           return (
             <div key={`quiz-${index}`} className="my-8 not-prose">

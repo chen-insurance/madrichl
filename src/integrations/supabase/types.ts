@@ -333,6 +333,36 @@ export type Database = {
         }
         Relationships: []
       }
+      life_insurance_rates: {
+        Row: {
+          age: number
+          created_at: string
+          price_per_100k_female_nonsmoker: number
+          price_per_100k_female_smoker: number
+          price_per_100k_male_nonsmoker: number
+          price_per_100k_male_smoker: number
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          created_at?: string
+          price_per_100k_female_nonsmoker?: number
+          price_per_100k_female_smoker?: number
+          price_per_100k_male_nonsmoker?: number
+          price_per_100k_male_smoker?: number
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          price_per_100k_female_nonsmoker?: number
+          price_per_100k_female_smoker?: number
+          price_per_100k_male_nonsmoker?: number
+          price_per_100k_male_smoker?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       menus: {
         Row: {
           created_at: string

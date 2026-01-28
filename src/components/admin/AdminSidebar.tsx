@@ -85,6 +85,11 @@ const AdminSidebar = () => {
       icon: ListChecks,
     },
     {
+      label: "נתוני מחשבונים",
+      href: "/admin/calculators",
+      icon: BarChart3,
+    },
+    {
       label: "לידים",
       href: "/admin/leads",
       icon: UserCheck,
