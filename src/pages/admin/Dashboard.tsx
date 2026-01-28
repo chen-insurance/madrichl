@@ -6,6 +6,7 @@ import { FileText, Eye, Users, TrendingUp, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import ContentPerformanceWidget from "@/components/admin/ContentPerformanceWidget";
+import RecentLeadsWidget from "@/components/admin/RecentLeadsWidget";
 
 const Dashboard = () => {
   const { data: stats, isLoading } = useQuery({
@@ -33,19 +34,6 @@ const Dashboard = () => {
       const { data, error } = await supabase
         .from("articles")
         .select("id, title, is_published, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: recentLeads } = useQuery({
-    queryKey: ["admin-recent-leads"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("leads")
-        .select("id, name, email, created_at")
         .order("created_at", { ascending: false })
         .limit(5);
       if (error) throw error;
@@ -165,34 +153,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Leads */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">לידים אחרונים</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recentLeads && recentLeads.length > 0 ? (
-                <div className="space-y-4">
-                  {recentLeads.map((lead) => (
-                    <div
-                      key={lead.id}
-                      className="flex items-center justify-between py-2 border-b border-border last:border-0"
-                    >
-                      <div>
-                        <p className="font-medium text-foreground">{lead.name}</p>
-                        <p className="text-sm text-muted-foreground">{lead.email}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(lead.created_at), "d בMMM", { locale: he })}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-              <p className="text-muted-foreground text-center py-4">אין לידים עדיין</p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Recent Leads Widget */}
+          <RecentLeadsWidget />
         </div>
 
         {/* Content Performance Widget */}
