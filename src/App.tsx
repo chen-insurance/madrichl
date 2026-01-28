@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Article from "./pages/Article";
 import Contact from "./pages/Contact";
 import Preview from "./pages/Preview";
+import CategoryArchive from "./pages/CategoryArchive";
 import ArticlesList from "./pages/admin/ArticlesList";
 import ArticleEditor from "./pages/admin/ArticleEditor";
 import Settings from "./pages/admin/Settings";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/news/:slug" element={<Article />} />
               <Route path="/preview" element={<Preview />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/category/:slug" element={<CategoryArchive />} />
               {/* Admin Routes */}
               <Route path="/admin" element={<ArticlesList />} />
               <Route path="/admin/dashboard" element={<Dashboard />} />
