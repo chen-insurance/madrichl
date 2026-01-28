@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import parse, { domToReact, HTMLReactParserOptions, Element, DOMNode } from "html-react-parser";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -22,22 +23,58 @@ interface MarkdownContentWithCTAProps {
   content: string;
 }
 
+// Clean content: convert span placeholders back to shortcodes and normalize
+const normalizeContent = (content: string): string => {
+  if (!content) return "";
+  
+  // Convert <span data-widget="{{shortcode}}" ...>text</span> back to {{shortcode}}
+  return content.replace(
+    /<span[^>]*data-widget="(\{\{[^"]+\}\})"[^>]*>[^<]*<\/span>/g,
+    "$1"
+  );
+};
+
+// Check if content is HTML or Markdown
+const isHtmlContent = (content: string): boolean => {
+  return /<[a-z][\s\S]*>/i.test(content);
+};
+
 const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
-  // Find all CTA shortcodes
+  // Normalize content first (convert span placeholders to shortcodes)
+  const normalizedContent = useMemo(() => normalizeContent(content), [content]);
+  
+  // Detect if content is HTML or Markdown
+  const contentIsHtml = useMemo(() => isHtmlContent(normalizedContent), [normalizedContent]);
+
+  // Find all CTA shortcodes (excluding quiz_ and insurance_calculator)
   const ctaShortcodes = useMemo(() => {
     const regex = /\{\{([a-zA-Z0-9_-]+)\}\}/g;
-    const matches = content.match(regex) || [];
+    const matches = normalizedContent.match(regex) || [];
     return matches
       .map((m) => m.replace(/\{\{|\}\}/g, ""))
-      .filter((s) => !s.startsWith("quiz_"));
-  }, [content]);
+      .filter((s) => !s.startsWith("quiz_") && s !== "insurance_calculator");
+  }, [normalizedContent]);
 
-  // Find all quiz shortcodes
-  const quizIds = useMemo(() => {
-    const regex = /\{\{quiz_([a-zA-Z0-9-]+)\}\}/g;
-    const matches = [...content.matchAll(regex)];
-    return matches.map((m) => m[1]);
-  }, [content]);
+  // Split content by all shortcodes (for Markdown rendering path)
+  const contentParts = useMemo(() => {
+    const regex = /(\{\{[a-zA-Z0-9_-]+\}\})/g;
+    const parts = normalizedContent.split(regex);
+
+    return parts.map((part) => {
+      if (part === "{{insurance_calculator}}") {
+        return { type: "insurance_calculator" as const };
+      }
+      const quizMatch = part.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
+      if (quizMatch) {
+        return { type: "quiz" as const, quizId: quizMatch[1] };
+      }
+      const ctaMatch = part.match(/\{\{([a-zA-Z0-9_-]+)\}\}/);
+      if (ctaMatch) {
+        return { type: "cta" as const, shortcode: ctaMatch[1] };
+      }
+      return { type: "markdown" as const, content: part };
+    });
+  }, [normalizedContent]);
 
   // Fetch CTA blocks
   const { data: ctaBlocks } = useQuery({
@@ -60,28 +97,137 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
     [ctaBlocks]
   );
 
-  // Split content by all shortcodes
-  const contentParts = useMemo(() => {
-    const regex = /(\{\{[a-zA-Z0-9_-]+\}\})/g;
-    const parts = content.split(regex);
+  // Render a CTA block
+  const renderCTABlock = (block: CTABlock, key: string) => (
+    <div
+      key={key}
+      className="my-8 rounded-xl p-6 text-center shadow-lg not-prose"
+      style={{ backgroundColor: block.background_color, color: "white" }}
+    >
+      {block.headline && <h3 className="text-xl font-bold mb-2">{block.headline}</h3>}
+      {block.description && <p className="text-sm opacity-90 mb-4">{block.description}</p>}
+      {block.button_text && block.button_link && (
+        <Link
+          to={block.button_link}
+          className="inline-block bg-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
+          style={{ color: block.background_color }}
+        >
+          {block.button_text}
+        </Link>
+      )}
+    </div>
+  );
 
-    return parts.map((part) => {
-      // Check for insurance calculator shortcode
+  // Replace shortcode text with actual React component
+  const replaceShortcodeInText = (text: string, keyPrefix: string): React.ReactNode[] => {
+    const regex = /(\{\{[a-zA-Z0-9_-]+\}\})/g;
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => {
+      const key = `${keyPrefix}-${index}`;
+      
       if (part === "{{insurance_calculator}}") {
-        return { type: "insurance_calculator" as const };
+        return (
+          <div key={key} className="my-8 not-prose">
+            <LifeInsuranceCalc />
+          </div>
+        );
       }
+      
       const quizMatch = part.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
       if (quizMatch) {
-        return { type: "quiz" as const, quizId: quizMatch[1] };
+        return (
+          <div key={key} className="my-8 not-prose">
+            <QuizWidget quizId={quizMatch[1]} />
+          </div>
+        );
       }
+      
       const ctaMatch = part.match(/\{\{([a-zA-Z0-9_-]+)\}\}/);
       if (ctaMatch) {
-        return { type: "cta" as const, shortcode: ctaMatch[1] };
+        const block = blocksMap.get(ctaMatch[1]);
+        if (block) {
+          return renderCTABlock(block, key);
+        }
+        return null;
       }
-      return { type: "markdown" as const, content: part };
-    });
-  }, [content]);
+      
+      return part || null;
+    }).filter(Boolean);
+  };
 
+  // HTML parser options for replacing widgets
+  const parserOptions: HTMLReactParserOptions = {
+    replace: (domNode) => {
+      // Handle text nodes that might contain shortcodes
+      if (domNode.type === "text" && (domNode as any).data) {
+        const text = (domNode as any).data as string;
+        if (text.includes("{{")) {
+          const replaced = replaceShortcodeInText(text, `txt-${Math.random()}`);
+          if (replaced.length === 1 && typeof replaced[0] === "string") {
+            return undefined;
+          }
+          return <>{replaced}</>;
+        }
+      }
+      
+      // Handle span elements with data-widget attribute (legacy support)
+      if (domNode instanceof Element && domNode.name === "span") {
+        const dataWidget = domNode.attribs?.["data-widget"];
+        if (dataWidget) {
+          if (dataWidget === "{{insurance_calculator}}") {
+            return (
+              <div className="my-8 not-prose">
+                <LifeInsuranceCalc />
+              </div>
+            );
+          }
+          
+          const quizMatch = dataWidget.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
+          if (quizMatch) {
+            return (
+              <div className="my-8 not-prose">
+                <QuizWidget quizId={quizMatch[1]} />
+              </div>
+            );
+          }
+          
+          const ctaMatch = dataWidget.match(/\{\{([a-zA-Z0-9_-]+)\}\}/);
+          if (ctaMatch) {
+            const block = blocksMap.get(ctaMatch[1]);
+            if (block) {
+              return renderCTABlock(block, `cta-${ctaMatch[1]}`);
+            }
+          }
+        }
+      }
+      
+      // Handle h2 and h3 for TOC anchors
+      if (domNode instanceof Element && (domNode.name === "h2" || domNode.name === "h3")) {
+        const children = domNode.children;
+        const text = children
+          .map((child: DOMNode) => ((child as any).data || ""))
+          .join("");
+        const id = text.replace(/[^\w\u0590-\u05FF\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
+        
+        const Tag = domNode.name;
+        return (
+          <Tag id={id} className="scroll-mt-24">
+            {domToReact(children as DOMNode[], parserOptions)}
+          </Tag>
+        );
+      }
+      
+      return undefined;
+    },
+  };
+
+  // For HTML content, use html-react-parser
+  if (contentIsHtml) {
+    return <>{parse(normalizedContent, parserOptions)}</>;
+  }
+
+  // For Markdown content, use ReactMarkdown with shortcode splitting
   const components: Components = {
     h2: ({ children }) => {
       const text = String(children);
@@ -117,25 +263,7 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         if (part.type === "cta" && part.shortcode) {
           const block = blocksMap.get(part.shortcode);
           if (!block) return null;
-          return (
-            <div
-              key={`cta-${index}`}
-              className="my-8 rounded-xl p-6 text-center shadow-lg not-prose"
-              style={{ backgroundColor: block.background_color, color: "white" }}
-            >
-              {block.headline && <h3 className="text-xl font-bold mb-2">{block.headline}</h3>}
-              {block.description && <p className="text-sm opacity-90 mb-4">{block.description}</p>}
-              {block.button_text && block.button_link && (
-                <Link
-                  to={block.button_link}
-                  className="inline-block bg-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-                  style={{ color: block.background_color }}
-                >
-                  {block.button_text}
-                </Link>
-              )}
-            </div>
-          );
+          return renderCTABlock(block, `cta-${index}`);
         }
 
         if (part.type === "markdown" && part.content?.trim()) {
