@@ -12,13 +12,21 @@ import InArticleCTA from "@/components/article/InArticleCTA";
 import AuthorBox from "@/components/article/AuthorBox";
 import RelatedArticles from "@/components/article/RelatedArticles";
 import MarkdownContent from "@/components/article/MarkdownContent";
+import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import LeadForm from "@/components/LeadForm";
+import FAQSection from "@/components/article/FAQSection";
+import FAQSchema from "@/components/article/FAQSchema";
 import { format } from "date-fns";
 import { Loader2, Calendar } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -101,6 +109,11 @@ const Article = () => {
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
+  // Parse FAQ items from database
+  const faqItems: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
+    ? (article.faq_items as unknown as FAQItem[])
+    : [];
+
   // Breadcrumb data for UI and Schema
   const categoryLabel = article.category || "חדשות";
   const breadcrumbItems = [
@@ -137,6 +150,7 @@ const Article = () => {
       {/* Structured Data */}
       <ArticleSchema article={article} />
       <BreadcrumbSchema items={breadcrumbSchemaItems} />
+      {faqItems.length > 0 && <FAQSchema items={faqItems} />}
 
       <Header />
 
@@ -193,14 +207,14 @@ const Article = () => {
                 </div>
               </header>
 
-              {/* Article Content with custom heading IDs for TOC */}
+              {/* Article Content with CTA blocks and custom heading IDs for TOC */}
               <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-li:text-foreground">
-                {firstPart && <MarkdownContent content={firstPart} />}
+                {firstPart && <MarkdownContentWithCTA content={firstPart} />}
 
                 {/* In-Article CTA after 2nd paragraph */}
                 {contentParagraphs.length > 2 && <InArticleCTA />}
 
-                {secondPart && <MarkdownContent content={secondPart} />}
+                {secondPart && <MarkdownContentWithCTA content={secondPart} />}
               </div>
 
               {/* Author Box - E-E-A-T */}
@@ -208,6 +222,9 @@ const Article = () => {
                 authorName={article.author_name}
                 authorBio={article.author_bio}
               />
+
+              {/* FAQ Section */}
+              {faqItems.length > 0 && <FAQSection items={faqItems} />}
 
               {/* Bottom Lead Form (Mobile & Desktop) */}
               <div className="mt-12">

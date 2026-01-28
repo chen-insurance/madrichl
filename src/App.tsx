@@ -27,6 +27,7 @@ import PagesList from "./pages/admin/PagesList";
 import PageEditor from "./pages/admin/PageEditor";
 import Authors from "./pages/admin/Authors";
 import Redirects from "./pages/admin/Redirects";
+import CTABlocks from "./pages/admin/CTABlocks";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/admin/pages/:id" element={<PageEditor />} />
               <Route path="/admin/authors" element={<Authors />} />
               <Route path="/admin/redirects" element={<Redirects />} />
+              <Route path="/admin/cta-blocks" element={<CTABlocks />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />
               {/* Static pages - MUST be before catch-all */}

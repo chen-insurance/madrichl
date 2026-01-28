@@ -22,6 +22,7 @@ import {
   AlignLeft,
   Undo,
   Redo,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -29,6 +30,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import AIAssistModal from "./AIAssistModal";
 
 interface RichTextEditorProps {
   content: string;
@@ -38,6 +40,7 @@ interface RichTextEditorProps {
 const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [showAIAssist, setShowAIAssist] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -99,6 +102,10 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
       editor.chain().focus().setImage({ src: imageUrl }).run();
       setImageUrl("");
     }
+  };
+
+  const handleAIInsert = (text: string) => {
+    editor.chain().focus().insertContent(text).run();
   };
 
   const ToolbarButton = ({
@@ -277,6 +284,21 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
           </PopoverContent>
         </Popover>
 
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* AI Assist Button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowAIAssist(true)}
+          className="h-8 px-3 gap-1 bg-gradient-to-r from-accent/10 to-accent/5 border-accent/30 hover:border-accent/50"
+          title="עוזר AI"
+        >
+          <Sparkles className="w-4 h-4 text-accent" />
+          <span className="text-xs font-medium">AI</span>
+        </Button>
+
         <div className="flex-1" />
 
         {/* Undo/Redo */}
@@ -296,6 +318,13 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
 
       {/* Editor Content */}
       <EditorContent editor={editor} />
+
+      {/* AI Assist Modal */}
+      <AIAssistModal
+        open={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        onInsert={handleAIInsert}
+      />
     </div>
   );
 };

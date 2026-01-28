@@ -21,6 +21,7 @@ import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check } fro
 import { z } from "zod";
 import SEOScoreCard from "@/components/admin/SEOScoreCard";
 import { MediaLibraryModal } from "@/components/admin/MediaLibrary";
+import FAQBuilder, { FAQItem } from "@/components/admin/FAQBuilder";
 
 const articleSchema = z.object({
   title: z.string().trim().min(1, "כותרת נדרשת"),
@@ -79,6 +80,7 @@ const ArticleEditor = () => {
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [previewToken, setPreviewToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
 
   // Fetch existing article
   const { data: article, isLoading } = useQuery({
@@ -112,6 +114,11 @@ const ArticleEditor = () => {
       });
       setIsPublished(article.is_published);
       setPreviewToken(article.preview_token || null);
+      // Load FAQ items from database
+      const storedFaq = article.faq_items;
+      if (storedFaq && Array.isArray(storedFaq)) {
+        setFaqItems(storedFaq as unknown as FAQItem[]);
+      }
     }
   }, [article]);
 
@@ -136,50 +143,54 @@ const ArticleEditor = () => {
 
   // Save mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: ArticleFormData & { is_published: boolean }) => {
+    mutationFn: async (data: ArticleFormData & { is_published: boolean; faq_items: FAQItem[] }) => {
       // Find category name for the legacy category field
       const selectedCategory = categories?.find(c => c.id === data.category_id);
       
       if (isNew) {
+        const insertData = {
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt || null,
+          content: data.content || null,
+          featured_image: data.featured_image || null,
+          seo_title: data.seo_title || null,
+          seo_description: data.seo_description || null,
+          author_name: data.author_name || null,
+          author_bio: data.author_bio || null,
+          category_id: data.category_id || null,
+          category: selectedCategory?.name || null,
+          is_published: data.is_published,
+          published_at: data.is_published ? new Date().toISOString() : null,
+          faq_items: JSON.parse(JSON.stringify(data.faq_items)),
+        };
         const { data: newArticle, error } = await supabase
           .from("articles")
-          .insert({
-            title: data.title,
-            slug: data.slug,
-            excerpt: data.excerpt || null,
-            content: data.content || null,
-            featured_image: data.featured_image || null,
-            seo_title: data.seo_title || null,
-            seo_description: data.seo_description || null,
-            author_name: data.author_name || null,
-            author_bio: data.author_bio || null,
-            category_id: data.category_id || null,
-            category: selectedCategory?.name || null,
-            is_published: data.is_published,
-            published_at: data.is_published ? new Date().toISOString() : null,
-          })
+          .insert(insertData)
           .select()
           .single();
         if (error) throw error;
         return newArticle;
       } else {
+        const updateData = {
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt || null,
+          content: data.content || null,
+          featured_image: data.featured_image || null,
+          seo_title: data.seo_title || null,
+          seo_description: data.seo_description || null,
+          author_name: data.author_name || null,
+          author_bio: data.author_bio || null,
+          category_id: data.category_id || null,
+          category: selectedCategory?.name || null,
+          is_published: data.is_published,
+          published_at: data.is_published ? new Date().toISOString() : null,
+          faq_items: JSON.parse(JSON.stringify(data.faq_items)),
+        };
         const { data: updatedArticle, error } = await supabase
           .from("articles")
-          .update({
-            title: data.title,
-            slug: data.slug,
-            excerpt: data.excerpt || null,
-            content: data.content || null,
-            featured_image: data.featured_image || null,
-            seo_title: data.seo_title || null,
-            seo_description: data.seo_description || null,
-            author_name: data.author_name || null,
-            author_bio: data.author_bio || null,
-            category_id: data.category_id || null,
-            category: selectedCategory?.name || null,
-            is_published: data.is_published,
-            published_at: data.is_published ? new Date().toISOString() : null,
-          })
+          .update(updateData)
           .eq("id", id)
           .select()
           .single();
@@ -236,12 +247,12 @@ const ArticleEditor = () => {
     }
 
     const shouldPublish = publish ? true : isPublished;
-    saveMutation.mutate({ ...validation.data, is_published: shouldPublish });
+    saveMutation.mutate({ ...validation.data, is_published: shouldPublish, faq_items: faqItems });
     if (publish) setIsPublished(true);
   };
 
   const handleUnpublish = () => {
-    saveMutation.mutate({ ...formData, is_published: false });
+    saveMutation.mutate({ ...formData, is_published: false, faq_items: faqItems });
     setIsPublished(false);
   };
 
@@ -548,6 +559,9 @@ const ArticleEditor = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* FAQ Builder */}
+          <FAQBuilder items={faqItems} onChange={setFaqItems} />
 
           {/* SEO Score Card */}
           <SEOScoreCard
