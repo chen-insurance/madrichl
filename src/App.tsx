@@ -17,6 +17,7 @@ import FinancialTracks from "./pages/admin/FinancialTracks";
 import Categories from "./pages/admin/Categories";
 import Dashboard from "./pages/admin/Dashboard";
 import Media from "./pages/admin/Media";
+import HomepageSettings from "./pages/admin/HomepageSettings";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/articles/:id" element={<ArticleEditor />} />
               <Route path="/admin/categories" element={<Categories />} />
+              <Route path="/admin/homepage" element={<HomepageSettings />} />
               <Route path="/admin/tracks" element={<FinancialTracks />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />

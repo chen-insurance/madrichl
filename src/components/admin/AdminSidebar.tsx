@@ -45,6 +45,11 @@ const AdminSidebar = () => {
       ],
     },
     {
+      label: "עמוד הבית",
+      href: "/admin/homepage",
+      icon: Home,
+    },
+    {
       label: "מסלולי השקעה",
       href: "/admin/tracks",
       icon: BarChart3,
