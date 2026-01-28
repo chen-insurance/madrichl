@@ -81,6 +81,7 @@ export type Database = {
       articles: {
         Row: {
           author_bio: string | null
+          author_id: string | null
           author_name: string | null
           category: string | null
           category_id: string | null
@@ -102,6 +103,7 @@ export type Database = {
         }
         Insert: {
           author_bio?: string | null
+          author_id?: string | null
           author_name?: string | null
           category?: string | null
           category_id?: string | null
@@ -123,6 +125,7 @@ export type Database = {
         }
         Update: {
           author_bio?: string | null
+          author_id?: string | null
           author_name?: string | null
           category?: string | null
           category_id?: string | null
@@ -144,6 +147,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "articles_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
@@ -151,6 +161,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      authors: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          id: string
+          name: string
+          role: string | null
+          slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       categories: {
         Row: {
@@ -245,22 +288,85 @@ export type Database = {
         }
         Relationships: []
       }
+      menus: {
+        Row: {
+          created_at: string
+          id: string
+          items_json: Json
+          location: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items_json?: Json
+          location: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items_json?: Json
+          location?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       redirects: {
         Row: {
           created_at: string
           id: string
+          is_active: boolean
           new_slug: string
           old_slug: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_active?: boolean
           new_slug: string
           old_slug: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_active?: boolean
           new_slug?: string
           old_slug?: string
         }

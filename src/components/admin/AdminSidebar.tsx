@@ -15,6 +15,10 @@ import {
   ChevronDown,
   ChevronLeft,
   UserCheck,
+  Menu,
+  FileStack,
+  Users,
+  Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,9 +50,22 @@ const AdminSidebar = () => {
       ],
     },
     {
+      label: "עמודים",
+      icon: FileStack,
+      children: [
+        { label: "כל העמודים", href: "/admin/pages" },
+        { label: "עמוד חדש", href: "/admin/pages/new" },
+      ],
+    },
+    {
       label: "עמוד הבית",
       href: "/admin/homepage",
       icon: Home,
+    },
+    {
+      label: "תפריטים",
+      href: "/admin/menus",
+      icon: Menu,
     },
     {
       label: "מסלולי השקעה",
@@ -67,8 +84,12 @@ const AdminSidebar = () => {
     },
     {
       label: "הגדרות",
-      href: "/admin/settings",
       icon: Settings,
+      children: [
+        { label: "כללי", href: "/admin/settings" },
+        { label: "כותבים", href: "/admin/authors" },
+        { label: "הפניות (301)", href: "/admin/redirects" },
+      ],
     },
   ];
 
