@@ -30,6 +30,7 @@ import Authors from "./pages/admin/Authors";
 import Redirects from "./pages/admin/Redirects";
 import CTABlocks from "./pages/admin/CTABlocks";
 import QuizBuilder from "./pages/admin/QuizBuilder";
+import CalculatorsData from "./pages/admin/CalculatorsData";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 
 const queryClient = new QueryClient();
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/admin/redirects" element={<Redirects />} />
               <Route path="/admin/cta-blocks" element={<CTABlocks />} />
               <Route path="/admin/quizzes" element={<QuizBuilder />} />
+              <Route path="/admin/calculators" element={<CalculatorsData />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />
               {/* Static pages - MUST be before catch-all */}
