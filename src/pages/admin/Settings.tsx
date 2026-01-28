@@ -6,13 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Code, Webhook } from "lucide-react";
+import { Loader2, Save, Code, Webhook, Megaphone } from "lucide-react";
 
 const Settings = () => {
   const [headScripts, setHeadScripts] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [showAnnouncementBar, setShowAnnouncementBar] = useState(false);
+  const [announcementText, setAnnouncementText] = useState("");
+  const [announcementLink, setAnnouncementLink] = useState("");
+  const [announcementColor, setAnnouncementColor] = useState("#f59e0b");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -30,15 +35,13 @@ const Settings = () => {
 
   useEffect(() => {
     if (settings) {
-      const headScriptsSetting = settings.find((s) => s.key === "head_scripts");
-      const webhookUrlSetting = settings.find((s) => s.key === "webhook_url");
-      
-      if (headScriptsSetting) {
-        setHeadScripts(headScriptsSetting.value || "");
-      }
-      if (webhookUrlSetting) {
-        setWebhookUrl(webhookUrlSetting.value || "");
-      }
+      const getValue = (key: string) => settings.find((s) => s.key === key)?.value || "";
+      setHeadScripts(getValue("head_scripts"));
+      setWebhookUrl(getValue("webhook_url"));
+      setShowAnnouncementBar(getValue("show_announcement_bar") === "true");
+      setAnnouncementText(getValue("announcement_text"));
+      setAnnouncementLink(getValue("announcement_link"));
+      setAnnouncementColor(getValue("announcement_color") || "#f59e0b");
     }
   }, [settings]);
 
@@ -98,6 +101,31 @@ const Settings = () => {
     },
   });
 
+  // Save announcement settings mutation
+  const saveAnnouncementMutation = useMutation({
+    mutationFn: async () => {
+      await saveSetting("show_announcement_bar", showAnnouncementBar.toString());
+      await saveSetting("announcement_text", announcementText);
+      await saveSetting("announcement_link", announcementLink);
+      await saveSetting("announcement_color", announcementColor);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["public-site-settings"] });
+      toast({
+        title: "נשמר בהצלחה",
+        description: "הגדרות פס ההודעות עודכנו",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לשמור את ההגדרות",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <AdminLayout>
       <div className="p-6 md:p-8 max-w-4xl">
@@ -117,6 +145,95 @@ const Settings = () => {
           </div>
         ) : (
           <div className="grid gap-6">
+            {/* Announcement Bar */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <Megaphone className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <CardTitle>פס הודעות (Announcement Bar)</CardTitle>
+                    <CardDescription>
+                      הצג פס הודעות בראש האתר עם מבצע, חדשות או CTA
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="show_announcement">הפעל פס הודעות</Label>
+                  <Switch
+                    id="show_announcement"
+                    checked={showAnnouncementBar}
+                    onCheckedChange={setShowAnnouncementBar}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="announcement_text">טקסט ההודעה</Label>
+                  <Input
+                    id="announcement_text"
+                    value={announcementText}
+                    onChange={(e) => setAnnouncementText(e.target.value)}
+                    placeholder="🔥 מבצע מיוחד! בדיקת ביטוח חינם לזמן מוגבל"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="announcement_link">קישור (אופציונלי)</Label>
+                  <Input
+                    id="announcement_link"
+                    value={announcementLink}
+                    onChange={(e) => setAnnouncementLink(e.target.value)}
+                    placeholder="/contact או https://example.com"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="announcement_color">צבע רקע</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="announcement_color"
+                      type="color"
+                      value={announcementColor}
+                      onChange={(e) => setAnnouncementColor(e.target.value)}
+                      className="w-16 h-10 p-1"
+                    />
+                    <Input
+                      value={announcementColor}
+                      onChange={(e) => setAnnouncementColor(e.target.value)}
+                      placeholder="#f59e0b"
+                      dir="ltr"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                {showAnnouncementBar && announcementText && (
+                  <div
+                    className="p-3 rounded-lg text-center text-white text-sm font-medium"
+                    style={{ backgroundColor: announcementColor }}
+                  >
+                    {announcementText}
+                  </div>
+                )}
+
+                <Button
+                  onClick={() => saveAnnouncementMutation.mutate()}
+                  disabled={saveAnnouncementMutation.isPending}
+                >
+                  {saveAnnouncementMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  שמירה
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Webhook URL */}
             <Card>
               <CardHeader>

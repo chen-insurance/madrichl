@@ -1,28 +1,80 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface MenuItem {
+  id: string;
+  type: string;
+  label: string;
+  url: string;
+}
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = {
-    categories: [
-      { label: "ביטוח חיים", href: "/life-insurance" },
-      { label: "ביטוח בריאות", href: "/health-insurance" },
-      { label: "ביטוח רכב", href: "/car-insurance" },
-      { label: "פנסיה", href: "/pension" },
-      { label: "ביטוח עסקי", href: "/business-insurance" },
-    ],
-    company: [
-      { label: "אודות", href: "/about" },
-      { label: "צור קשר", href: "/contact" },
-      { label: "הצטרפו לצוות", href: "/careers" },
-      { label: "פרסום באתר", href: "/advertise" },
-    ],
-    legal: [
-      { label: "תנאי שימוש", href: "/terms" },
-      { label: "מדיניות פרטיות", href: "/privacy" },
-      { label: "נגישות", href: "/accessibility" },
-    ],
-  };
+  // Fetch footer menus
+  const { data: footerCol1 } = useQuery({
+    queryKey: ["public-menus", "footer_col_1"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menus")
+        .select("items_json")
+        .eq("location", "footer_col_1")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.items_json as unknown as MenuItem[]) || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: footerCol2 } = useQuery({
+    queryKey: ["public-menus", "footer_col_2"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menus")
+        .select("items_json")
+        .eq("location", "footer_col_2")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.items_json as unknown as MenuItem[]) || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: footerCol3 } = useQuery({
+    queryKey: ["public-menus", "footer_col_3"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menus")
+        .select("items_json")
+        .eq("location", "footer_col_3")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.items_json as unknown as MenuItem[]) || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fallback links if no menu configured
+  const defaultCol1 = [
+    { label: "ביטוח חיים", url: "/category/life-insurance" },
+    { label: "ביטוח בריאות", url: "/category/health-insurance" },
+    { label: "פנסיה", url: "/category/pension" },
+  ];
+
+  const defaultCol2 = [
+    { label: "אודות", url: "/about" },
+    { label: "צור קשר", url: "/contact" },
+  ];
+
+  const defaultCol3 = [
+    { label: "תנאי שימוש", url: "/terms" },
+    { label: "מדיניות פרטיות", url: "/privacy" },
+  ];
+
+  const col1Links = footerCol1 && footerCol1.length > 0 ? footerCol1 : defaultCol1;
+  const col2Links = footerCol2 && footerCol2.length > 0 ? footerCol2 : defaultCol2;
+  const col3Links = footerCol3 && footerCol3.length > 0 ? footerCol3 : defaultCol3;
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -46,14 +98,14 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Categories */}
+          {/* Column 1 */}
           <div>
             <h3 className="font-display font-semibold text-lg mb-4">קטגוריות</h3>
             <ul className="space-y-2">
-              {footerLinks.categories.map((link) => (
-                <li key={link.href}>
+              {col1Links.map((link, index) => (
+                <li key={`col1-${index}`}>
                   <Link
-                    to={link.href}
+                    to={link.url}
                     className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
                   >
                     {link.label}
@@ -63,14 +115,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Column 2 */}
           <div>
             <h3 className="font-display font-semibold text-lg mb-4">החברה</h3>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
+              {col2Links.map((link, index) => (
+                <li key={`col2-${index}`}>
                   <Link
-                    to={link.href}
+                    to={link.url}
                     className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
                   >
                     {link.label}
@@ -80,14 +132,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Column 3 */}
           <div>
             <h3 className="font-display font-semibold text-lg mb-4">מידע משפטי</h3>
             <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.href}>
+              {col3Links.map((link, index) => (
+                <li key={`col3-${index}`}>
                   <Link
-                    to={link.href}
+                    to={link.url}
                     className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
                   >
                     {link.label}
