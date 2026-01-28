@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          session_id: string
+          value: number | null
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          session_id: string
+          value?: number | null
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          session_id?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       article_views: {
         Row: {
           article_id: string
@@ -56,6 +91,7 @@ export type Database = {
           featured_image: string | null
           id: string
           is_published: boolean
+          preview_token: string | null
           published_at: string | null
           seo_description: string | null
           seo_title: string | null
@@ -76,6 +112,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           is_published?: boolean
+          preview_token?: string | null
           published_at?: string | null
           seo_description?: string | null
           seo_title?: string | null
@@ -96,6 +133,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           is_published?: boolean
+          preview_token?: string | null
           published_at?: string | null
           seo_description?: string | null
           seo_title?: string | null
@@ -251,6 +289,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_preview_token: { Args: never; Returns: string }
       get_trending_articles: {
         Args: { p_exclude_slug?: string; p_limit?: number }
         Returns: {

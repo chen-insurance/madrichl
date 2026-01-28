@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Eye, Users, TrendingUp, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import ContentPerformanceWidget from "@/components/admin/ContentPerformanceWidget";
 
 const Dashboard = () => {
   const { data: stats, isLoading } = useQuery({
@@ -188,10 +189,15 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-center py-4">אין לידים עדיין</p>
+              <p className="text-muted-foreground text-center py-4">אין לידים עדיין</p>
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Content Performance Widget */}
+        <div className="mt-6">
+          <ContentPerformanceWidget />
         </div>
       </div>
     </AdminLayout>

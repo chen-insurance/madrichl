@@ -1,71 +1,49 @@
-import { useParams, Navigate } from "react-router-dom";
+import { useSearchParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/article/Breadcrumbs";
-import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
-import ArticleSchema from "@/components/article/ArticleSchema";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import InArticleCTA from "@/components/article/InArticleCTA";
 import AuthorBox from "@/components/article/AuthorBox";
-import RelatedArticles from "@/components/article/RelatedArticles";
 import MarkdownContent from "@/components/article/MarkdownContent";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import LeadForm from "@/components/LeadForm";
 import { format } from "date-fns";
-import { Loader2, Calendar } from "lucide-react";
-import { useHeadScripts } from "@/hooks/useHeadScripts";
-import { useArticleView } from "@/hooks/useArticleView";
-import { useContentTracker } from "@/hooks/useContentTracker";
+import { Loader2, Calendar, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const Article = () => {
-  const { slug } = useParams<{ slug: string }>();
-  useHeadScripts();
-
-  // Check for redirect first
-  const { data: redirect, isLoading: isRedirectLoading } = useQuery({
-    queryKey: ["redirect-check", slug],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("redirects")
-        .select("new_slug")
-        .eq("old_slug", slug)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!slug,
-  });
+const Preview = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
   const { data: article, isLoading, error } = useQuery({
-    queryKey: ["article", slug],
+    queryKey: ["preview-article", token],
     queryFn: async () => {
+      if (!token) throw new Error("No preview token provided");
+
       const { data, error } = await supabase
         .from("articles")
         .select("*")
-        .eq("slug", slug)
-        .eq("is_published", true)
+        .eq("preview_token", token)
         .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("Article not found or invalid token");
+      
       return data;
     },
-    enabled: !!slug && !redirect,
+    enabled: !!token,
+    retry: false,
   });
 
-  // Track article view (with debounce)
-  useArticleView(article?.id);
-
-  // Track content engagement (scroll depth, time on page)
-  useContentTracker({ articleId: article?.id || "", enabled: !!article });
-
-  // Handle redirect
-  if (redirect) {
-    return <Navigate to={`/news/${redirect.new_slug}`} replace />;
+  if (!token) {
+    return <Navigate to="/" replace />;
   }
 
-  if (isLoading || isRedirectLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -84,10 +62,10 @@ const Article = () => {
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-              הכתבה לא נמצאה
+              קישור התצוגה המקדימה לא תקף
             </h1>
             <p className="text-muted-foreground">
-              הכתבה שחיפשתם אינה קיימת או שהוסרה
+              הקישור פג תוקף או שהמאמר הוסר
             </p>
           </div>
         </main>
@@ -101,53 +79,38 @@ const Article = () => {
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
-  // Breadcrumb data for UI and Schema
+  // Breadcrumb data for UI
   const categoryLabel = article.category || "חדשות";
   const breadcrumbItems = [
     { label: categoryLabel, href: `/category/${encodeURIComponent(categoryLabel)}` },
     { label: article.title },
   ];
 
-  const breadcrumbSchemaItems = [
-    { name: "ראשי", url: "/" },
-    { name: categoryLabel, url: `/category/${encodeURIComponent(categoryLabel)}` },
-    { name: article.title, url: `/news/${article.slug}` },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>{article.seo_title || article.title} | המדריך לצרכן</title>
-        <meta
-          name="description"
-          content={article.seo_description || article.excerpt || ""}
-        />
-        <meta property="og:title" content={article.seo_title || article.title} />
-        <meta
-          property="og:description"
-          content={article.seo_description || article.excerpt || ""}
-        />
-        {article.featured_image && (
-          <meta property="og:image" content={article.featured_image} />
-        )}
-        <meta property="og:type" content="article" />
-        <link rel="canonical" href={`https://the-guide.co.il/news/${article.slug}`} />
+        <title>תצוגה מקדימה: {article.title} | המדריך לצרכן</title>
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-
-      {/* Structured Data */}
-      <ArticleSchema article={article} />
-      <BreadcrumbSchema items={breadcrumbSchemaItems} />
 
       <Header />
 
       <main className="flex-1 py-8 md:py-12">
         <div className="container mx-auto">
+          {/* Preview Warning Banner */}
+          <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10">
+            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+            <AlertDescription className="text-yellow-600">
+              זוהי תצוגה מקדימה של טיוטה. המאמר עדיין לא פורסם.
+            </AlertDescription>
+          </Alert>
+
           <Breadcrumbs items={breadcrumbItems} />
 
           <div className="grid lg:grid-cols-[1fr_320px] gap-8 lg:gap-12">
             {/* Main Content */}
             <article className="min-w-0">
-              {/* Featured Image - with aspect-ratio for CLS prevention, eager loading for LCP */}
+              {/* Featured Image */}
               {article.featured_image && (
                 <div className="rounded-xl overflow-hidden mb-8">
                   <OptimizedImage
@@ -177,14 +140,12 @@ const Article = () => {
                 )}
 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground pb-6 border-b border-border">
-                  {article.published_at && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        {format(new Date(article.published_at), "dd/MM/yyyy")}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      {format(new Date(article.created_at), "dd/MM/yyyy")}
+                    </span>
+                  </div>
                   {article.author_name && (
                     <span className="text-foreground font-medium">
                       מאת: {article.author_name}
@@ -193,23 +154,22 @@ const Article = () => {
                 </div>
               </header>
 
-              {/* Article Content with custom heading IDs for TOC */}
+              {/* Article Content */}
               <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-li:text-foreground">
                 {firstPart && <MarkdownContent content={firstPart} />}
 
-                {/* In-Article CTA after 2nd paragraph */}
                 {contentParagraphs.length > 2 && <InArticleCTA />}
 
                 {secondPart && <MarkdownContent content={secondPart} />}
               </div>
 
-              {/* Author Box - E-E-A-T */}
+              {/* Author Box */}
               <AuthorBox
                 authorName={article.author_name}
                 authorBio={article.author_bio}
               />
 
-              {/* Bottom Lead Form (Mobile & Desktop) */}
+              {/* Bottom Lead Form */}
               <div className="mt-12">
                 <LeadForm
                   title="בדוק את זכאותך עכשיו"
@@ -217,24 +177,10 @@ const Article = () => {
                   variant="card"
                 />
               </div>
-
-              {/* Related Articles - Semantic similarity when available */}
-              <RelatedArticles
-                currentSlug={slug}
-                category={article.category}
-                articleId={article.id}
-              />
-
-              {/* Article Footer */}
-              <div className="mt-8 pt-8 border-t border-border">
-                <p className="text-sm text-muted-foreground text-center">
-                  המידע במאמר זה נועד למטרות מידע כללי בלבד ואינו מהווה ייעוץ מקצועי.
-                </p>
-              </div>
             </article>
 
             {/* Sidebar */}
-            <ArticleSidebar currentSlug={slug} articleContent={article.content} />
+            <ArticleSidebar currentSlug={article.slug} articleContent={article.content} />
           </div>
         </div>
       </main>
@@ -244,4 +190,4 @@ const Article = () => {
   );
 };
 
-export default Article;
+export default Preview;

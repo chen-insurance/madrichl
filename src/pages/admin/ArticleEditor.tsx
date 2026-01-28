@@ -17,8 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check } from "lucide-react";
 import { z } from "zod";
+import SEOScoreCard from "@/components/admin/SEOScoreCard";
+import { MediaLibraryModal } from "@/components/admin/MediaLibrary";
 
 const articleSchema = z.object({
   title: z.string().trim().min(1, "כותרת נדרשת"),
@@ -74,6 +76,9 @@ const ArticleEditor = () => {
     },
   });
   const [isPublished, setIsPublished] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [previewToken, setPreviewToken] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Fetch existing article
   const { data: article, isLoading } = useQuery({
@@ -106,6 +111,7 @@ const ArticleEditor = () => {
         category_id: article.category_id || "",
       });
       setIsPublished(article.is_published);
+      setPreviewToken(article.preview_token || null);
     }
   }, [article]);
 
@@ -237,6 +243,44 @@ const ArticleEditor = () => {
   const handleUnpublish = () => {
     saveMutation.mutate({ ...formData, is_published: false });
     setIsPublished(false);
+  };
+
+  const handleGeneratePreviewToken = async () => {
+    if (!id || isNew) return;
+    
+    try {
+      // Generate a random token
+      const token = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      const { error } = await supabase
+        .from("articles")
+        .update({ preview_token: token })
+        .eq("id", id);
+      
+      if (error) throw error;
+      
+      setPreviewToken(token);
+      toast({ title: "קישור תצוגה מקדימה נוצר בהצלחה" });
+    } catch (error) {
+      toast({ title: "שגיאה ביצירת קישור", variant: "destructive" });
+    }
+  };
+
+  const handleCopyPreviewLink = async () => {
+    if (!previewToken) return;
+    
+    const previewUrl = `${window.location.origin}/preview?token=${previewToken}`;
+    await navigator.clipboard.writeText(previewUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+    toast({ title: "הקישור הועתק" });
+  };
+
+  const handleMediaSelect = (url: string) => {
+    setFormData((prev) => ({ ...prev, featured_image: url }));
+    setShowMediaLibrary(false);
   };
 
   if (!isNew && isLoading) {
@@ -388,20 +432,32 @@ const ArticleEditor = () => {
               <CardTitle>מדיה</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="featured_image">תמונה ראשית (URL)</Label>
-                <Input
-                  id="featured_image"
-                  value={formData.featured_image}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, featured_image: e.target.value }))
-                  }
-                  placeholder="https://example.com/image.jpg"
-                  dir="ltr"
-                  className="text-left"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="featured_image">תמונה ראשית</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="featured_image"
+                      value={formData.featured_image}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, featured_image: e.target.value }))
+                      }
+                      placeholder="https://example.com/image.jpg"
+                      dir="ltr"
+                      className="text-left flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowMediaLibrary(true)}
+                    >
+                      <Image className="w-4 h-4" />
+                      ספרייה
+                    </Button>
+                  </div>
+                </div>
                 {formData.featured_image && (
-                  <div className="mt-2 rounded-lg overflow-hidden border border-border max-w-sm">
+                  <div className="rounded-lg overflow-hidden border border-border max-w-sm">
                     <img
                       src={formData.featured_image}
                       alt="תצוגה מקדימה"
@@ -492,8 +548,66 @@ const ArticleEditor = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* SEO Score Card */}
+          <SEOScoreCard
+            title={formData.title}
+            seoTitle={formData.seo_title || ""}
+            seoDescription={formData.seo_description || ""}
+            featuredImage={formData.featured_image || ""}
+            content={formData.content || ""}
+          />
+
+          {/* Preview Link (for drafts) */}
+          {!isNew && !isPublished && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Link2 className="w-5 h-5" />
+                  קישור תצוגה מקדימה
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  צרו קישור לשיתוף טיוטה עם אנשים אחרים ללא צורך בפרסום
+                </p>
+                <div className="flex gap-2">
+                  {previewToken ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleCopyPreviewLink}
+                      className="flex-1"
+                    >
+                      {copiedLink ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                      {copiedLink ? "הועתק!" : "העתקת קישור"}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={handleGeneratePreviewToken}
+                      className="flex-1"
+                    >
+                      <Link2 className="w-4 h-4" />
+                      יצירת קישור תצוגה מקדימה
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
+
+      {/* Media Library Modal */}
+      <MediaLibraryModal
+        open={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onSelect={handleMediaSelect}
+      />
     </AdminLayout>
   );
 };
