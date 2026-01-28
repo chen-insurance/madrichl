@@ -120,13 +120,9 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Desktop CTA */}
+            {/* Desktop CTA - Admin button removed for security */}
             <div className="hidden lg:flex items-center gap-4">
-              <Link to="/admin">
-                <Button variant="outline" size="sm">
-                  כניסת מנהלים
-                </Button>
-              </Link>
+              {/* CTA buttons can be added here */}
             </div>
 
             {/* Mobile Menu Button - Left side in RTL */}
@@ -170,11 +166,6 @@ const Header = () => {
 
                   {/* Mobile Footer */}
                   <div className="p-4 border-t border-border">
-                    <Link to="/admin" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full mb-2">
-                        כניסת מנהלים
-                      </Button>
-                    </Link>
                     <Button variant="gold" className="w-full">
                       בדיקת ביטוח חינם
                     </Button>
