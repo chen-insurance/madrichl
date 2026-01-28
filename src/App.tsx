@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useTrafficSource } from "@/hooks/useTrafficSource";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -28,19 +29,22 @@ import PageEditor from "./pages/admin/PageEditor";
 import Authors from "./pages/admin/Authors";
 import Redirects from "./pages/admin/Redirects";
 import CTABlocks from "./pages/admin/CTABlocks";
+import QuizBuilder from "./pages/admin/QuizBuilder";
+import ExitIntentPopup from "./components/ExitIntentPopup";
 
 const queryClient = new QueryClient();
 
-// Component to initialize traffic source tracking
-const TrafficSourceTracker = ({ children }: { children: React.ReactNode }) => {
+// Component to initialize traffic source tracking and tracking pixels
+const AppInitializer = ({ children }: { children: React.ReactNode }) => {
   useTrafficSource();
+  useTrackingPixels();
   return <>{children}</>;
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TrafficSourceTracker>
+      <AppInitializer>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -66,6 +70,7 @@ const App = () => (
               <Route path="/admin/authors" element={<Authors />} />
               <Route path="/admin/redirects" element={<Redirects />} />
               <Route path="/admin/cta-blocks" element={<CTABlocks />} />
+              <Route path="/admin/quizzes" element={<QuizBuilder />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />
               {/* Static pages - MUST be before catch-all */}
@@ -73,9 +78,11 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            {/* Exit Intent Popup - Global */}
+            <ExitIntentPopup />
           </BrowserRouter>
         </TooltipProvider>
-      </TrafficSourceTracker>
+      </AppInitializer>
     </AuthProvider>
   </QueryClientProvider>
 );

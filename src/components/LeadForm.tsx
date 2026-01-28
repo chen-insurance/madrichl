@@ -25,6 +25,7 @@ interface LeadFormProps {
   sourceUrl?: string;
   prefilledContext?: string;
   onSuccess?: () => void;
+  extraData?: Record<string, unknown>;
 }
 
 const LeadForm = ({ 
@@ -34,6 +35,7 @@ const LeadForm = ({
   sourceUrl,
   prefilledContext,
   onSuccess,
+  extraData,
 }: LeadFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -95,6 +97,7 @@ const LeadForm = ({
         utm_data: {
           ...(trafficData || {}),
           context: prefilledContext || null,
+          ...(extraData || {}),
         },
       };
 

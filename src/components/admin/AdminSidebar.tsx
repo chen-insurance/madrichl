@@ -20,6 +20,7 @@ import {
   Users,
   Link2,
   Megaphone,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +78,11 @@ const AdminSidebar = () => {
       label: "פרסומות ו-CTA",
       href: "/admin/cta-blocks",
       icon: Megaphone,
+    },
+    {
+      label: "שאלונים",
+      href: "/admin/quizzes",
+      icon: ListChecks,
     },
     {
       label: "לידים",

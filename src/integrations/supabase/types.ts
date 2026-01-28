@@ -362,6 +362,7 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          is_landing_page: boolean
           is_published: boolean
           seo_description: string | null
           seo_title: string | null
@@ -373,6 +374,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_landing_page?: boolean
           is_published?: boolean
           seo_description?: string | null
           seo_title?: string | null
@@ -384,11 +386,39 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_landing_page?: boolean
           is_published?: boolean
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          steps_json: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          steps_json?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          steps_json?: Json
           updated_at?: string
         }
         Relationships: []
