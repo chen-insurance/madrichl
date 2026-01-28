@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Article from "./pages/Article";
 import Contact from "./pages/Contact";
+import Preview from "./pages/Preview";
 import ArticlesList from "./pages/admin/ArticlesList";
 import ArticleEditor from "./pages/admin/ArticleEditor";
 import Settings from "./pages/admin/Settings";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/news/:slug" element={<Article />} />
+              <Route path="/preview" element={<Preview />} />
               <Route path="/contact" element={<Contact />} />
               {/* Admin Routes */}
               <Route path="/admin" element={<ArticlesList />} />
