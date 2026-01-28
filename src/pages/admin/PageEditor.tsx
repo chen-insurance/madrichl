@@ -7,9 +7,10 @@ import RichTextEditor from "@/components/admin/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save, Eye, EyeOff, ArrowRight, Plus } from "lucide-react";
+import { Loader2, Save, Eye, EyeOff, ArrowRight, Plus, Layout } from "lucide-react";
 
 const PageEditor = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const PageEditor = () => {
     seo_description: "",
   });
   const [isPublished, setIsPublished] = useState(false);
+  const [isLandingPage, setIsLandingPage] = useState(false);
 
   // Fetch existing page
   const { data: page, isLoading } = useQuery({
@@ -52,6 +54,7 @@ const PageEditor = () => {
         seo_description: page.seo_description || "",
       });
       setIsPublished(page.is_published);
+      setIsLandingPage(page.is_landing_page || false);
     }
   }, [page]);
 
@@ -82,6 +85,7 @@ const PageEditor = () => {
         seo_title: formData.seo_title || null,
         seo_description: formData.seo_description || null,
         is_published: publish,
+        is_landing_page: isLandingPage,
       };
 
       if (isNew) {
@@ -206,6 +210,33 @@ const PageEditor = () => {
                 <RichTextEditor
                   content={formData.content}
                   onChange={(content) => setFormData((prev) => ({ ...prev, content }))}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Landing Page Mode */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <Layout className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <CardTitle>מצב דף נחיתה</CardTitle>
+                  <CardDescription>
+                    הסתר את הניווט והפוטר לחוויית המרה ממוקדת
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="landing_page_mode">הפעל מצב דף נחיתה</Label>
+                <Switch
+                  id="landing_page_mode"
+                  checked={isLandingPage}
+                  onCheckedChange={setIsLandingPage}
                 />
               </div>
             </CardContent>

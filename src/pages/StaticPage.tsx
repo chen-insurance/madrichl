@@ -1,7 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const StaticPage = () => {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data: page, isLoading, error } = useQuery({
+  const { data: page, isLoading } = useQuery({
     queryKey: ["static-page", slug],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -26,17 +25,19 @@ const StaticPage = () => {
     enabled: !!slug,
   });
 
+  const isLandingPage = page?.is_landing_page || false;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        {!isLandingPage && <Header />}
         <main className="container mx-auto px-4 py-12 max-w-4xl">
           <Skeleton className="h-12 w-2/3 mb-6" />
           <Skeleton className="h-4 w-full mb-3" />
           <Skeleton className="h-4 w-full mb-3" />
           <Skeleton className="h-4 w-3/4 mb-3" />
         </main>
-        <Footer />
+        {!isLandingPage && <Footer />}
       </div>
     );
   }
@@ -61,6 +62,54 @@ const StaticPage = () => {
     );
   }
 
+  // Landing Page Mode - Clean, focused layout
+  if (isLandingPage) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>{page.seo_title || page.title} | המדריך לצרכן</title>
+          <meta
+            name="description"
+            content={page.seo_description || `${page.title} - המדריך לצרכן`}
+          />
+          <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
+        </Helmet>
+
+        <main className="min-h-screen flex items-center justify-center py-12">
+          <div className="container mx-auto px-4 max-w-3xl">
+            {/* Minimal Logo */}
+            <div className="text-center mb-8">
+              <Link to="/" className="inline-flex items-center gap-2">
+                <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center">
+                  <span className="text-primary font-display font-bold text-lg">מ</span>
+                </div>
+                <span className="font-display font-bold text-lg text-foreground">המדריך לצרכן</span>
+              </Link>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-8">
+              {page.title}
+            </h1>
+
+            {/* Content */}
+            <article className="prose prose-lg max-w-none rtl">
+              {page.content ? (
+                <div 
+                  className="prose prose-lg max-w-none"
+                  dangerouslySetInnerHTML={{ __html: page.content }}
+                />
+              ) : (
+                <p className="text-muted-foreground text-center">אין תוכן לעמוד זה.</p>
+              )}
+            </article>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Normal Page Layout
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -69,7 +118,7 @@ const StaticPage = () => {
           name="description"
           content={page.seo_description || `${page.title} - המדריך לצרכן`}
         />
-        <link rel="canonical" href={`https://hamadrikh.co.il/${slug}`} />
+        <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
       </Helmet>
 
       <Header />
