@@ -14,6 +14,7 @@ import {
   Home,
   ChevronDown,
   ChevronLeft,
+  UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,11 @@ const AdminSidebar = () => {
       label: "מסלולי השקעה",
       href: "/admin/tracks",
       icon: BarChart3,
+    },
+    {
+      label: "לידים",
+      href: "/admin/leads",
+      icon: UserCheck,
     },
     {
       label: "מדיה",
