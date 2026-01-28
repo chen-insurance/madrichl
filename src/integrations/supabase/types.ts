@@ -89,6 +89,7 @@ export type Database = {
           created_at: string
           embedding: string | null
           excerpt: string | null
+          faq_items: Json | null
           featured_image: string | null
           id: string
           is_published: boolean
@@ -111,6 +112,7 @@ export type Database = {
           created_at?: string
           embedding?: string | null
           excerpt?: string | null
+          faq_items?: Json | null
           featured_image?: string | null
           id?: string
           is_published?: boolean
@@ -133,6 +135,7 @@ export type Database = {
           created_at?: string
           embedding?: string | null
           excerpt?: string | null
+          faq_items?: Json | null
           featured_image?: string | null
           id?: string
           is_published?: boolean
@@ -218,6 +221,48 @@ export type Database = {
           id?: string
           name?: string
           slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cta_blocks: {
+        Row: {
+          background_color: string | null
+          button_link: string | null
+          button_text: string | null
+          created_at: string
+          description: string | null
+          headline: string | null
+          id: string
+          is_active: boolean
+          name: string
+          shortcut_code: string
+          updated_at: string
+        }
+        Insert: {
+          background_color?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          description?: string | null
+          headline?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          shortcut_code: string
+          updated_at?: string
+        }
+        Update: {
+          background_color?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          description?: string | null
+          headline?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          shortcut_code?: string
           updated_at?: string
         }
         Relationships: []

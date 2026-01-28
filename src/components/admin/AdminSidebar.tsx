@@ -19,6 +19,7 @@ import {
   FileStack,
   Users,
   Link2,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,11 @@ const AdminSidebar = () => {
       label: "מסלולי השקעה",
       href: "/admin/tracks",
       icon: BarChart3,
+    },
+    {
+      label: "פרסומות ו-CTA",
+      href: "/admin/cta-blocks",
+      icon: Megaphone,
     },
     {
       label: "לידים",
