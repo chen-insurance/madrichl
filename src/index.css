@@ -173,4 +173,14 @@
   .shadow-gold {
     box-shadow: var(--shadow-gold);
   }
+
+  /* Widget placeholder in Rich Text Editor */
+  .widget-placeholder {
+    @apply inline-block bg-muted text-muted-foreground px-3 py-2 rounded-md text-sm font-medium border border-dashed border-border my-2;
+    user-select: all;
+  }
+
+  .ProseMirror .widget-placeholder {
+    @apply block w-full text-center;
+  }
 }

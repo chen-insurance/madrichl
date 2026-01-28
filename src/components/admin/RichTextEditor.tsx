@@ -23,6 +23,7 @@ import {
   Undo,
   Redo,
   Sparkles,
+  Puzzle,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -31,6 +32,37 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import AIAssistModal from "./AIAssistModal";
+import InsertWidgetModal from "./InsertWidgetModal";
+
+// Helper to convert shortcodes to visual placeholders when loading content
+const convertShortcodesToPlaceholders = (html: string): string => {
+  if (!html) return html;
+  
+  // Match {{shortcode}} patterns and convert to placeholder spans
+  return html.replace(/\{\{([^}]+)\}\}/g, (match, code) => {
+    const displayName = getWidgetDisplayName(code);
+    return `<span data-widget="${match}" class="widget-placeholder">[ווידג׳ט: ${displayName}]</span>`;
+  });
+};
+
+// Helper to convert placeholder spans back to shortcodes when saving
+const convertPlaceholdersToShortcodes = (html: string): string => {
+  if (!html) return html;
+  
+  // Match placeholder spans and extract the original shortcode
+  return html.replace(
+    /<span[^>]*data-widget="([^"]+)"[^>]*class="widget-placeholder"[^>]*>[^<]*<\/span>/g,
+    (_, shortcode) => shortcode
+  );
+};
+
+// Get display name for a shortcode
+const getWidgetDisplayName = (code: string): string => {
+  if (code === "insurance_calculator") return "מחשבון ביטוח חיים";
+  if (code.startsWith("quiz_")) return "שאלון";
+  if (code.startsWith("cta_")) return "בלוק CTA";
+  return code;
+};
 
 interface RichTextEditorProps {
   content: string;
@@ -41,6 +73,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [showAIAssist, setShowAIAssist] = useState(false);
+  const [showWidgetModal, setShowWidgetModal] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -68,9 +101,12 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         placeholder: "התחילו לכתוב את תוכן המאמר...",
       }),
     ],
-    content,
+    content: convertShortcodesToPlaceholders(content),
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Convert visual placeholders back to shortcodes when saving
+      const html = editor.getHTML();
+      const cleanedHtml = convertPlaceholdersToShortcodes(html);
+      onChange(cleanedHtml);
     },
     editorProps: {
       attributes: {
@@ -106,6 +142,15 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
 
   const handleAIInsert = (text: string) => {
     editor.chain().focus().insertContent(text).run();
+  };
+
+  const handleWidgetInsert = (shortcode: string, displayName: string) => {
+    // Insert a visual placeholder that will be rendered as the shortcode
+    editor
+      .chain()
+      .focus()
+      .insertContent(`<span data-widget="${shortcode}" class="widget-placeholder">[ווידג׳ט: ${displayName}]</span>`)
+      .run();
   };
 
   const ToolbarButton = ({
@@ -286,6 +331,19 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
 
         <div className="w-px h-6 bg-border mx-1" />
 
+        {/* Insert Widget Button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowWidgetModal(true)}
+          className="h-8 px-3 gap-1 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:border-primary/50"
+          title="הוספת ווידג׳ט"
+        >
+          <Puzzle className="w-4 h-4 text-primary" />
+          <span className="text-xs font-medium">ווידג׳ט</span>
+        </Button>
+
         {/* AI Assist Button */}
         <Button
           type="button"
@@ -324,6 +382,13 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         open={showAIAssist}
         onClose={() => setShowAIAssist(false)}
         onInsert={handleAIInsert}
+      />
+
+      {/* Insert Widget Modal */}
+      <InsertWidgetModal
+        open={showWidgetModal}
+        onClose={() => setShowWidgetModal(false)}
+        onInsert={handleWidgetInsert}
       />
     </div>
   );
