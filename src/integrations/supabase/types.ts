@@ -409,6 +409,7 @@ export type Database = {
           view_count: number
         }[]
       }
+      is_admin_user: { Args: never; Returns: boolean }
       match_articles: {
         Args: {
           exclude_slug?: string
