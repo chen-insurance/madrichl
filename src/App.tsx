@@ -32,6 +32,7 @@ import CTABlocks from "./pages/admin/CTABlocks";
 import QuizBuilder from "./pages/admin/QuizBuilder";
 import CalculatorsData from "./pages/admin/CalculatorsData";
 import ExitIntentPopup from "./components/ExitIntentPopup";
+import AccessibilityWidget from "./components/AccessibilityWidget";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,8 @@ const App = () => (
             </Routes>
             {/* Exit Intent Popup - Global */}
             <ExitIntentPopup />
+            {/* Accessibility Widget - Global */}
+            <AccessibilityWidget />
           </BrowserRouter>
         </TooltipProvider>
       </AppInitializer>

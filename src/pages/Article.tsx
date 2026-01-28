@@ -135,15 +135,23 @@ const Article = () => {
           name="description"
           content={article.seo_description || article.excerpt || ""}
         />
+        {/* Open Graph */}
         <meta property="og:title" content={article.seo_title || article.title} />
         <meta
           property="og:description"
           content={article.seo_description || article.excerpt || ""}
         />
-        {article.featured_image && (
-          <meta property="og:image" content={article.featured_image} />
-        )}
+        <meta property="og:image" content={article.featured_image || "https://the-guide.co.il/og-default.png"} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://the-guide.co.il/news/${article.slug}`} />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.seo_title || article.title} />
+        <meta name="twitter:description" content={article.seo_description || article.excerpt || ""} />
+        <meta name="twitter:image" content={article.featured_image || "https://the-guide.co.il/og-default.png"} />
+        {/* Canonical */}
         <link rel="canonical" href={`https://the-guide.co.il/news/${article.slug}`} />
       </Helmet>
 

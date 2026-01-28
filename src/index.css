@@ -1,4 +1,29 @@
 @tailwind base;
+
+/* Accessibility Mode Styles */
+html.text-lg-mode {
+  font-size: 1.125rem;
+}
+
+html.text-lg-mode body {
+  font-size: 1.125rem;
+}
+
+html.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 85%;
+  --primary: 45 93% 58%;
+  --primary-foreground: 0 0% 0%;
+}
+
+html.highlight-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
 @tailwind components;
 @tailwind utilities;
 

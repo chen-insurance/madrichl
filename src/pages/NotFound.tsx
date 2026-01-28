@@ -1,5 +1,11 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
+import { Home, Search } from "lucide-react";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import LeadForm from "@/components/LeadForm";
+import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
   const location = useLocation();
@@ -9,14 +15,50 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1 py-12 md:py-16">
+        <div className="container mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-accent/10 mb-6">
+              <Search className="w-12 h-12 text-accent" />
+            </div>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+              אופס! העמוד לא נמצא
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-md mx-auto mb-6">
+              אבל אל דאגה, אנחנו עדיין יכולים לעזור לך לחסוך.
+            </p>
+            <Link to="/">
+              <Button variant="outline" className="gap-2">
+                <Home className="w-4 h-4" />
+                חזרה לדף הבית
+              </Button>
+            </Link>
+          </div>
+
+          {/* Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+            {/* Lead Form */}
+            <div>
+              <LeadForm
+                title="בדוק את זכאותך עכשיו"
+                subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
+                variant="card"
+              />
+            </div>
+
+            {/* Calculator */}
+            <div>
+              <LifeInsuranceCalc />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };
