@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 
 const StaticPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -92,13 +93,10 @@ const StaticPage = () => {
               {page.title}
             </h1>
 
-            {/* Content */}
+            {/* Content with widget support */}
             <article className="prose prose-lg max-w-none rtl">
               {page.content ? (
-                <div 
-                  className="prose prose-lg max-w-none"
-                  dangerouslySetInnerHTML={{ __html: page.content }}
-                />
+                <MarkdownContentWithCTA content={page.content} />
               ) : (
                 <p className="text-muted-foreground text-center">אין תוכן לעמוד זה.</p>
               )}
@@ -138,13 +136,10 @@ const StaticPage = () => {
           {page.title}
         </h1>
 
-        {/* Content */}
+        {/* Content with widget support */}
         <article className="prose prose-lg max-w-none rtl">
           {page.content ? (
-            <div 
-              className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: page.content }}
-            />
+            <MarkdownContentWithCTA content={page.content} />
           ) : (
             <p className="text-muted-foreground">אין תוכן לעמוד זה.</p>
           )}
