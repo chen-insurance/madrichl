@@ -1,5 +1,5 @@
-import { ArrowLeft, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, TrendingUp, CheckCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/common/OptimizedImage";
 
@@ -94,7 +94,7 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
             </div>
           </Link>
 
-          {/* Secondary Articles */}
+          {/* Secondary Articles + CTA */}
           <div className="flex flex-col gap-4">
             {secondary.map((article, index) => (
               <Link
@@ -121,6 +121,36 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
                 </div>
               </Link>
             ))}
+
+            {/* Lead Form CTA Card */}
+            <div className="bg-gradient-navy rounded-xl p-5 text-cream animate-fade-in" style={{ animationDelay: "200ms" }}>
+              <h3 className="font-display font-bold text-lg mb-2">בדוק את זכאותך להטבות</h3>
+              <ul className="text-cream/80 text-sm mb-4 space-y-1">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                  <span>השוואת מחירים חינם</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                  <span>ייעוץ מקצועי ללא התחייבות</span>
+                </li>
+              </ul>
+              <Button 
+                variant="gold" 
+                size="sm" 
+                className="w-full"
+                onClick={() => {
+                  const leadForm = document.querySelector('#lead-form-section');
+                  if (leadForm) {
+                    leadForm.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    window.location.href = '/contact';
+                  }
+                }}
+              >
+                בדוק זכאות עכשיו
+              </Button>
+            </div>
           </div>
         </div>
       </div>
