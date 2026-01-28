@@ -6,7 +6,6 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
-import NewsletterSection from "@/components/home/NewsletterSection";
 import MarketTicker from "@/components/home/MarketTicker";
 import ComparisonTable from "@/components/market/ComparisonTable";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
@@ -127,7 +126,6 @@ const Index = () => {
         <ComparisonTable />
         <CategorySection />
         <LatestArticles articles={latestArticles || undefined} />
-        <NewsletterSection />
       </main>
       <Footer />
     </div>
