@@ -23,6 +23,7 @@ serve(async (req) => {
       .from("articles")
       .select("slug, updated_at, published_at")
       .eq("is_published", true)
+      .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false });
 
     if (error) {

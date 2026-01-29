@@ -39,6 +39,7 @@ const CategoryArchive = () => {
         .from("articles")
         .select("id", { count: "exact", head: true })
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .eq("category", category?.name);
       if (error) throw error;
       return count || 0;
@@ -57,6 +58,7 @@ const CategoryArchive = () => {
         .from("articles")
         .select("id, title, slug, excerpt, featured_image, published_at, category")
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .eq("category", category?.name)
         .order("published_at", { ascending: false })
         .range(from, to);

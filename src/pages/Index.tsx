@@ -45,6 +45,7 @@ const Index = () => {
         .select("id, title, excerpt, slug, featured_image, published_at")
         .eq("id", homepageSettings.hero_article_id)
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .maybeSingle();
 
       if (error) throw error;
@@ -61,6 +62,7 @@ const Index = () => {
         .from("articles")
         .select("id, title, excerpt, slug, featured_image, published_at, category_id")
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .order("published_at", { ascending: false })
         .limit(6);
 
@@ -90,6 +92,7 @@ const Index = () => {
         .from("articles")
         .select("id, title, excerpt, slug, featured_image, published_at")
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .order("published_at", { ascending: false })
         .limit(2);
 

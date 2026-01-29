@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useTrafficSource } from "@/hooks/useTrafficSource";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
+import { useThemeSettings } from "@/hooks/useThemeSettings";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -41,6 +42,7 @@ const queryClient = new QueryClient();
 const AppInitializer = ({ children }: { children: React.ReactNode }) => {
   useTrafficSource();
   useTrackingPixels();
+  useThemeSettings();
   return <>{children}</>;
 };
 

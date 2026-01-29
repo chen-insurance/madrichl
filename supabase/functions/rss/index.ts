@@ -57,6 +57,7 @@ serve(async (req) => {
       .from("articles")
       .select("title, slug, excerpt, content, featured_image, author_name, category, published_at, updated_at")
       .eq("is_published", true)
+      .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false })
       .limit(50); // Limit to 50 most recent for RSS
 

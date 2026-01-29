@@ -25,6 +25,7 @@ const TrendingArticles = ({ excludeSlug, limit = 5 }: TrendingArticlesProps) => 
           .from("articles")
           .select("id, title, slug, published_at, featured_image, view_count")
           .eq("is_published", true)
+          .lte("published_at", new Date().toISOString())
           .neq("slug", excludeSlug || "")
           .order("view_count", { ascending: false })
           .order("published_at", { ascending: false })
