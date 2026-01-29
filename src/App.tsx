@@ -33,6 +33,7 @@ import QuizBuilder from "./pages/admin/QuizBuilder";
 import CalculatorsData from "./pages/admin/CalculatorsData";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import AccessibilityWidget from "./components/AccessibilityWidget";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
