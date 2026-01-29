@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import RichTextEditor from "@/components/admin/RichTextEditor";
@@ -16,9 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check } from "lucide-react";
+import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check, CalendarIcon } from "lucide-react";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 import SEOScoreCard from "@/components/admin/SEOScoreCard";
 import { MediaLibraryModal } from "@/components/admin/MediaLibrary";
 import FAQBuilder, { FAQItem } from "@/components/admin/FAQBuilder";
@@ -77,6 +85,7 @@ const ArticleEditor = () => {
     },
   });
   const [isPublished, setIsPublished] = useState(false);
+  const [publishedAt, setPublishedAt] = useState<Date | undefined>(undefined);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [previewToken, setPreviewToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -113,6 +122,7 @@ const ArticleEditor = () => {
         category_id: article.category_id || "",
       });
       setIsPublished(article.is_published);
+      setPublishedAt(article.published_at ? new Date(article.published_at) : undefined);
       setPreviewToken(article.preview_token || null);
       // Load FAQ items from database
       const storedFaq = article.faq_items;
@@ -143,7 +153,7 @@ const ArticleEditor = () => {
 
   // Save mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: ArticleFormData & { is_published: boolean; faq_items: FAQItem[] }) => {
+    mutationFn: async (data: ArticleFormData & { is_published: boolean; faq_items: FAQItem[]; published_at: Date | null }) => {
       // Find category name for the legacy category field
       const selectedCategory = categories?.find(c => c.id === data.category_id);
       
@@ -161,7 +171,7 @@ const ArticleEditor = () => {
           category_id: data.category_id || null,
           category: selectedCategory?.name || null,
           is_published: data.is_published,
-          published_at: data.is_published ? new Date().toISOString() : null,
+          published_at: data.published_at ? data.published_at.toISOString() : null,
           faq_items: JSON.parse(JSON.stringify(data.faq_items)),
         };
         const { data: newArticle, error } = await supabase
@@ -185,7 +195,7 @@ const ArticleEditor = () => {
           category_id: data.category_id || null,
           category: selectedCategory?.name || null,
           is_published: data.is_published,
-          published_at: data.is_published ? new Date().toISOString() : null,
+          published_at: data.published_at ? data.published_at.toISOString() : null,
           faq_items: JSON.parse(JSON.stringify(data.faq_items)),
         };
         const { data: updatedArticle, error } = await supabase
@@ -247,13 +257,32 @@ const ArticleEditor = () => {
     }
 
     const shouldPublish = publish ? true : isPublished;
-    saveMutation.mutate({ ...validation.data, is_published: shouldPublish, faq_items: faqItems });
-    if (publish) setIsPublished(true);
+    // When publishing, if no date is set use current date
+    const dateToPublish = shouldPublish 
+      ? (publishedAt || new Date()) 
+      : null;
+    
+    saveMutation.mutate({ 
+      ...validation.data, 
+      is_published: shouldPublish, 
+      faq_items: faqItems,
+      published_at: dateToPublish,
+    });
+    if (publish) {
+      setIsPublished(true);
+      if (!publishedAt) setPublishedAt(new Date());
+    }
   };
 
   const handleUnpublish = () => {
-    saveMutation.mutate({ ...formData, is_published: false, faq_items: faqItems });
+    saveMutation.mutate({ 
+      ...formData, 
+      is_published: false, 
+      faq_items: faqItems,
+      published_at: null,
+    });
     setIsPublished(false);
+    setPublishedAt(undefined);
   };
 
   const handleGeneratePreviewToken = async () => {
@@ -557,6 +586,81 @@ const ArticleEditor = () => {
                   {formData.seo_description?.length || 0}/160 תווים
                 </p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Scheduled Publishing */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5" />
+                תזמון פרסום
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                תזמנו את הפרסום לתאריך עתידי. המאמר יהיה גלוי רק כאשר יגיע מועד הפרסום.
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[280px] justify-start text-left font-normal",
+                        !publishedAt && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="ml-2 h-4 w-4" />
+                      {publishedAt ? format(publishedAt, "dd/MM/yyyy HH:mm") : "בחר תאריך פרסום"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={publishedAt}
+                      onSelect={setPublishedAt}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                    <div className="p-3 border-t border-border">
+                      <Label className="text-xs text-muted-foreground">שעה</Label>
+                      <Input
+                        type="time"
+                        value={publishedAt ? format(publishedAt, "HH:mm") : ""}
+                        onChange={(e) => {
+                          if (publishedAt && e.target.value) {
+                            const [hours, minutes] = e.target.value.split(':');
+                            const newDate = new Date(publishedAt);
+                            newDate.setHours(parseInt(hours), parseInt(minutes));
+                            setPublishedAt(newDate);
+                          }
+                        }}
+                        className="mt-1"
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                {publishedAt && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPublishedAt(undefined)}
+                  >
+                    נקה תאריך
+                  </Button>
+                )}
+              </div>
+              {publishedAt && publishedAt > new Date() && (
+                <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                  📅 המאמר יתפרסם אוטומטית ב-{format(publishedAt, "dd/MM/yyyy בשעה HH:mm")}
+                </div>
+              )}
+              {publishedAt && publishedAt <= new Date() && isPublished && (
+                <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                  ✅ המאמר פורסם ב-{format(publishedAt, "dd/MM/yyyy בשעה HH:mm")}
+                </div>
+              )}
             </CardContent>
           </Card>
 

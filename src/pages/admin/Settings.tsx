@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Code, Webhook, Megaphone, MousePointerClick, BarChart3 } from "lucide-react";
+import { Loader2, Save, Code, Webhook, Megaphone, MousePointerClick, BarChart3, Palette } from "lucide-react";
 
 const Settings = () => {
   const [headScripts, setHeadScripts] = useState("");
@@ -29,6 +29,11 @@ const Settings = () => {
   // Tracking Pixels
   const [facebookPixelId, setFacebookPixelId] = useState("");
   const [gtmId, setGtmId] = useState("");
+  
+  // Theme Customizer
+  const [primaryColor, setPrimaryColor] = useState("#1e3a5f");
+  const [secondaryColor, setSecondaryColor] = useState("#f59e0b");
+  const [buttonRadius, setButtonRadius] = useState("0.5rem");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -62,6 +67,10 @@ const Settings = () => {
       // Tracking
       setFacebookPixelId(getValue("facebook_pixel_id"));
       setGtmId(getValue("gtm_id"));
+      // Theme
+      setPrimaryColor(getValue("primary_color") || "#1e3a5f");
+      setSecondaryColor(getValue("secondary_color") || "#f59e0b");
+      setButtonRadius(getValue("button_radius") || "0.5rem");
     }
   }, [settings]);
 
@@ -159,6 +168,23 @@ const Settings = () => {
     },
   });
 
+  // Save Theme Settings
+  const saveThemeMutation = useMutation({
+    mutationFn: async () => {
+      await saveSetting("primary_color", primaryColor);
+      await saveSetting("secondary_color", secondaryColor);
+      await saveSetting("button_radius", buttonRadius);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["theme-settings"] });
+      toast({ title: "נשמר בהצלחה", description: "הגדרות העיצוב עודכנו" });
+    },
+    onError: () => {
+      toast({ title: "שגיאה", description: "לא ניתן לשמור את ההגדרות", variant: "destructive" });
+    },
+  });
+
   return (
     <AdminLayout>
       <div className="p-6 md:p-8 max-w-4xl">
@@ -178,8 +204,9 @@ const Settings = () => {
           </div>
         ) : (
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="general">כללי</TabsTrigger>
+              <TabsTrigger value="design">עיצוב</TabsTrigger>
               <TabsTrigger value="conversion">המרות</TabsTrigger>
               <TabsTrigger value="tracking">מעקב וסקריפטים</TabsTrigger>
             </TabsList>
@@ -308,6 +335,168 @@ const Settings = () => {
                       <Save className="w-4 h-4" />
                     )}
                     שמירה
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Design Tab */}
+            <TabsContent value="design" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                      <Palette className="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                      <CardTitle>התאמה אישית של העיצוב</CardTitle>
+                      <CardDescription>
+                        שנה את צבעי המותג ועיצוב הכפתורים באתר
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="primary_color">צבע ראשי (Primary)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="primary_color"
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-16 h-10 p-1 cursor-pointer"
+                        />
+                        <Input
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          placeholder="#1e3a5f"
+                          dir="ltr"
+                          className="flex-1 font-mono"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        צבע הכותרות, כפתורים ואלמנטים עיקריים
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="secondary_color">צבע משני (Secondary/Accent)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="secondary_color"
+                          type="color"
+                          value={secondaryColor}
+                          onChange={(e) => setSecondaryColor(e.target.value)}
+                          className="w-16 h-10 p-1 cursor-pointer"
+                        />
+                        <Input
+                          value={secondaryColor}
+                          onChange={(e) => setSecondaryColor(e.target.value)}
+                          placeholder="#f59e0b"
+                          dir="ltr"
+                          className="flex-1 font-mono"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        צבע הדגשות, לינקים וקריאות לפעולה
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="button_radius">עיגול פינות כפתורים (Border Radius)</Label>
+                    <div className="flex gap-4 items-center">
+                      <Input
+                        id="button_radius"
+                        value={buttonRadius}
+                        onChange={(e) => setButtonRadius(e.target.value)}
+                        placeholder="0.5rem"
+                        dir="ltr"
+                        className="w-32 font-mono"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setButtonRadius("0")}
+                          className="text-xs"
+                        >
+                          מרובע
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setButtonRadius("0.5rem")}
+                          className="text-xs"
+                        >
+                          עדין
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setButtonRadius("1rem")}
+                          className="text-xs"
+                        >
+                          מעוגל
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setButtonRadius("9999px")}
+                          className="text-xs"
+                        >
+                          כפתור עגול
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="border border-border rounded-lg p-6 space-y-4">
+                    <p className="text-sm font-medium text-muted-foreground">תצוגה מקדימה:</p>
+                    <div className="flex flex-wrap gap-4 items-center">
+                      <Button
+                        style={{
+                          backgroundColor: primaryColor,
+                          borderRadius: buttonRadius,
+                        }}
+                        className="text-white"
+                      >
+                        כפתור ראשי
+                      </Button>
+                      <Button
+                        variant="outline"
+                        style={{
+                          borderColor: primaryColor,
+                          color: primaryColor,
+                          borderRadius: buttonRadius,
+                        }}
+                      >
+                        כפתור משני
+                      </Button>
+                      <a
+                        href="#"
+                        style={{ color: secondaryColor }}
+                        className="underline font-medium"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        קישור לדוגמה
+                      </a>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => saveThemeMutation.mutate()}
+                    disabled={saveThemeMutation.isPending}
+                  >
+                    {saveThemeMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    שמירת הגדרות עיצוב
                   </Button>
                 </CardContent>
               </Card>

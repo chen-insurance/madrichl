@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -39,6 +39,8 @@ import { toast } from "sonner";
 
 const LEADS_PER_PAGE = 20;
 
+type LeadStatus = "new" | "contacted" | "closed";
+
 interface Lead {
   id: string;
   name: string;
@@ -47,12 +49,27 @@ interface Lead {
   source_url: string | null;
   utm_data: Record<string, string> | null;
   created_at: string;
+  status: LeadStatus | null;
 }
+
+const STATUS_LABELS: Record<LeadStatus, string> = {
+  new: "חדש",
+  contacted: "נוצר קשר",
+  closed: "סגור",
+};
+
+const STATUS_COLORS: Record<LeadStatus, "default" | "secondary" | "outline"> = {
+  new: "default",
+  contacted: "secondary",
+  closed: "outline",
+};
 
 const Leads = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const queryClient = useQueryClient();
 
   // Calculate date range based on filter
   const getDateRange = () => {
@@ -73,7 +90,7 @@ const Leads = () => {
 
   // Fetch total count
   const { data: totalCount } = useQuery({
-    queryKey: ["leads-count", searchQuery, dateFilter],
+    queryKey: ["leads-count", searchQuery, dateFilter, statusFilter],
     queryFn: async () => {
       let query = supabase
         .from("leads")
@@ -82,6 +99,10 @@ const Leads = () => {
       const dateRange = getDateRange();
       if (dateRange) {
         query = query.gte("created_at", dateRange);
+      }
+
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
       }
 
       if (searchQuery) {
@@ -98,7 +119,7 @@ const Leads = () => {
 
   // Fetch leads with pagination
   const { data: leads, isLoading } = useQuery({
-    queryKey: ["leads", searchQuery, dateFilter, currentPage],
+    queryKey: ["leads", searchQuery, dateFilter, statusFilter, currentPage],
     queryFn: async () => {
       const from = (currentPage - 1) * LEADS_PER_PAGE;
       const to = from + LEADS_PER_PAGE - 1;
@@ -114,6 +135,10 @@ const Leads = () => {
         query = query.gte("created_at", dateRange);
       }
 
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
+      }
+
       if (searchQuery) {
         query = query.or(
           `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`
@@ -125,6 +150,26 @@ const Leads = () => {
       return data as Lead[];
     },
   });
+
+  // Update lead status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: LeadStatus }) => {
+      const { error } = await supabase
+        .from("leads")
+        .update({ status })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["leads-count"] });
+      toast.success("הסטטוס עודכן בהצלחה");
+    },
+    onError: () => {
+      toast.error("שגיאה בעדכון הסטטוס");
+    },
+  });
+
 
   // Fetch all leads for export
   const exportToCSV = async () => {
@@ -154,13 +199,14 @@ const Leads = () => {
       }
 
       // Create CSV content
-      const headers = ["שם", "מייל", "טלפון", "מקור", "UTM Source", "UTM Medium", "UTM Campaign", "תאריך"];
+      const headers = ["שם", "מייל", "טלפון", "סטטוס", "מקור", "UTM Source", "UTM Medium", "UTM Campaign", "תאריך"];
       const rows = data.map((lead: Lead) => {
         const utmData = lead.utm_data || {};
         return [
           lead.name,
           lead.email,
           lead.phone || "",
+          STATUS_LABELS[(lead.status as LeadStatus) || "new"],
           lead.source_url || "",
           utmData.utm_source || "",
           utmData.utm_medium || "",
@@ -210,6 +256,11 @@ const Leads = () => {
 
   const handleDateFilterChange = (value: string) => {
     setDateFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
     setCurrentPage(1);
   };
 
@@ -278,6 +329,17 @@ const Leads = () => {
                   <SelectItem value="year">שנה אחרונה</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className="w-full sm:w-36">
+                  <SelectValue placeholder="סטטוס" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">כל הסטטוסים</SelectItem>
+                  <SelectItem value="new">חדש</SelectItem>
+                  <SelectItem value="contacted">נוצר קשר</SelectItem>
+                  <SelectItem value="closed">סגור</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
@@ -300,6 +362,7 @@ const Leads = () => {
                         <TableHead className="text-right">שם</TableHead>
                         <TableHead className="text-right">מייל</TableHead>
                         <TableHead className="text-right">טלפון</TableHead>
+                        <TableHead className="text-right">סטטוס</TableHead>
                         <TableHead className="text-right">מקור</TableHead>
                         <TableHead className="text-right">UTM</TableHead>
                         <TableHead className="text-right">תאריך</TableHead>
@@ -332,6 +395,28 @@ const Leads = () => {
                             ) : (
                               <span className="text-muted-foreground">—</span>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={lead.status || "new"}
+                              onValueChange={(value) =>
+                                updateStatusMutation.mutate({
+                                  id: lead.id,
+                                  status: value as LeadStatus,
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-28 h-8">
+                                <Badge variant={STATUS_COLORS[(lead.status as LeadStatus) || "new"]}>
+                                  {STATUS_LABELS[(lead.status as LeadStatus) || "new"]}
+                                </Badge>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="new">חדש</SelectItem>
+                                <SelectItem value="contacted">נוצר קשר</SelectItem>
+                                <SelectItem value="closed">סגור</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             {lead.source_url ? (

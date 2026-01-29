@@ -311,6 +311,7 @@ export type Database = {
           name: string
           phone: string | null
           source_url: string | null
+          status: string | null
           utm_data: Json | null
         }
         Insert: {
@@ -320,6 +321,7 @@ export type Database = {
           name: string
           phone?: string | null
           source_url?: string | null
+          status?: string | null
           utm_data?: Json | null
         }
         Update: {
@@ -329,6 +331,7 @@ export type Database = {
           name?: string
           phone?: string | null
           source_url?: string | null
+          status?: string | null
           utm_data?: Json | null
         }
         Relationships: []

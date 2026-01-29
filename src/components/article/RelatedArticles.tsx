@@ -51,6 +51,7 @@ const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesPr
         .from("articles")
         .select("id, title, slug, published_at, featured_image, excerpt, category")
         .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
         .neq("slug", currentSlug || "");
 
       // If we have a category, prioritize same-category articles
@@ -78,6 +79,7 @@ const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesPr
           .from("articles")
           .select("id, title, slug, published_at, featured_image, excerpt, category")
           .eq("is_published", true)
+          .lte("published_at", new Date().toISOString())
           .neq("slug", currentSlug || "")
           .not("id", "in", `(${existingIds.join(",")})`)
           .order("published_at", { ascending: false })
