@@ -21,6 +21,7 @@ import {
   Link2,
   Megaphone,
   ListChecks,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +84,11 @@ const AdminSidebar = () => {
       label: "שאלונים",
       href: "/admin/quizzes",
       icon: ListChecks,
+    },
+    {
+      label: "מילון מונחים",
+      href: "/admin/glossary",
+      icon: BookOpen,
     },
     {
       label: "נתוני מחשבונים",
