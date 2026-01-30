@@ -32,6 +32,9 @@ import Redirects from "./pages/admin/Redirects";
 import CTABlocks from "./pages/admin/CTABlocks";
 import QuizBuilder from "./pages/admin/QuizBuilder";
 import CalculatorsData from "./pages/admin/CalculatorsData";
+import Glossary from "./pages/admin/Glossary";
+import GlossaryIndex from "./pages/GlossaryIndex";
+import GlossaryTerm from "./pages/GlossaryTerm";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import AccessibilityWidget from "./components/AccessibilityWidget";
 import ScrollToTop from "./components/ScrollToTop";
@@ -78,8 +81,12 @@ const App = () => (
               <Route path="/admin/cta-blocks" element={<CTABlocks />} />
               <Route path="/admin/quizzes" element={<QuizBuilder />} />
               <Route path="/admin/calculators" element={<CalculatorsData />} />
+              <Route path="/admin/glossary" element={<Glossary />} />
               <Route path="/admin/media" element={<Media />} />
               <Route path="/admin/settings" element={<Settings />} />
+              {/* Glossary pages */}
+              <Route path="/glossary" element={<GlossaryIndex />} />
+              <Route path="/glossary/:slug" element={<GlossaryTerm />} />
               {/* Static pages - MUST be before catch-all */}
               <Route path="/:slug" element={<StaticPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

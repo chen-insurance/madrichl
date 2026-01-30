@@ -13,6 +13,7 @@ import AuthorBox from "@/components/article/AuthorBox";
 import RelatedArticles from "@/components/article/RelatedArticles";
 import MarkdownContent from "@/components/article/MarkdownContent";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
+import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import LeadForm from "@/components/LeadForm";
 import FAQSection from "@/components/article/FAQSection";
@@ -214,6 +215,9 @@ const Article = () => {
                   )}
                 </div>
               </header>
+
+              {/* Mobile Table of Contents */}
+              <MobileTableOfContents content={article.content} />
 
               {/* Article Content with CTA blocks and custom heading IDs for TOC */}
               <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-li:text-foreground">

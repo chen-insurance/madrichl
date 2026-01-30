@@ -303,6 +303,39 @@ export type Database = {
         }
         Relationships: []
       }
+      glossary_terms: {
+        Row: {
+          created_at: string
+          definition_rich_text: string | null
+          id: string
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          term_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          definition_rich_text?: string | null
+          id?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          term_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          definition_rich_text?: string | null
+          id?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          term_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
