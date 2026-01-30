@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, AlertTriangle, Loader2, XCircle } from "lucide-react";
+import { Calculator, AlertTriangle, Loader2 } from "lucide-react";
 import LeadForm from "@/components/LeadForm";
 
 interface InsuranceRate {
@@ -21,38 +20,22 @@ interface InsuranceRate {
 
 // Age restriction constants
 const MIN_AGE = 18;
-const MAX_AGE = 60;
+const MAX_AGE = 67;
 const WARNING_AGE_START = 55;
 
 const LifeInsuranceCalc = () => {
-  const currentYear = new Date().getFullYear();
-  const minBirthYear = currentYear - MAX_AGE; // 1965 for 2025
-  const maxBirthYear = currentYear - MIN_AGE; // 2007 for 2025
-  
-  const [birthYear, setBirthYear] = useState<number | null>(null);
+  const [age, setAge] = useState(35);
   const [gender, setGender] = useState<"male" | "female">("male");
   const [isSmoker, setIsSmoker] = useState(false);
   const [coverage, setCoverage] = useState(1000000);
   const [showLeadForm, setShowLeadForm] = useState(false);
-  const [ageError, setAgeError] = useState<string | null>(null);
 
-  // Calculate age from birth year
-  const age = birthYear ? currentYear - birthYear : null;
-  
   // Determine if age is in warning zone (55-60)
-  const isWarningAge = age !== null && age >= WARNING_AGE_START && age <= MAX_AGE;
-  
-  // Check if age exceeds limit
-  const isAgeExceeded = age !== null && age > MAX_AGE;
+  const isWarningAge = age >= WARNING_AGE_START && age <= 60;
 
-  // Generate year options (from oldest to youngest for dropdown)
-  const yearOptions = useMemo(() => {
-    const years: number[] = [];
-    for (let year = minBirthYear; year <= maxBirthYear; year++) {
-      years.push(year);
-    }
-    return years.reverse(); // Most recent first
-  }, [minBirthYear, maxBirthYear]);
+  // Calculate birth year from age for lead form
+  const currentYear = new Date().getFullYear();
+  const birthYear = currentYear - age;
 
   const { data: rates, isLoading } = useQuery({
     queryKey: ["life-insurance-rates"],
@@ -85,13 +68,12 @@ const LifeInsuranceCalc = () => {
   };
 
   const monthlyPrice = useMemo(() => {
-    if (age === null) return 0;
     const pricePerUnit = getRate(age, gender, isSmoker);
     return (pricePerUnit * coverage) / 100000;
   }, [age, gender, isSmoker, coverage, rates]);
 
   const smokerSavings = useMemo(() => {
-    if (!isSmoker || age === null) return 0;
+    if (!isSmoker) return 0;
     const smokerPrice = getRate(age, gender, true);
     const nonSmokerPrice = getRate(age, gender, false);
     const monthlyDiff = ((smokerPrice - nonSmokerPrice) * coverage) / 100000;
@@ -111,29 +93,10 @@ const LifeInsuranceCalc = () => {
   };
 
   const handleGetQuote = () => {
-    // Extra validation (shouldn't happen with dropdown limits, but safety first)
-    if (age === null) {
-      setAgeError("נא לבחור שנת לידה");
-      return;
-    }
-    
-    if (age > MAX_AGE) {
-      setAgeError(`השירות מותאם כרגע לגילאים ${MIN_AGE}-${MAX_AGE} בלבד.`);
-      return;
-    }
-    
-    if (age < MIN_AGE) {
-      setAgeError(`השירות מותאם כרגע לגילאים ${MIN_AGE}-${MAX_AGE} בלבד.`);
-      return;
-    }
-    
-    setAgeError(null);
     setShowLeadForm(true);
   };
 
-  const leadFormContext = age !== null 
-    ? `מחשבון ביטוח חיים: גיל ${age}, ${gender === "male" ? "גבר" : "אישה"}, ${isSmoker ? "מעשן/ת" : "לא מעשן/ת"}, כיסוי ${formatNumber(coverage)} ₪, מחיר משוער ${formatCurrency(monthlyPrice)}/חודש`
-    : "";
+  const leadFormContext = `מחשבון ביטוח חיים: גיל ${age}, ${gender === "male" ? "גבר" : "אישה"}, ${isSmoker ? "מעשן/ת" : "לא מעשן/ת"}, כיסוי ${formatNumber(coverage)} ₪, מחיר משוער ${formatCurrency(monthlyPrice)}/חודש`;
 
   // Build extra data including the high-risk tag for warning ages
   const extraData = {
@@ -169,35 +132,24 @@ const LifeInsuranceCalc = () => {
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Birth Year Dropdown */}
+          {/* Age Slider */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <Label className="text-base font-medium">שנת לידה</Label>
-              {age !== null && (
-                <span className="text-lg font-semibold text-accent">גיל {age}</span>
-              )}
+              <Label className="text-base font-medium">גיל</Label>
+              <span className="text-lg font-semibold text-accent">{age}</span>
             </div>
-            <Select
-              value={birthYear?.toString() || ""}
-              onValueChange={(value) => {
-                setBirthYear(parseInt(value));
-                setAgeError(null);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="בחר שנת לידה" />
-              </SelectTrigger>
-              <SelectContent>
-                {yearOptions.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year} (גיל {currentYear - year})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              גילאים {MIN_AGE}-{MAX_AGE} בלבד
-            </p>
+            <Slider
+              value={[age]}
+              onValueChange={([v]) => setAge(v)}
+              min={MIN_AGE}
+              max={MAX_AGE}
+              step={1}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{MIN_AGE}</span>
+              <span>{MAX_AGE}</span>
+            </div>
           </div>
 
           {/* Gender Toggle */}
@@ -282,7 +234,7 @@ const LifeInsuranceCalc = () => {
           <div className="bg-secondary/50 rounded-xl p-6 text-center space-y-2">
             <p className="text-sm text-muted-foreground">מחיר חודשי משוער</p>
             <p className="text-4xl font-bold text-accent">
-              {age !== null ? formatCurrency(monthlyPrice) : "---"}
+              {formatCurrency(monthlyPrice)}
             </p>
             <p className="text-xs text-muted-foreground">
               לכיסוי של {formatNumber(coverage)} ₪
@@ -304,20 +256,11 @@ const LifeInsuranceCalc = () => {
             </div>
           )}
 
-          {/* Age Error Message */}
-          {ageError && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3">
-              <XCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-              <p className="text-sm font-medium text-destructive">{ageError}</p>
-            </div>
-          )}
-
           {/* CTA Button */}
           <Button
             onClick={handleGetQuote}
             size="lg"
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6"
-            disabled={age === null}
           >
             קבל הצעה מדויקת למחיר זה
           </Button>
