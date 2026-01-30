@@ -338,7 +338,9 @@ export type Database = {
       }
       leads: {
         Row: {
+          birth_year: number | null
           created_at: string
+          current_status: string | null
           email: string
           id: string
           name: string
@@ -348,7 +350,9 @@ export type Database = {
           utm_data: Json | null
         }
         Insert: {
+          birth_year?: number | null
           created_at?: string
+          current_status?: string | null
           email: string
           id?: string
           name: string
@@ -358,7 +362,9 @@ export type Database = {
           utm_data?: Json | null
         }
         Update: {
+          birth_year?: number | null
           created_at?: string
+          current_status?: string | null
           email?: string
           id?: string
           name?: string

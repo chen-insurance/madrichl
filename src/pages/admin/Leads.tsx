@@ -47,9 +47,11 @@ interface Lead {
   email: string;
   phone: string | null;
   source_url: string | null;
-  utm_data: Record<string, string> | null;
+  utm_data: Record<string, unknown> | null;
   created_at: string;
   status: LeadStatus | null;
+  birth_year: number | null;
+  current_status: string | null;
 }
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
@@ -200,8 +202,8 @@ const Leads = () => {
 
       // Create CSV content
       const headers = ["שם", "מייל", "טלפון", "סטטוס", "מקור", "UTM Source", "UTM Medium", "UTM Campaign", "תאריך"];
-      const rows = data.map((lead: Lead) => {
-        const utmData = lead.utm_data || {};
+      const rows = data.map((lead) => {
+        const utmData = (lead.utm_data as Record<string, string> | null) || {};
         return [
           lead.name,
           lead.email,
@@ -438,16 +440,16 @@ const Leads = () => {
                             )}
                           </TableCell>
                           <TableCell>
-                            {lead.utm_data && Object.keys(lead.utm_data).length > 0 ? (
+                            {lead.utm_data && typeof lead.utm_data === 'object' && Object.keys(lead.utm_data).length > 0 ? (
                               <div className="flex flex-wrap gap-1">
-                                {lead.utm_data.utm_source && (
+                                {(lead.utm_data as Record<string, string>).utm_source && (
                                   <Badge variant="secondary" className="text-xs">
-                                    {lead.utm_data.utm_source}
+                                    {String((lead.utm_data as Record<string, string>).utm_source)}
                                   </Badge>
                                 )}
-                                {lead.utm_data.utm_medium && (
+                                {(lead.utm_data as Record<string, string>).utm_medium && (
                                   <Badge variant="outline" className="text-xs">
-                                    {lead.utm_data.utm_medium}
+                                    {String((lead.utm_data as Record<string, string>).utm_medium)}
                                   </Badge>
                                 )}
                               </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,9 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Shield } from "lucide-react";
 import { getTrafficData } from "@/hooks/useTrafficSource";
+
+// Age restriction constants
+const MIN_BIRTH_YEAR = 1960;
+const MAX_BIRTH_YEAR = 2006;
+const MAX_AGE_ALLOWED = 60;
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "שם חייב להכיל לפחות 2 תווים").max(100, "שם ארוך מדי"),
@@ -39,7 +46,26 @@ const LeadForm = ({
 }: LeadFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [birthYear, setBirthYear] = useState<string>("");
+  const [currentStatus, setCurrentStatus] = useState<string>("");
+  const [ageError, setAgeError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const currentYear = new Date().getFullYear();
+
+  // Generate year options (1960-2006, newest first)
+  const yearOptions = useMemo(() => {
+    const years: number[] = [];
+    for (let year = MIN_BIRTH_YEAR; year <= MAX_BIRTH_YEAR; year++) {
+      years.push(year);
+    }
+    return years.reverse();
+  }, []);
+
+  // Calculate age and check if blocked
+  const selectedAge = birthYear ? currentYear - parseInt(birthYear) : null;
+  const isAgeBlocked = selectedAge !== null && selectedAge > MAX_AGE_ALLOWED;
+  const isWarningAge = selectedAge !== null && selectedAge >= 55 && selectedAge <= MAX_AGE_ALLOWED;
 
   const {
     register,
@@ -55,7 +81,6 @@ const LeadForm = ({
 
   const sendWebhook = async (leadData: Record<string, unknown>) => {
     try {
-      // Fetch webhook URL from site_settings
       const { data: settings } = await supabase
         .from("site_settings")
         .select("value")
@@ -65,7 +90,6 @@ const LeadForm = ({
       const webhookUrl = settings?.value;
       
       if (webhookUrl && webhookUrl.trim()) {
-        // Send webhook in background - don't block the user experience
         fetch(webhookUrl, {
           method: "POST",
           headers: {
@@ -82,31 +106,55 @@ const LeadForm = ({
   };
 
   const onSubmit = async (data: LeadFormData) => {
+    // Validate birth year is selected
+    if (!birthYear) {
+      setAgeError("נא לבחור שנת לידה");
+      return;
+    }
+
+    // Check age restriction
+    if (isAgeBlocked) {
+      setAgeError("השירות מותאם לגילאים עד 60 בלבד");
+      return;
+    }
+
+    // Validate current status
+    if (!currentStatus) {
+      toast({
+        title: "שגיאה",
+        description: "נא לבחור אם יש לך ביטוח קיים",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
+    setAgeError(null);
+
     try {
-      // Get traffic data from session storage
       const trafficData = getTrafficData();
       const currentUrl = sourceUrl || window.location.href;
 
-      // Prepare the full lead data - email is required in DB, use empty string if not provided
       const leadData = {
         name: data.name,
         email: data.email || "",
         phone: data.phone,
         source_url: currentUrl,
+        birth_year: parseInt(birthYear),
+        current_status: currentStatus,
         utm_data: {
           ...(trafficData || {}),
           context: prefilledContext || null,
           ...(extraData || {}),
+          calculated_age: selectedAge,
+          ...(isWarningAge && { lead_risk_tag: "high_risk_hard_to_convert" }),
         },
       };
 
-      // Insert into database
       const { error } = await supabase.from("leads").insert([leadData]);
 
       if (error) throw error;
 
-      // Send webhook (non-blocking)
       sendWebhook({
         ...leadData,
         submitted_at: new Date().toISOString(),
@@ -114,6 +162,8 @@ const LeadForm = ({
 
       setIsSuccess(true);
       reset();
+      setBirthYear("");
+      setCurrentStatus("");
       toast({
         title: "תודה! הפרטים התקבלו",
         description: "ניצור איתך קשר בהקדם",
@@ -212,10 +262,61 @@ const LeadForm = ({
           )}
         </div>
 
+        {/* Year of Birth Dropdown */}
+        <div className="space-y-2">
+          <Label>שנת לידה</Label>
+          <Select
+            value={birthYear}
+            onValueChange={(value) => {
+              setBirthYear(value);
+              setAgeError(null);
+            }}
+          >
+            <SelectTrigger className={ageError || isAgeBlocked ? "border-destructive" : ""}>
+              <SelectValue placeholder="בחר שנת לידה" />
+            </SelectTrigger>
+            <SelectContent>
+              {yearOptions.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {(ageError || isAgeBlocked) && (
+            <p className="text-xs text-destructive">
+              {ageError || "השירות מותאם לגילאים עד 60 בלבד"}
+            </p>
+          )}
+        </div>
+
+        {/* Current Insurance Status */}
+        <div className="space-y-3">
+          <Label>האם יש לך ביטוח חיים קיים?</Label>
+          <RadioGroup
+            value={currentStatus}
+            onValueChange={setCurrentStatus}
+            className="flex flex-col gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="yes" id="status-yes" />
+              <Label htmlFor="status-yes" className="font-normal cursor-pointer">כן</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="no" id="status-no" />
+              <Label htmlFor="status-no" className="font-normal cursor-pointer">לא</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="not_sure" id="status-not-sure" />
+              <Label htmlFor="status-not-sure" className="font-normal cursor-pointer">לא בטוח/ה</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         <Button
           type="submit"
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isAgeBlocked}
         >
           {isSubmitting ? (
             <>
