@@ -4,12 +4,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import LeadForm from "@/components/LeadForm";
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight, XCircle } from "lucide-react";
+
+type ActionType = "next_question" | "jump_to_lead_form" | "disqualify";
+
+interface QuizOption {
+  text: string;
+  action_type: ActionType;
+  rejection_message?: string;
+}
 
 interface QuizStep {
   id: string;
   question: string;
-  options: string[];
+  options: QuizOption[];
 }
 
 interface QuizWidgetProps {
@@ -20,6 +28,9 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isComplete, setIsComplete] = useState(false);
+  const [isDisqualified, setIsDisqualified] = useState(false);
+  const [rejectionMessage, setRejectionMessage] = useState("");
+  const [showLeadForm, setShowLeadForm] = useState(false);
 
   const { data: quiz, isLoading } = useQuery({
     queryKey: ["quiz", quizId],
@@ -53,8 +64,22 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
     return null;
   }
 
-  const stepsData = quiz.steps_json as unknown as QuizStep[] | null;
-  
+  // Handle both legacy string[] options and new QuizOption[] format
+  const rawSteps = quiz.steps_json as unknown;
+  const stepsData: QuizStep[] | null = Array.isArray(rawSteps)
+    ? rawSteps.map((step: any) => ({
+        id: step.id,
+        question: step.question,
+        options: Array.isArray(step.options)
+          ? step.options.map((opt: any) =>
+              typeof opt === "string"
+                ? { text: opt, action_type: "next_question" as ActionType }
+                : opt
+            )
+          : [],
+      }))
+    : null;
+
   if (!stepsData || stepsData.length === 0) {
     return null;
   }
@@ -62,16 +87,27 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
   const steps = stepsData;
   const totalSteps = steps.length + 1; // +1 for lead form
   const progress = ((currentStep + 1) / totalSteps) * 100;
-  const isLastQuestionStep = currentStep >= steps.length;
 
-  const handleOptionClick = (option: string) => {
-    setAnswers({ ...answers, [currentStep]: option });
-    
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Move to lead form step
-      setCurrentStep(steps.length);
+  const handleOptionClick = (option: QuizOption) => {
+    setAnswers({ ...answers, [currentStep]: option.text });
+
+    switch (option.action_type) {
+      case "disqualify":
+        setIsDisqualified(true);
+        setRejectionMessage(option.rejection_message || "מצטערים, השירות אינו מתאים עבורך.");
+        break;
+      case "jump_to_lead_form":
+        setShowLeadForm(true);
+        break;
+      case "next_question":
+      default:
+        if (currentStep < steps.length - 1) {
+          setCurrentStep(currentStep + 1);
+        } else {
+          // Last question, show lead form
+          setShowLeadForm(true);
+        }
+        break;
     }
   };
 
@@ -84,6 +120,23 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
   const handleLeadFormSuccess = () => {
     setIsComplete(true);
   };
+
+  // Disqualified state
+  if (isDisqualified) {
+    return (
+      <div className="bg-card rounded-xl shadow-soft overflow-hidden">
+        <div className="p-8 text-center">
+          <XCircle className="w-16 h-16 mx-auto mb-4 text-destructive" />
+          <h3 className="font-display text-xl font-bold text-foreground mb-3">
+            {rejectionMessage}
+          </h3>
+          <p className="text-muted-foreground text-sm">
+            תודה על ההתעניינות. אנו מקווים לעזור לך בעתיד.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isComplete) {
     return (
@@ -110,7 +163,7 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
 
       {/* Content */}
       <div className="p-6">
-        {isLastQuestionStep ? (
+        {showLeadForm ? (
           // Lead Form Step
           <div>
             <h3 className="font-display text-xl font-bold text-foreground mb-2">
@@ -144,7 +197,7 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
                   <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium ml-4">
                     {String.fromCharCode(1488 + index)}
                   </span>
-                  {option}
+                  {option.text}
                 </Button>
               ))}
             </div>
@@ -152,7 +205,7 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
         )}
 
         {/* Back Button */}
-        {currentStep > 0 && (
+        {currentStep > 0 && !showLeadForm && (
           <Button
             variant="ghost"
             size="sm"
