@@ -175,7 +175,7 @@ const Article = () => {
                 <div className="rounded-xl overflow-hidden mb-8">
                   <OptimizedImage
                     src={article.featured_image}
-                    alt={article.title}
+                    alt={article.image_alt_text || article.title}
                     aspectRatio="video"
                     priority={true}
                   />

@@ -92,6 +92,7 @@ export type Database = {
           faq_items: Json | null
           featured_image: string | null
           id: string
+          image_alt_text: string | null
           is_published: boolean
           preview_token: string | null
           published_at: string | null
@@ -115,6 +116,7 @@ export type Database = {
           faq_items?: Json | null
           featured_image?: string | null
           id?: string
+          image_alt_text?: string | null
           is_published?: boolean
           preview_token?: string | null
           published_at?: string | null
@@ -138,6 +140,7 @@ export type Database = {
           faq_items?: Json | null
           featured_image?: string | null
           id?: string
+          image_alt_text?: string | null
           is_published?: boolean
           preview_token?: string | null
           published_at?: string | null
