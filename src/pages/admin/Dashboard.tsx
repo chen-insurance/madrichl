@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Eye, Users, TrendingUp, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { FileText, Eye, Users, TrendingUp, Loader2, UserPlus, BarChart3, Clock } from "lucide-react";
+import { format, startOfToday } from "date-fns";
 import { he } from "date-fns/locale";
 import ContentPerformanceWidget from "@/components/admin/ContentPerformanceWidget";
 import RecentLeadsWidget from "@/components/admin/RecentLeadsWidget";
@@ -12,11 +12,14 @@ const Dashboard = () => {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
-      const [articlesResult, leadsResult, viewsResult, publishedResult] = await Promise.all([
+      const todayStart = startOfToday().toISOString();
+      
+      const [articlesResult, leadsResult, viewsResult, publishedResult, leadsToday] = await Promise.all([
         supabase.from("articles").select("id", { count: "exact" }),
         supabase.from("leads").select("id", { count: "exact" }),
         supabase.from("article_views").select("id", { count: "exact" }),
         supabase.from("articles").select("id", { count: "exact" }).eq("is_published", true),
+        supabase.from("leads").select("id", { count: "exact" }).gte("created_at", todayStart),
       ]);
 
       return {
@@ -24,6 +27,7 @@ const Dashboard = () => {
         publishedArticles: publishedResult.count || 0,
         totalLeads: leadsResult.count || 0,
         totalViews: viewsResult.count || 0,
+        leadsToday: leadsToday.count || 0,
       };
     },
   });
@@ -43,46 +47,51 @@ const Dashboard = () => {
 
   const statCards = [
     {
-      title: "סה״כ מאמרים",
-      value: stats?.totalArticles || 0,
+      title: "לידים היום",
+      value: stats?.leadsToday || 0,
+      icon: UserPlus,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-500/10",
+      trend: "+12%",
+      trendUp: true,
+    },
+    {
+      title: "מאמרים פעילים",
+      value: stats?.publishedArticles || 0,
       icon: FileText,
-      color: "text-blue-500",
+      color: "text-blue-600",
       bgColor: "bg-blue-500/10",
     },
     {
-      title: "מאמרים מפורסמים",
-      value: stats?.publishedArticles || 0,
-      icon: Eye,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
-    },
-    {
-      title: "לידים",
+      title: "סה״כ לידים",
       value: stats?.totalLeads || 0,
       icon: Users,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      color: "text-violet-600",
+      bgColor: "bg-violet-500/10",
     },
     {
-      title: "צפיות",
+      title: "צפיות (7 ימים)",
       value: stats?.totalViews || 0,
       icon: TrendingUp,
-      color: "text-accent",
-      bgColor: "bg-accent/10",
+      color: "text-amber-600",
+      bgColor: "bg-amber-500/10",
     },
   ];
 
   return (
     <AdminLayout>
-      <div className="p-6 md:p-8">
+      <div className="p-4 md:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            לוח בקרה
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            סקירה כללית של האתר והפעילות
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+              לוח בקרה
+            </h1>
+            <p className="text-muted-foreground mt-1 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              עודכן לאחרונה: {format(new Date(), "HH:mm", { locale: he })}
+            </p>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -91,19 +100,29 @@ const Dashboard = () => {
             <Loader2 className="w-8 h-8 animate-spin text-accent" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {statCards.map((stat) => (
-              <Card key={stat.title}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold text-foreground mt-1">
-                        {stat.value.toLocaleString()}
-                      </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {statCards.map((stat, index) => (
+              <Card 
+                key={stat.title} 
+                className={`bg-card border-border/50 shadow-sm hover:shadow-md transition-shadow ${index === 0 ? 'ring-2 ring-emerald-500/20' : ''}`}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold text-foreground">
+                          {stat.value.toLocaleString()}
+                        </p>
+                        {stat.trend && (
+                          <span className={`text-xs font-medium ${stat.trendUp ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {stat.trend}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                    <div className={`p-3 rounded-xl ${stat.bgColor}`}>
+                      <stat.icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                   </div>
                 </CardContent>
@@ -112,23 +131,26 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Recent Activity */}
+        {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Articles */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">מאמרים אחרונים</CardTitle>
+          <Card className="bg-card border-border/50 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5 text-muted-foreground" />
+                מאמרים אחרונים
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {recentArticles && recentArticles.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {recentArticles.map((article) => (
                     <div
                       key={article.id}
-                      className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                      className="flex items-center justify-between py-3 px-3 rounded-lg hover:bg-muted/50 transition-colors -mx-3"
                     >
-                      <div>
-                        <p className="font-medium text-foreground truncate max-w-xs">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-foreground truncate">
                           {article.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
@@ -136,9 +158,9 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
+                        className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 mr-3 ${
                           article.is_published
-                            ? "bg-green-500/10 text-green-500"
+                            ? "bg-emerald-500/10 text-emerald-600"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
@@ -148,7 +170,10 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-center py-4">אין מאמרים עדיין</p>
+                <div className="text-center py-8">
+                  <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-muted-foreground">אין מאמרים עדיין</p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -158,9 +183,7 @@ const Dashboard = () => {
         </div>
 
         {/* Content Performance Widget */}
-        <div className="mt-6">
-          <ContentPerformanceWidget />
-        </div>
+        <ContentPerformanceWidget />
       </div>
     </AdminLayout>
   );

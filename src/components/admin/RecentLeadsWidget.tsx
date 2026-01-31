@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, ExternalLink, Loader2 } from "lucide-react";
+import { Download, ExternalLink, Loader2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -83,23 +83,26 @@ const RecentLeadsWidget = () => {
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg">לידים אחרונים</CardTitle>
+    <Card className="bg-card border-border/50 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <Users className="w-5 h-5 text-muted-foreground" />
+          לידים אחרונים
+        </CardTitle>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="gap-2"
+            className="gap-2 h-8"
           >
             <Download className="h-4 w-4" />
-            ייצוא CSV
+            <span className="hidden sm:inline">ייצוא CSV</span>
           </Button>
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild className="h-8">
             <Link to="/admin/leads" className="gap-2">
               <ExternalLink className="h-4 w-4" />
-              הכל
+              <span className="hidden sm:inline">הכל</span>
             </Link>
           </Button>
         </div>
