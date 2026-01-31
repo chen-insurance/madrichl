@@ -25,7 +25,7 @@ import {
   Sparkles,
   Puzzle,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Popover,
   PopoverContent,
@@ -46,7 +46,6 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [showAIAssist, setShowAIAssist] = useState(false);
   const [showWidgetModal, setShowWidgetModal] = useState(false);
-  const initialContentSet = useRef(false);
 
   const editor = useEditor({
     extensions: [
@@ -88,16 +87,13 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     },
   });
 
-  // Fix: Watch for content prop changes (async fetch) and update editor
+  // Fix: Watch for content prop changes and update editor when content differs
   useEffect(() => {
-    if (editor && content && !initialContentSet.current) {
-      // Only set content if editor is empty or this is the first real content load
+    if (editor && content) {
       const currentContent = editor.getHTML();
-      const isEditorEmpty = currentContent === "<p></p>" || currentContent === "";
-      
-      if (isEditorEmpty && content) {
+      // Only update if content is different (avoid loops)
+      if (currentContent !== content) {
         editor.commands.setContent(content);
-        initialContentSet.current = true;
       }
     }
   }, [editor, content]);
