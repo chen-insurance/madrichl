@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import logoIcon from "@/assets/logo-icon.png";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,9 +99,11 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo - Right side in RTL */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-gold rounded-lg flex items-center justify-center shadow-gold">
-                <span className="text-primary font-display font-bold text-lg md:text-xl">מ</span>
-              </div>
+              <img 
+                src={logoIcon} 
+                alt="המדריך לצרכן" 
+                className="w-10 h-10 md:w-12 md:h-12 object-contain"
+              />
               <div>
                 <h1 className="font-display font-bold text-lg md:text-xl text-foreground">המדריך לצרכן</h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">מגזין ביטוח ופיננסים</p>
@@ -140,9 +143,11 @@ const Header = () => {
                   {/* Mobile Header */}
                   <div className="p-6 border-b border-border">
                     <Link to="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
-                      <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center shadow-gold">
-                        <span className="text-primary font-display font-bold text-lg">מ</span>
-                      </div>
+                      <img 
+                        src={logoIcon} 
+                        alt="המדריך לצרכן" 
+                        className="w-10 h-10 object-contain"
+                      />
                       <div>
                         <h1 className="font-display font-bold text-lg text-foreground">המדריך לצרכן</h1>
                         <p className="text-xs text-muted-foreground">מגזין ביטוח ופיננסים</p>
