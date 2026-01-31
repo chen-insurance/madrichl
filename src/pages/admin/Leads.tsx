@@ -34,8 +34,10 @@ import {
   ChevronRight,
   ChevronLeft,
   ExternalLink,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
+import LeadDetailsModal from "@/components/admin/LeadDetailsModal";
 
 const LEADS_PER_PAGE = 20;
 
@@ -71,6 +73,8 @@ const Leads = () => {
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Calculate date range based on filter
@@ -368,6 +372,7 @@ const Leads = () => {
                         <TableHead className="text-right">מקור</TableHead>
                         <TableHead className="text-right">UTM</TableHead>
                         <TableHead className="text-right">תאריך</TableHead>
+                        <TableHead className="text-right w-16">פעולות</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -464,6 +469,19 @@ const Leads = () => {
                               {format(new Date(lead.created_at), "HH:mm")}
                             </span>
                           </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setDetailsModalOpen(true);
+                              }}
+                              title="צפייה בפרטים"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -509,6 +527,13 @@ const Leads = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Lead Details Modal */}
+        <LeadDetailsModal
+          lead={selectedLead}
+          open={detailsModalOpen}
+          onOpenChange={setDetailsModalOpen}
+        />
       </div>
     </AdminLayout>
   );
