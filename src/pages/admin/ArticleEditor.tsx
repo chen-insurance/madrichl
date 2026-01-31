@@ -37,6 +37,7 @@ const articleSchema = z.object({
   excerpt: z.string().optional(),
   content: z.string().optional(),
   featured_image: z.string().url().optional().or(z.literal("")),
+  image_alt_text: z.string().optional(),
   seo_title: z.string().optional(),
   seo_description: z.string().optional(),
   author_name: z.string().optional(),
@@ -65,6 +66,7 @@ const ArticleEditor = () => {
     excerpt: "",
     content: "",
     featured_image: "",
+    image_alt_text: "",
     seo_title: "",
     seo_description: "",
     author_name: "מערכת המדריך",
@@ -115,6 +117,7 @@ const ArticleEditor = () => {
         excerpt: article.excerpt || "",
         content: article.content || "",
         featured_image: article.featured_image || "",
+        image_alt_text: article.image_alt_text || "",
         seo_title: article.seo_title || "",
         seo_description: article.seo_description || "",
         author_name: article.author_name || "מערכת המדריך",
@@ -164,6 +167,7 @@ const ArticleEditor = () => {
           excerpt: data.excerpt || null,
           content: data.content || null,
           featured_image: data.featured_image || null,
+          image_alt_text: data.image_alt_text || null,
           seo_title: data.seo_title || null,
           seo_description: data.seo_description || null,
           author_name: data.author_name || null,
@@ -188,6 +192,7 @@ const ArticleEditor = () => {
           excerpt: data.excerpt || null,
           content: data.content || null,
           featured_image: data.featured_image || null,
+          image_alt_text: data.image_alt_text || null,
           seo_title: data.seo_title || null,
           seo_description: data.seo_description || null,
           author_name: data.author_name || null,
@@ -500,7 +505,7 @@ const ArticleEditor = () => {
                   <div className="rounded-lg overflow-hidden border border-border max-w-sm">
                     <img
                       src={formData.featured_image}
-                      alt="תצוגה מקדימה"
+                      alt={formData.image_alt_text || "תצוגה מקדימה"}
                       className="w-full h-auto"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = "none";
@@ -508,6 +513,22 @@ const ArticleEditor = () => {
                     />
                   </div>
                 )}
+                
+                {/* Image Alt Text for SEO */}
+                <div className="space-y-2">
+                  <Label htmlFor="image_alt_text">טקסט חלופי לתמונה (Alt Text)</Label>
+                  <Input
+                    id="image_alt_text"
+                    value={formData.image_alt_text}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, image_alt_text: e.target.value }))
+                    }
+                    placeholder="תיאור התמונה עבור Google ונגישות"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    תיאור קצר של התמונה עבור מנועי חיפוש וקוראי מסך. חשוב ל-SEO ונגישות.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

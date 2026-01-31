@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -122,6 +123,14 @@ const LifeInsuranceCalc = () => {
 
   return (
     <>
+      <Helmet>
+        <title>מחשבון ביטוח חיים | המדריך לצרכן</title>
+        <meta
+          name="description"
+          content="חשב את עלות ביטוח החיים שלך בקלות. הזן גיל, מין וסכום כיסוי וקבל הערכת מחיר חודשי מיידית. כלי חינמי לתכנון פיננסי."
+        />
+        <link rel="canonical" href="https://the-guide.co.il/Life_Insurance_Calc" />
+      </Helmet>
       <Card className="w-full max-w-xl mx-auto border-accent/20 shadow-lg">
         <CardHeader className="bg-gradient-navy text-cream rounded-t-xl">
           <div className="flex items-center gap-3">
