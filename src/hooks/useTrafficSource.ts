@@ -8,23 +8,32 @@ const STORAGE_KEY = "traffic_data";
 
 /**
  * Global hook that captures traffic source data from URL parameters
- * and stores it in sessionStorage for lead attribution.
- * Runs once when the app loads and preserves data across navigation.
+ * and stores it in localStorage for lead attribution.
+ * 
+ * Uses "Last Click" attribution model:
+ * - If URL has UTM params → Overwrite existing data (new source wins)
+ * - If URL has NO UTMs → Keep existing data (preserve original source)
+ * 
+ * localStorage persists across browser sessions for long-term tracking.
  */
 export const useTrafficSource = () => {
   useEffect(() => {
-    // Check if we already have traffic data stored
-    const existingData = sessionStorage.getItem(STORAGE_KEY);
-    
-    // Only capture on first visit (don't overwrite existing data)
-    if (existingData) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Check if current URL has any UTM or ad click params
+    const hasNewUtms = 
+      urlParams.has("utm_source") ||
+      urlParams.has("utm_medium") ||
+      urlParams.has("utm_campaign") ||
+      urlParams.has("gclid") ||
+      urlParams.has("fbclid");
+
+    // If no new UTMs in URL, keep existing localStorage data
+    if (!hasNewUtms) {
       return;
     }
 
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Build traffic data object
+    // New UTMs detected - overwrite with fresh attribution data
     const trafficData: TrafficData = {};
 
     // UTM parameters
@@ -52,20 +61,20 @@ export const useTrafficSource = () => {
       trafficData.referrer = document.referrer;
     }
 
-    // Capture landing page
+    // Capture landing page and timestamp
     trafficData.landing_page = window.location.pathname + window.location.search;
     trafficData.captured_at = new Date().toISOString();
 
-    // Store the data
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trafficData));
+    // Overwrite localStorage with new attribution data
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trafficData));
   }, []);
 };
 
 /**
- * Utility function to get stored traffic data
+ * Utility function to get stored traffic data from localStorage
  */
 export const getTrafficData = (): Record<string, string | undefined> | null => {
-  const storedData = sessionStorage.getItem(STORAGE_KEY);
+  const storedData = localStorage.getItem(STORAGE_KEY);
   if (!storedData) return null;
   
   try {
