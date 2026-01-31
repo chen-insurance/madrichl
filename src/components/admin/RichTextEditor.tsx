@@ -25,7 +25,7 @@ import {
   Sparkles,
   Puzzle,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Popover,
   PopoverContent,
@@ -34,35 +34,7 @@ import {
 import AIAssistModal from "./AIAssistModal";
 import InsertWidgetModal from "./InsertWidgetModal";
 
-// Helper to convert shortcodes to visual placeholders when loading content
-const convertShortcodesToPlaceholders = (html: string): string => {
-  if (!html) return html;
-  
-  // Match {{shortcode}} patterns and convert to placeholder spans
-  return html.replace(/\{\{([^}]+)\}\}/g, (match, code) => {
-    const displayName = getWidgetDisplayName(code);
-    return `<span data-widget="${match}" class="widget-placeholder">[ווידג׳ט: ${displayName}]</span>`;
-  });
-};
-
-// Helper to convert placeholder spans back to shortcodes when saving
-const convertPlaceholdersToShortcodes = (html: string): string => {
-  if (!html) return html;
-  
-  // Match placeholder spans and extract the original shortcode
-  return html.replace(
-    /<span[^>]*data-widget="([^"]+)"[^>]*class="widget-placeholder"[^>]*>[^<]*<\/span>/g,
-    (_, shortcode) => shortcode
-  );
-};
-
-// Get display name for a shortcode
-const getWidgetDisplayName = (code: string): string => {
-  if (code === "insurance_calculator") return "מחשבון ביטוח חיים";
-  if (code.startsWith("quiz_")) return "שאלון";
-  if (code.startsWith("cta_")) return "בלוק CTA";
-  return code;
-};
+// No conversion needed - shortcodes are stored and displayed as plain text {{shortcode}}
 
 interface RichTextEditorProps {
   content: string;
@@ -74,6 +46,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [showAIAssist, setShowAIAssist] = useState(false);
   const [showWidgetModal, setShowWidgetModal] = useState(false);
+  const initialContentSet = useRef(false);
 
   const editor = useEditor({
     extensions: [
@@ -101,12 +74,10 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         placeholder: "התחילו לכתוב את תוכן המאמר...",
       }),
     ],
-    content: convertShortcodesToPlaceholders(content),
+    content: content || "",
     onUpdate: ({ editor }) => {
-      // Convert visual placeholders back to shortcodes when saving
       const html = editor.getHTML();
-      const cleanedHtml = convertPlaceholdersToShortcodes(html);
-      onChange(cleanedHtml);
+      onChange(html);
     },
     editorProps: {
       attributes: {
@@ -116,6 +87,20 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
       },
     },
   });
+
+  // Fix: Watch for content prop changes (async fetch) and update editor
+  useEffect(() => {
+    if (editor && content && !initialContentSet.current) {
+      // Only set content if editor is empty or this is the first real content load
+      const currentContent = editor.getHTML();
+      const isEditorEmpty = currentContent === "<p></p>" || currentContent === "";
+      
+      if (isEditorEmpty && content) {
+        editor.commands.setContent(content);
+        initialContentSet.current = true;
+      }
+    }
+  }, [editor, content]);
 
   if (!editor) {
     return null;
@@ -144,13 +129,9 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     editor.chain().focus().insertContent(text).run();
   };
 
-  const handleWidgetInsert = (shortcode: string, displayName: string) => {
-    // Insert a visual placeholder that will be rendered as the shortcode
-    editor
-      .chain()
-      .focus()
-      .insertContent(`<span data-widget="${shortcode}" class="widget-placeholder">[ווידג׳ט: ${displayName}]</span>`)
-      .run();
+  const handleWidgetInsert = (shortcode: string, _displayName: string) => {
+    // Insert raw shortcode text only - no HTML wrapping
+    editor.chain().focus().insertContent(shortcode).run();
   };
 
   const ToolbarButton = ({
