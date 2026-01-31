@@ -36,11 +36,11 @@ const MarketTicker = () => {
   }, []);
 
   return (
-    <div className="w-full bg-card border-b border-border overflow-hidden">
+    <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-card border-b border-border overflow-hidden">
       <div
         ref={containerRef}
-        className="tradingview-widget-container"
-        style={{ height: "46px" }}
+        className="tradingview-widget-container w-full"
+        style={{ minHeight: "46px", overflow: "hidden" }}
       />
     </div>
   );
