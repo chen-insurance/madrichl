@@ -47,6 +47,19 @@ const GlossaryIndex = () => {
           content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים."
         />
         <link rel="canonical" href="https://the-guide.co.il/glossary" />
+        {/* Open Graph */}
+        <meta property="og:title" content="מילון מונחים פיננסיים | המדריך לצרכן" />
+        <meta property="og:description" content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://the-guide.co.il/glossary" />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="מילון מונחים פיננסיים | המדריך לצרכן" />
+        <meta name="twitter:description" content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים." />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
       </Helmet>
 
       <Header />

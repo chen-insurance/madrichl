@@ -130,6 +130,19 @@ const LifeInsuranceCalc = () => {
           content="חשב את עלות ביטוח החיים שלך בקלות. הזן גיל, מין וסכום כיסוי וקבל הערכת מחיר חודשי מיידית. כלי חינמי לתכנון פיננסי."
         />
         <link rel="canonical" href="https://the-guide.co.il/Life_Insurance_Calc" />
+        {/* Open Graph */}
+        <meta property="og:title" content="מחשבון ביטוח חיים | המדריך לצרכן" />
+        <meta property="og:description" content="חשב את עלות ביטוח החיים שלך בקלות. הזן גיל, מין וסכום כיסוי וקבל הערכת מחיר חודשי מיידית." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://the-guide.co.il/Life_Insurance_Calc" />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="מחשבון ביטוח חיים | המדריך לצרכן" />
+        <meta name="twitter:description" content="חשב את עלות ביטוח החיים שלך בקלות. הזן גיל, מין וסכום כיסוי וקבל הערכת מחיר חודשי מיידית." />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
       </Helmet>
       <Card className="w-full max-w-xl mx-auto border-accent/20 shadow-lg">
         <CardHeader className="bg-gradient-navy text-cream rounded-t-xl">

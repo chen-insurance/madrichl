@@ -105,6 +105,20 @@ const GlossaryTerm = () => {
           rel="canonical"
           href={`https://the-guide.co.il/glossary/${term.slug}`}
         />
+        {/* Open Graph */}
+        <meta property="og:title" content={term.seo_title || `${term.term_name} - מילון מונחים | המדריך לצרכן`} />
+        <meta property="og:description" content={term.seo_description || term.definition_rich_text?.slice(0, 155) || `הגדרת המונח ${term.term_name}`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://the-guide.co.il/glossary/${term.slug}`} />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={term.seo_title || `${term.term_name} - מילון מונחים | המדריך לצרכן`} />
+        <meta name="twitter:description" content={term.seo_description || term.definition_rich_text?.slice(0, 155) || `הגדרת המונח ${term.term_name}`} />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        {/* Structured Data */}
         {definedTermSchema && (
           <script type="application/ld+json">
             {JSON.stringify(definedTermSchema)}
