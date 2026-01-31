@@ -78,21 +78,6 @@ const Header = () => {
 
   return (
     <>
-      {/* Announcement Bar */}
-      {announcement?.show && announcement?.text && (
-        <div
-          className="text-center py-2 px-4 text-white text-sm font-medium"
-          style={{ backgroundColor: announcement.color }}
-        >
-          {announcement.link ? (
-            <Link to={announcement.link} className="hover:underline">
-              {announcement.text}
-            </Link>
-          ) : (
-            announcement.text
-          )}
-        </div>
-      )}
 
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="container mx-auto">
