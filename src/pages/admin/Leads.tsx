@@ -35,7 +35,11 @@ import {
   ChevronLeft,
   ExternalLink,
   Eye,
+  Trash2,
+  CheckSquare,
+  X,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import LeadDetailsModal from "@/components/admin/LeadDetailsModal";
 
@@ -75,6 +79,7 @@ const Leads = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
 
   // Calculate date range based on filter
@@ -176,6 +181,46 @@ const Leads = () => {
     },
   });
 
+  // Bulk update status mutation
+  const bulkUpdateStatusMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[]; status: LeadStatus }) => {
+      const { error } = await supabase
+        .from("leads")
+        .update({ status })
+        .in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["leads-count"] });
+      setSelectedIds(new Set());
+      toast.success(`${variables.ids.length} לידים עודכנו בהצלחה`);
+    },
+    onError: () => {
+      toast.error("שגיאה בעדכון הלידים");
+    },
+  });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from("leads")
+        .delete()
+        .in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_, ids) => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["leads-count"] });
+      setSelectedIds(new Set());
+      toast.success(`${ids.length} לידים נמחקו בהצלחה`);
+    },
+    onError: () => {
+      toast.error("שגיאה במחיקת הלידים");
+    },
+  });
+
 
   // Fetch all leads for export
   const exportToCSV = async () => {
@@ -270,6 +315,88 @@ const Leads = () => {
     setCurrentPage(1);
   };
 
+  // Selection helpers
+  const toggleSelectAll = () => {
+    if (!leads) return;
+    if (selectedIds.size === leads.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(leads.map((l) => l.id)));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedIds(newSet);
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkStatusChange = (status: LeadStatus) => {
+    if (selectedIds.size === 0) return;
+    bulkUpdateStatusMutation.mutate({ ids: Array.from(selectedIds), status });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`האם למחוק ${selectedIds.size} לידים?`)) return;
+    bulkDeleteMutation.mutate(Array.from(selectedIds));
+  };
+
+  const handleExportSelected = () => {
+    if (!leads || selectedIds.size === 0) return;
+    const selectedLeads = leads.filter((l) => selectedIds.has(l.id));
+    exportLeadsToCSV(selectedLeads);
+  };
+
+  const exportLeadsToCSV = (leadsToExport: Lead[]) => {
+    if (leadsToExport.length === 0) {
+      toast.error("אין נתונים לייצוא");
+      return;
+    }
+
+    const headers = ["שם", "מייל", "טלפון", "סטטוס", "מקור", "UTM Source", "UTM Medium", "UTM Campaign", "תאריך"];
+    const rows = leadsToExport.map((lead) => {
+      const utmData = (lead.utm_data as Record<string, string> | null) || {};
+      return [
+        lead.name,
+        lead.email,
+        lead.phone || "",
+        STATUS_LABELS[(lead.status as LeadStatus) || "new"],
+        lead.source_url || "",
+        utmData.utm_source || "",
+        utmData.utm_medium || "",
+        utmData.utm_campaign || "",
+        format(new Date(lead.created_at), "dd/MM/yyyy HH:mm"),
+      ];
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `leads-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success(`יוצאו ${leadsToExport.length} לידים בהצלחה`);
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -350,6 +477,43 @@ const Leads = () => {
           </CardContent>
         </Card>
 
+        {/* Bulk Actions Bar */}
+        {selectedIds.size > 0 && (
+          <Card className="border-accent bg-accent/5">
+            <CardContent className="py-3 px-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-accent" />
+                  <span className="font-medium">{selectedIds.size} נבחרו</span>
+                </div>
+                <div className="h-6 w-px bg-border" />
+                <Select onValueChange={(v) => handleBulkStatusChange(v as LeadStatus)}>
+                  <SelectTrigger className="w-36 h-8">
+                    <SelectValue placeholder="שנה סטטוס" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">חדש</SelectItem>
+                    <SelectItem value="contacted">נוצר קשר</SelectItem>
+                    <SelectItem value="closed">סגור</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm" onClick={handleExportSelected} className="gap-2">
+                  <Download className="w-4 h-4" />
+                  ייצוא נבחרים
+                </Button>
+                <Button variant="destructive" size="sm" onClick={handleBulkDelete} className="gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  מחק
+                </Button>
+                <Button variant="ghost" size="sm" onClick={clearSelection} className="gap-1 mr-auto">
+                  <X className="w-4 h-4" />
+                  בטל בחירה
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Leads Table */}
         <Card>
           <CardContent className="p-0">
@@ -365,6 +529,13 @@ const Leads = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-12">
+                          <Checkbox
+                            checked={leads.length > 0 && selectedIds.size === leads.length}
+                            onCheckedChange={toggleSelectAll}
+                            aria-label="בחר הכל"
+                          />
+                        </TableHead>
                         <TableHead className="text-right">שם</TableHead>
                         <TableHead className="text-right">מייל</TableHead>
                         <TableHead className="text-right">טלפון</TableHead>
@@ -377,7 +548,14 @@ const Leads = () => {
                     </TableHeader>
                     <TableBody>
                       {leads.map((lead) => (
-                        <TableRow key={lead.id}>
+                        <TableRow key={lead.id} data-state={selectedIds.has(lead.id) ? "selected" : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.has(lead.id)}
+                              onCheckedChange={() => toggleSelectOne(lead.id)}
+                              aria-label={`בחר ${lead.name}`}
+                            />
+                          </TableCell>
                           <TableCell className="font-medium">
                             {lead.name}
                           </TableCell>
