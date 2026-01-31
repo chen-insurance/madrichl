@@ -32,7 +32,11 @@ interface NavItem {
   children?: { label: string; href: string }[];
 }
 
-const AdminSidebar = () => {
+interface AdminSidebarProps {
+  onNavigate?: () => void;
+}
+
+const AdminSidebar = ({ onNavigate }: AdminSidebarProps) => {
   const { signOut } = useAuth();
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(["posts"]);
@@ -141,12 +145,16 @@ const AdminSidebar = () => {
     await signOut();
   };
 
+  const handleLinkClick = () => {
+    onNavigate?.();
+  };
+
   return (
-    <aside className="w-64 bg-card border-l border-border flex flex-col h-screen sticky top-0">
+    <aside className="w-64 bg-card border-l border-border/60 flex flex-col h-screen sticky top-0 shadow-sm">
       {/* Logo */}
-      <div className="p-6 border-b border-border">
-        <Link to="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center shadow-gold">
+      <div className="p-5 border-b border-border/60">
+        <Link to="/admin" className="flex items-center gap-3" onClick={handleLinkClick}>
+          <div className="w-10 h-10 bg-gradient-gold rounded-xl flex items-center justify-center shadow-gold">
             <span className="text-primary font-display font-bold text-lg">מ</span>
           </div>
           <div>
@@ -157,7 +165,7 @@ const AdminSidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => (
           <div key={item.label}>
             {item.children ? (
@@ -165,15 +173,18 @@ const AdminSidebar = () => {
                 <button
                   onClick={() => toggleMenu(item.label)}
                   className={cn(
-                    "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-right",
+                    "w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-150 text-right group",
                     isParentActive(item)
                       ? "bg-accent/10 text-accent font-medium"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
+                    <item.icon className={cn(
+                      "w-5 h-5 transition-colors",
+                      isParentActive(item) ? "text-accent" : "text-muted-foreground group-hover:text-foreground"
+                    )} />
+                    <span className="text-sm">{item.label}</span>
                   </div>
                   {expandedMenus.includes(item.label) ? (
                     <ChevronDown className="w-4 h-4" />
@@ -182,16 +193,17 @@ const AdminSidebar = () => {
                   )}
                 </button>
                 {expandedMenus.includes(item.label) && (
-                  <div className="mr-6 mt-1 space-y-1 border-r border-border pr-4">
+                  <div className="mr-5 mt-1 space-y-0.5 border-r-2 border-border/50 pr-3">
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
                         to={child.href}
+                        onClick={handleLinkClick}
                         className={cn(
-                          "block px-4 py-2 rounded-lg transition-colors text-sm",
+                          "block px-3 py-2 rounded-lg transition-all duration-150 text-sm",
                           isActive(child.href)
-                            ? "bg-accent/10 text-accent font-medium"
-                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            ? "bg-accent text-accent-foreground font-medium shadow-sm"
+                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                         )}
                       >
                         {child.label}
@@ -203,15 +215,19 @@ const AdminSidebar = () => {
             ) : (
               <Link
                 to={item.href!}
+                onClick={handleLinkClick}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group",
                   isActive(item.href!)
-                    ? "bg-accent/10 text-accent font-medium"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    ? "bg-accent text-accent-foreground font-medium shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 )}
               >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
+                <item.icon className={cn(
+                  "w-5 h-5 transition-colors",
+                  isActive(item.href!) ? "text-accent-foreground" : "text-muted-foreground group-hover:text-foreground"
+                )} />
+                <span className="text-sm">{item.label}</span>
               </Link>
             )}
           </div>
@@ -219,21 +235,22 @@ const AdminSidebar = () => {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border space-y-2">
+      <div className="p-3 border-t border-border/60 space-y-1">
         <Link
           to="/"
-          className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:bg-secondary hover:text-foreground rounded-lg transition-colors"
+          onClick={handleLinkClick}
+          className="flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg transition-all duration-150 group"
         >
-          <Home className="w-5 h-5" />
-          <span>לאתר הראשי</span>
+          <Home className="w-5 h-5 group-hover:text-foreground" />
+          <span className="text-sm">לאתר הראשי</span>
         </Link>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
+          className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 px-3 py-2.5 h-auto"
           onClick={handleSignOut}
         >
           <LogOut className="w-5 h-5" />
-          <span>התנתקות</span>
+          <span className="text-sm">התנתקות</span>
         </Button>
       </div>
     </aside>
