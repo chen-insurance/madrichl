@@ -1,4 +1,4 @@
-import { ArrowLeft, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/common/OptimizedImage";
@@ -50,17 +50,6 @@ const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionPro
   return (
     <section className="py-8 md:py-12">
       <div className="container mx-auto">
-        {/* Breaking News Banner */}
-        <div className="mb-6 flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-lg p-3 animate-fade-in">
-          <div className="flex items-center gap-2 bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-semibold">
-            <TrendingUp className="w-4 h-4" />
-            <span>עדכון חם</span>
-          </div>
-          <p className="text-sm text-foreground truncate">
-            הרשות לשוק ההון מפרסמת הנחיות חדשות לגילוי מידע בפוליסות ביטוח
-          </p>
-        </div>
-
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Featured Article */}
           <Link
