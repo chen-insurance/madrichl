@@ -8,13 +8,23 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, GripVertical, Copy, Edit, ListChecks } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, Copy, Edit, ListChecks, Ban, ArrowRight, Send } from "lucide-react";
+
+type ActionType = "next_question" | "jump_to_lead_form" | "disqualify";
+
+interface QuizOption {
+  text: string;
+  action_type: ActionType;
+  rejection_message?: string;
+}
 
 interface QuizStep {
   id: string;
   question: string;
-  options: string[];
+  options: QuizOption[];
 }
 
 interface Quiz {
@@ -72,12 +82,15 @@ const QuizBuilder = () => {
       {
         id: crypto.randomUUID(),
         question: "",
-        options: ["", ""],
+        options: [
+          { text: "", action_type: "next_question" },
+          { text: "", action_type: "next_question" },
+        ],
       },
     ]);
   };
 
-  const updateStep = (index: number, field: keyof QuizStep, value: string | string[]) => {
+  const updateStep = (index: number, field: keyof QuizStep, value: string | QuizOption[]) => {
     const updated = [...steps];
     updated[index] = { ...updated[index], [field]: value };
     setSteps(updated);
@@ -85,13 +98,19 @@ const QuizBuilder = () => {
 
   const addOption = (stepIndex: number) => {
     const updated = [...steps];
-    updated[stepIndex].options = [...updated[stepIndex].options, ""];
+    updated[stepIndex].options = [
+      ...updated[stepIndex].options,
+      { text: "", action_type: "next_question" },
+    ];
     setSteps(updated);
   };
 
-  const updateOption = (stepIndex: number, optionIndex: number, value: string) => {
+  const updateOption = (stepIndex: number, optionIndex: number, field: keyof QuizOption, value: string) => {
     const updated = [...steps];
-    updated[stepIndex].options[optionIndex] = value;
+    updated[stepIndex].options[optionIndex] = {
+      ...updated[stepIndex].options[optionIndex],
+      [field]: value,
+    };
     setSteps(updated);
   };
 
@@ -247,24 +266,66 @@ const QuizBuilder = () => {
                           />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <Label>אפשרויות</Label>
                           {step.options.map((option, optIndex) => (
-                            <div key={optIndex} className="flex gap-2">
-                              <Input
-                                value={option}
-                                onChange={(e) => updateOption(stepIndex, optIndex, e.target.value)}
-                                placeholder={`אפשרות ${optIndex + 1}`}
-                              />
-                              {step.options.length > 2 && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => removeOption(stepIndex, optIndex)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              )}
+                            <div key={optIndex} className="border rounded-lg p-3 space-y-3 bg-muted/30">
+                              <div className="flex gap-2 items-start">
+                                <div className="flex-1 space-y-2">
+                                  <Input
+                                    value={option.text}
+                                    onChange={(e) => updateOption(stepIndex, optIndex, "text", e.target.value)}
+                                    placeholder={`אפשרות ${optIndex + 1}`}
+                                  />
+                                  <Select
+                                    value={option.action_type}
+                                    onValueChange={(val) => updateOption(stepIndex, optIndex, "action_type", val)}
+                                  >
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="next_question">
+                                        <span className="flex items-center gap-2">
+                                          <ArrowRight className="w-4 h-4" />
+                                          המשך לשאלה הבאה
+                                        </span>
+                                      </SelectItem>
+                                      <SelectItem value="jump_to_lead_form">
+                                        <span className="flex items-center gap-2">
+                                          <Send className="w-4 h-4 text-green-600" />
+                                          קפוץ לטופס לידים
+                                        </span>
+                                      </SelectItem>
+                                      <SelectItem value="disqualify">
+                                        <span className="flex items-center gap-2">
+                                          <Ban className="w-4 h-4 text-destructive" />
+                                          פסול (הודעת דחייה)
+                                        </span>
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  {option.action_type === "disqualify" && (
+                                    <Textarea
+                                      value={option.rejection_message || ""}
+                                      onChange={(e) => updateOption(stepIndex, optIndex, "rejection_message", e.target.value)}
+                                      placeholder="הודעת דחייה (לדוגמה: מצטערים, השירות אינו מתאים לגילך)"
+                                      className="text-sm"
+                                      rows={2}
+                                    />
+                                  )}
+                                </div>
+                                {step.options.length > 2 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="shrink-0"
+                                    onClick={() => removeOption(stepIndex, optIndex)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           ))}
                           <Button
