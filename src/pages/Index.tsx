@@ -6,7 +6,6 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
-import MarketTicker from "@/components/home/MarketTicker";
 import ComparisonTable from "@/components/market/ComparisonTable";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 
@@ -118,8 +117,6 @@ const Index = () => {
         />
         <link rel="canonical" href="https://the-guide.co.il" />
       </Helmet>
-
-      <MarketTicker />
       <Header />
       <main className="flex-1">
         <HeroSection
