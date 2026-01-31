@@ -95,7 +95,9 @@ const PagesList = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {format(new Date(page.created_at), "dd/MM/yyyy")}
+                        {page.created_at && !isNaN(new Date(page.created_at).getTime())
+                          ? format(new Date(page.created_at), "dd/MM/yyyy")
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
