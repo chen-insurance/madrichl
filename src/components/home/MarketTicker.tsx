@@ -9,15 +9,15 @@ const MarketTicker = () => {
     // Clear any existing content
     containerRef.current.innerHTML = "";
 
-    // Create widget container div
+    // Create the widget container div that TradingView expects
     const widgetContainer = document.createElement("div");
     widgetContainer.className = "tradingview-widget-container__widget";
-    widgetContainer.style.cssText = "width: 100%; height: 100%;";
 
-    // Create script element for TradingView widget
+    // Create script element for TradingView Ticker Tape widget
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
     script.async = true;
+    script.type = "text/javascript";
     script.innerHTML = JSON.stringify({
       symbols: [
         { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
@@ -28,7 +28,7 @@ const MarketTicker = () => {
       ],
       showSymbolLogo: true,
       isTransparent: true,
-      displayMode: "adaptive",
+      displayMode: "compact",
       colorTheme: "light",
       locale: "he_IL",
     });
@@ -45,23 +45,18 @@ const MarketTicker = () => {
 
   return (
     <div
+      className="w-full bg-card border-b border-border"
       style={{
-        position: "relative",
-        width: "100vw",
-        height: "46px",
-        marginLeft: "calc(-50vw + 50%)",
-        left: "0",
+        height: "44px",
         overflow: "hidden",
-        zIndex: 10,
       }}
-      className="bg-card border-b border-border"
     >
       <div
         ref={containerRef}
         className="tradingview-widget-container"
         style={{
           width: "100%",
-          height: "46px",
+          height: "44px",
           overflow: "hidden",
         }}
       />
