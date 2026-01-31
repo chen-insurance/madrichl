@@ -134,6 +134,11 @@ const LeadForm = ({
     try {
       const trafficData = getTrafficData();
       const currentUrl = sourceUrl || window.location.href;
+      
+      // Extract page title and slug for Make.com tracking
+      const pageTitle = document.title;
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const pageSlug = pathParts[pathParts.length - 1] || 'homepage';
 
       const leadData = {
         name: data.name,
@@ -157,6 +162,8 @@ const LeadForm = ({
 
       sendWebhook({
         ...leadData,
+        page_title: pageTitle,
+        page_slug: pageSlug,
         submitted_at: new Date().toISOString(),
       });
 
