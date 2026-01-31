@@ -462,6 +462,7 @@ const ArticleEditor = () => {
               <div className="space-y-2">
                 <Label>תוכן</Label>
                 <RichTextEditor
+                  key={article?.id || "new"}
                   content={formData.content || ""}
                   onChange={(content) =>
                     setFormData((prev) => ({ ...prev, content }))
