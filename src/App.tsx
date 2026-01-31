@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useTrafficSource } from "@/hooks/useTrafficSource";
-import { useTrackingPixels } from "@/hooks/useTrackingPixels";
+import { useCustomScripts } from "@/hooks/useCustomScripts";
 import { useThemeSettings } from "@/hooks/useThemeSettings";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -41,10 +41,10 @@ import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
-// Component to initialize traffic source tracking and tracking pixels
+// Component to initialize traffic source tracking and custom scripts
 const AppInitializer = ({ children }: { children: React.ReactNode }) => {
   useTrafficSource();
-  useTrackingPixels();
+  useCustomScripts();
   useThemeSettings();
   return <>{children}</>;
 };

@@ -14,6 +14,7 @@ import { Loader2, Save, Code, Webhook, Megaphone, MousePointerClick, BarChart3, 
 
 const Settings = () => {
   const [headScripts, setHeadScripts] = useState("");
+  const [bodyScripts, setBodyScripts] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [showAnnouncementBar, setShowAnnouncementBar] = useState(false);
   const [announcementText, setAnnouncementText] = useState("");
@@ -54,6 +55,7 @@ const Settings = () => {
     if (settings) {
       const getValue = (key: string) => settings.find((s) => s.key === key)?.value || "";
       setHeadScripts(getValue("head_scripts"));
+      setBodyScripts(getValue("body_scripts"));
       setWebhookUrl(getValue("webhook_url"));
       setShowAnnouncementBar(getValue("show_announcement_bar") === "true");
       setAnnouncementText(getValue("announcement_text"));
@@ -92,12 +94,16 @@ const Settings = () => {
     }
   };
 
-  // Save head scripts mutation
-  const saveHeadScriptsMutation = useMutation({
-    mutationFn: async (value: string) => saveSetting("head_scripts", value),
+  // Save custom scripts mutation (head + body)
+  const saveCustomScriptsMutation = useMutation({
+    mutationFn: async () => {
+      await saveSetting("head_scripts", headScripts);
+      await saveSetting("body_scripts", bodyScripts);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-settings"] });
-      toast({ title: "נשמר בהצלחה", description: "הגדרות הסקריפטים עודכנו" });
+      queryClient.invalidateQueries({ queryKey: ["public-site-settings"] });
+      toast({ title: "נשמר בהצלחה", description: "הגדרות הקוד המותאם עודכנו" });
     },
     onError: () => {
       toast({ title: "שגיאה", description: "לא ניתן לשמור את ההגדרות", variant: "destructive" });
@@ -634,7 +640,7 @@ const Settings = () => {
                 </CardContent>
               </Card>
 
-              {/* Head Scripts */}
+              {/* Custom Code / Integrations */}
               <Card>
                 <CardHeader>
                   <div className="flex items-center gap-3">
@@ -642,36 +648,70 @@ const Settings = () => {
                       <Code className="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                      <CardTitle>Head Scripts (מתקדם)</CardTitle>
+                      <CardTitle>קוד מותאם / אינטגרציות</CardTitle>
                       <CardDescription>
-                        סקריפטים שיוזרקו לתוך ה-{"<head>"} של האתר הציבורי
+                        הדבקת קוד מעקב, פיקסלים או סקריפטים ישירות לאתר
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
+                  {/* Warning */}
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm">
+                    <p className="font-medium text-destructive mb-1">⚠️ זהירות!</p>
+                    <p className="text-muted-foreground">
+                      הדבקת קוד שגוי יכולה לשבור את האתר. הדבק כאן רק קודים מאומתים כמו Facebook Pixel, Google Analytics או Google Tag Manager.
+                    </p>
+                  </div>
+
+                  {/* Header Scripts */}
                   <div className="space-y-2">
-                    <Label htmlFor="head_scripts">קוד HTML / JavaScript</Label>
+                    <Label htmlFor="head_scripts">Header Scripts ({"<head>"})</Label>
+                    <p className="text-xs text-muted-foreground">
+                      סקריפטים שיוזרקו לתחילת ה-head - מתאים ל-GTM, Analytics, Meta Pixel
+                    </p>
                     <Textarea
                       id="head_scripts"
                       value={headScripts}
                       onChange={(e) => setHeadScripts(e.target.value)}
-                      placeholder={`<!-- Google Search Console Verification -->
-<meta name="google-site-verification" content="..." />`}
-                      className="font-mono text-sm min-h-[200px]"
+                      placeholder={`<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXX');</script>
+
+<!-- Meta Pixel Code -->
+<script>!function(f,b,e,v,n,t,s){...}</script>`}
+                      className="font-mono text-sm min-h-[180px]"
                       dir="ltr"
                     />
                   </div>
+
+                  {/* Body Scripts */}
+                  <div className="space-y-2">
+                    <Label htmlFor="body_scripts">Body Scripts ({"<body>"})</Label>
+                    <p className="text-xs text-muted-foreground">
+                      סקריפטים שיוזרקו בתחילת ה-body - מתאים ל-GTM noscript ווידג'טים
+                    </p>
+                    <Textarea
+                      id="body_scripts"
+                      value={bodyScripts}
+                      onChange={(e) => setBodyScripts(e.target.value)}
+                      placeholder={`<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`}
+                      className="font-mono text-sm min-h-[120px]"
+                      dir="ltr"
+                    />
+                  </div>
+
                   <Button
-                    onClick={() => saveHeadScriptsMutation.mutate(headScripts)}
-                    disabled={saveHeadScriptsMutation.isPending}
+                    onClick={() => saveCustomScriptsMutation.mutate()}
+                    disabled={saveCustomScriptsMutation.isPending}
                   >
-                    {saveHeadScriptsMutation.isPending ? (
+                    {saveCustomScriptsMutation.isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Save className="w-4 h-4" />
                     )}
-                    שמירת הגדרות
+                    שמירת קוד מותאם
                   </Button>
                 </CardContent>
               </Card>
