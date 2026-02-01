@@ -80,8 +80,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class:
-          "prose prose-lg max-w-none min-h-[400px] p-4 focus:outline-none text-right",
+        class: "focus:outline-none",
         dir: "rtl",
       },
     },

@@ -208,4 +208,58 @@ html.highlight-links a {
   .ProseMirror .widget-placeholder {
     @apply block w-full text-center;
   }
+
+  /* RichTextEditor (Tiptap) - Visual styles for admin editing */
+  .ProseMirror {
+    @apply min-h-[400px] p-4 text-right;
+  }
+
+  .ProseMirror:focus {
+    @apply outline-none;
+  }
+
+  .ProseMirror h1 {
+    @apply text-3xl font-bold font-display text-foreground mt-6 mb-4;
+  }
+
+  .ProseMirror h2 {
+    @apply text-2xl font-bold font-display text-foreground mt-6 mb-3;
+  }
+
+  .ProseMirror h3 {
+    @apply text-xl font-semibold font-display text-foreground mt-4 mb-2;
+  }
+
+  .ProseMirror p {
+    @apply mb-4 leading-relaxed text-foreground;
+  }
+
+  .ProseMirror ul {
+    @apply list-disc mr-6 mb-4 space-y-1;
+  }
+
+  .ProseMirror ol {
+    @apply list-decimal mr-6 mb-4 space-y-1;
+  }
+
+  .ProseMirror li {
+    @apply text-foreground;
+  }
+
+  .ProseMirror blockquote {
+    @apply border-r-4 border-accent pr-4 mr-0 italic text-muted-foreground my-4;
+  }
+
+  .ProseMirror a {
+    @apply text-accent underline;
+  }
+
+  .ProseMirror img {
+    @apply max-w-full h-auto rounded-lg my-4;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    @apply text-muted-foreground pointer-events-none float-right h-0;
+    content: attr(data-placeholder);
+  }
 }
