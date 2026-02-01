@@ -1,2 +1,2 @@
-# Proxy sitemap.xml to Supabase Edge Function
-/sitemap.xml https://awxmwvyoellhdhgvxife.supabase.co/functions/v1/sitemap 200
+/sitemap.xml  https://awxmwvyoellhdhgvxife.supabase.co/functions/v1/sitemap  200
+/* /index.html  200
