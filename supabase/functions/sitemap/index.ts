@@ -19,16 +19,15 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch all published articles
-    const { data: articles, error } = await supabase
+    const { data: articles, error: articlesError } = await supabase
       .from("articles")
       .select("slug, updated_at, published_at")
       .eq("is_published", true)
       .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching articles:", error);
-      throw error;
+    if (articlesError) {
+      console.error("Error fetching articles:", articlesError);
     }
 
     // Fetch all categories
@@ -40,12 +39,30 @@ serve(async (req) => {
       console.error("Error fetching categories:", catError);
     }
 
-    // Base URL - update this to your production domain
+    // Fetch all published static pages
+    const { data: pages, error: pagesError } = await supabase
+      .from("pages")
+      .select("slug, updated_at")
+      .eq("is_published", true);
+
+    if (pagesError) {
+      console.error("Error fetching pages:", pagesError);
+    }
+
+    // Fetch all glossary terms
+    const { data: glossaryTerms, error: glossaryError } = await supabase
+      .from("glossary_terms")
+      .select("slug, updated_at");
+
+    if (glossaryError) {
+      console.error("Error fetching glossary terms:", glossaryError);
+    }
+
+    // Base URL - production domain
     const baseUrl = "https://hamadrikh.co.il";
+    const now = new Date().toISOString().split("T")[0];
 
     // Generate XML sitemap
-    const now = new Date().toISOString().split("T")[0];
-    
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
@@ -62,7 +79,34 @@ serve(async (req) => {
     <lastmod>${now}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+  
+  <!-- Glossary Index -->
+  <url>
+    <loc>${baseUrl}/glossary</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>`;
+
+    // Add published static pages (from pages table)
+    if (pages && pages.length > 0) {
+      for (const page of pages) {
+        const lastmod = page.updated_at 
+          ? new Date(page.updated_at).toISOString().split("T")[0]
+          : now;
+        
+        xml += `
+  
+  <!-- Page: ${page.slug} -->
+  <url>
+    <loc>${baseUrl}/${page.slug}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+      }
+    }
 
     // Add category pages
     if (categories && categories.length > 0) {
@@ -104,10 +148,29 @@ serve(async (req) => {
       }
     }
 
+    // Add glossary term pages
+    if (glossaryTerms && glossaryTerms.length > 0) {
+      for (const term of glossaryTerms) {
+        const lastmod = term.updated_at 
+          ? new Date(term.updated_at).toISOString().split("T")[0]
+          : now;
+        
+        xml += `
+  
+  <!-- Glossary: ${term.slug} -->
+  <url>
+    <loc>${baseUrl}/glossary/${term.slug}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
+      }
+    }
+
     xml += `
 </urlset>`;
 
-    console.log(`Generated sitemap with ${articles?.length || 0} articles and ${categories?.length || 0} categories`);
+    console.log(`Generated sitemap with ${articles?.length || 0} articles, ${categories?.length || 0} categories, ${pages?.length || 0} pages, ${glossaryTerms?.length || 0} glossary terms`);
 
     return new Response(xml, {
       headers: {
