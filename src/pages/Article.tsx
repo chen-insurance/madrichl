@@ -220,7 +220,7 @@ const Article = () => {
               <MobileTableOfContents content={article.content} />
 
               {/* Article Content with CTA blocks and custom heading IDs for TOC */}
-              <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-li:text-foreground">
+              <div className="rich-text-content">
                 {firstPart && <MarkdownContentWithCTA content={firstPart} />}
 
                 {/* In-Article CTA after 2nd paragraph */}
