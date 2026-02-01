@@ -81,27 +81,16 @@ const LeadForm = ({
 
   const sendWebhook = async (leadData: Record<string, unknown>) => {
     try {
-      const { data: settings } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "webhook_url")
-        .maybeSingle();
-
-      const webhookUrl = settings?.value;
+      // Call edge function to securely send webhook (webhook URL is now protected)
+      const { error } = await supabase.functions.invoke("submit-lead-webhook", {
+        body: leadData,
+      });
       
-      if (webhookUrl && webhookUrl.trim()) {
-        fetch(webhookUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(leadData),
-        }).catch((err) => {
-          console.error("Webhook failed:", err);
-        });
+      if (error) {
+        console.error("Webhook edge function failed:", error);
       }
     } catch (err) {
-      console.error("Failed to fetch webhook URL:", err);
+      console.error("Failed to call webhook function:", err);
     }
   };
 
