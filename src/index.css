@@ -264,88 +264,90 @@ html.highlight-links a {
   }
 }
 
-/* Article Content Styling - Manual typography for frontend display */
-.rich-text-content {
-  color: hsl(var(--foreground));
-  font-size: 1.125rem;
-  line-height: 1.75;
+/* FORCE STYLES FOR ARTICLE AND EDITOR - Nuclear Option */
+.rich-text-content, .ProseMirror {
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  color: #374151 !important;
 }
 
-.rich-text-content h1 {
-  font-size: 2.25rem;
-  font-weight: 800;
-  margin-top: 2.5rem;
-  margin-bottom: 1.5rem;
-  color: hsl(var(--foreground));
-  font-family: var(--font-display, 'Heebo', sans-serif);
+/* Headings */
+.rich-text-content h1, .ProseMirror h1 {
+  font-size: 2.5em !important;
+  font-weight: 800 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.8em !important;
+  line-height: 1.2 !important;
+  color: #111827 !important;
+  display: block !important;
 }
 
-.rich-text-content h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: hsl(var(--foreground));
-  font-family: var(--font-display, 'Heebo', sans-serif);
+.rich-text-content h2, .ProseMirror h2 {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
+  color: #111827 !important;
+  display: block !important;
 }
 
-.rich-text-content h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: hsl(var(--foreground));
-  font-family: var(--font-display, 'Heebo', sans-serif);
+.rich-text-content h3, .ProseMirror h3 {
+  font-size: 1.5em !important;
+  font-weight: 600 !important;
+  margin-top: 1.2em !important;
+  margin-bottom: 0.5em !important;
+  color: #1f2937 !important;
+  display: block !important;
 }
 
-.rich-text-content p {
-  margin-bottom: 1.25rem;
+/* Paragraphs & Lists */
+.rich-text-content p, .ProseMirror p {
+  margin-bottom: 1.2rem !important;
+  display: block !important;
 }
 
-.rich-text-content ul {
-  list-style-type: disc;
-  padding-right: 1.5rem;
-  margin-bottom: 1.25rem;
+.rich-text-content ul, .ProseMirror ul {
+  list-style-type: disc !important;
+  padding-right: 2rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
 }
 
-.rich-text-content ol {
-  list-style-type: decimal;
-  padding-right: 1.5rem;
-  margin-bottom: 1.25rem;
+.rich-text-content ol, .ProseMirror ol {
+  list-style-type: decimal !important;
+  padding-right: 2rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
 }
 
-.rich-text-content li {
-  margin-bottom: 0.5rem;
+.rich-text-content li, .ProseMirror li {
+  margin-bottom: 0.5rem !important;
+  display: list-item !important;
 }
 
-.rich-text-content strong {
-  font-weight: 700;
-  color: hsl(var(--foreground));
+.rich-text-content strong, .ProseMirror strong {
+  font-weight: bold !important;
 }
 
-.rich-text-content a {
-  color: hsl(var(--accent));
-  text-decoration: none;
+.rich-text-content blockquote, .ProseMirror blockquote {
+  border-right: 4px solid #d97706 !important;
+  padding-right: 1rem !important;
+  margin-right: 0 !important;
+  font-style: italic !important;
+  color: #6b7280 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
 }
 
-.rich-text-content a:hover {
-  text-decoration: underline;
+.rich-text-content a, .ProseMirror a {
+  color: #d97706 !important;
+  text-decoration: underline !important;
 }
 
-.rich-text-content blockquote {
-  border-right: 4px solid hsl(var(--accent));
-  padding-right: 1rem;
-  margin-right: 0;
-  font-style: italic;
-  color: hsl(var(--muted-foreground));
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.rich-text-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.rich-text-content img, .ProseMirror img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
 }

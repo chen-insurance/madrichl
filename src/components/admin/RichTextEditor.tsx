@@ -351,7 +351,9 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
       </div>
 
       {/* Editor Content */}
-      <EditorContent editor={editor} />
+      <div className="rich-text-content min-h-[400px] p-4">
+        <EditorContent editor={editor} />
+      </div>
 
       {/* AI Assist Modal */}
       <AIAssistModal
