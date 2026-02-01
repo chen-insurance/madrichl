@@ -59,7 +59,7 @@ serve(async (req) => {
     }
 
     // Base URL - production domain
-    const baseUrl = "https://hamadrikh.co.il";
+    const baseUrl = "https://the-guide.co.il";
     const now = new Date().toISOString().split("T")[0];
 
     // Generate XML sitemap
@@ -185,7 +185,7 @@ serve(async (req) => {
       `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hamadrikh.co.il/</loc>
+    <loc>https://the-guide.co.il/</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <priority>1.0</priority>
   </url>
