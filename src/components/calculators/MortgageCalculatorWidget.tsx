@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Calculator, ArrowDown } from "lucide-react";
 
 const MortgageCalculatorWidget = () => {
@@ -94,30 +93,43 @@ const MortgageCalculatorWidget = () => {
             max={75}
             step={1}
             className="w-full"
+            dir="ltr"
+            inverted
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>20</span>
             <span>75</span>
+            <span>20</span>
           </div>
         </div>
 
         {/* Smoker Toggle */}
         <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
-          <Label htmlFor="smoker-toggle" className="text-sm font-medium cursor-pointer">
+          <Label className="text-sm font-medium">
             האם מעשן?
           </Label>
-          <div className="flex items-center gap-3">
-            <span className={`text-sm ${!isSmoker ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
-              לא
-            </span>
-            <Switch
-              id="smoker-toggle"
-              checked={isSmoker}
-              onCheckedChange={setIsSmoker}
-            />
-            <span className={`text-sm ${isSmoker ? 'font-bold text-destructive' : 'text-muted-foreground'}`}>
-              כן
-            </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsSmoker(false)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                !isSmoker 
+                  ? 'bg-green-100 text-green-700 border-2 border-green-500' 
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              לא מעשן
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSmoker(true)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                isSmoker 
+                  ? 'bg-red-100 text-red-700 border-2 border-red-500' 
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              מעשן
+            </button>
           </div>
         </div>
 
