@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import logoIcon from "@/assets/logo-icon.png";
 
 interface MenuItem {
   id: string;
@@ -84,9 +85,11 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center">
-                <span className="text-primary font-display font-bold text-lg">מ</span>
-              </div>
+              <img 
+                src={logoIcon} 
+                alt="המדריך לצרכן" 
+                className="w-10 h-10 object-contain"
+              />
               <div>
                 <h2 className="font-display font-bold text-lg">המדריך לצרכן</h2>
                 <p className="text-xs text-primary-foreground/60">מגזין ביטוח ופיננסים</p>
