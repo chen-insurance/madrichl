@@ -8,6 +8,7 @@ import { useTrafficSource } from "@/hooks/useTrafficSource";
 import { useCustomScripts } from "@/hooks/useCustomScripts";
 import { useThemeSettings } from "@/hooks/useThemeSettings";
 import Index from "./pages/Index";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Article from "./pages/Article";
@@ -60,6 +61,7 @@ const App = () => (
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/blog" element={<Blog />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/news/:slug" element={<Article />} />
               <Route path="/preview" element={<Preview />} />

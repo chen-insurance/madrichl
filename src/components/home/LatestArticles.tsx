@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ArticleCard from "./ArticleCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -82,10 +83,12 @@ const LatestArticles = ({ articles }: LatestArticlesProps) => {
               העדכונים החמים ביותר מעולם הביטוח והפנסיה
             </p>
           </div>
-          <Button variant="outline" className="hidden md:flex items-center gap-2">
-            <span>כל הכתבות</span>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
+          <Link to="/blog">
+            <Button variant="outline" className="hidden md:flex items-center gap-2">
+              <span>כל הכתבות</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -101,9 +104,11 @@ const LatestArticles = ({ articles }: LatestArticlesProps) => {
         </div>
 
         <div className="mt-8 text-center md:hidden">
-          <Button variant="outline" className="w-full">
-            כל הכתבות
-          </Button>
+          <Link to="/blog">
+            <Button variant="outline" className="w-full">
+              כל הכתבות
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

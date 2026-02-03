@@ -164,7 +164,7 @@ const Article = () => {
       <Header />
 
       <main className="flex-1 py-8 md:py-12">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <Breadcrumbs items={breadcrumbItems} />
 
           <div className="grid lg:grid-cols-[1fr_320px] gap-8 lg:gap-12">
@@ -172,7 +172,7 @@ const Article = () => {
             <article className="min-w-0">
               {/* Featured Image - with aspect-ratio for CLS prevention, eager loading for LCP */}
               {article.featured_image && (
-                <div className="rounded-xl overflow-hidden mb-8">
+                <div className="rounded-xl overflow-hidden mb-6 md:mb-8 -mx-4 md:mx-0">
                   <OptimizedImage
                     src={article.featured_image}
                     alt={article.image_alt_text || article.title}
@@ -183,13 +183,13 @@ const Article = () => {
               )}
 
               {/* Article Header */}
-              <header className="mb-8">
+              <header className="mb-6 md:mb-8 px-0">
                 {article.category && (
                   <span className="inline-block text-sm font-medium text-accent bg-accent/10 px-3 py-1 rounded-full mb-4">
                     {article.category}
                   </span>
                 )}
-                <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-4">
+                <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-snug mb-4">
                   {article.title}
                 </h1>
 
@@ -220,7 +220,7 @@ const Article = () => {
               <MobileTableOfContents content={article.content} />
 
               {/* Article Content with CTA blocks and custom heading IDs for TOC */}
-              <div className="rich-text-content w-full max-w-4xl mx-auto text-right">
+              <div className="article-content rich-text-content w-full max-w-none text-right">
                 {firstPart && <MarkdownContentWithCTA content={firstPart} />}
 
                 {/* In-Article CTA after 2nd paragraph */}

@@ -4,6 +4,8 @@ import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
+import Color from "@tiptap/extension-color";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,6 +26,8 @@ import {
   Redo,
   Sparkles,
   Puzzle,
+  Palette,
+  Type,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -31,15 +35,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import AIAssistModal from "./AIAssistModal";
 import InsertWidgetModal from "./InsertWidgetModal";
-
-// No conversion needed - shortcodes are stored and displayed as plain text {{shortcode}}
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
 }
+
+const FONT_SIZES = [
+  { label: "קטן", value: "14px" },
+  { label: "רגיל", value: "16px" },
+  { label: "בינוני", value: "18px" },
+  { label: "גדול", value: "20px" },
+  { label: "גדול מאוד", value: "24px" },
+];
+
+const TEXT_COLORS = [
+  { label: "שחור", value: "#111827" },
+  { label: "אפור", value: "#6b7280" },
+  { label: "כחול", value: "#2563eb" },
+  { label: "ירוק", value: "#16a34a" },
+  { label: "אדום", value: "#dc2626" },
+  { label: "כתום", value: "#ea580c" },
+  { label: "סגול", value: "#9333ea" },
+  { label: "זהב", value: "#d97706" },
+];
 
 const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [linkUrl, setLinkUrl] = useState("");
@@ -54,6 +82,8 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
           levels: [1, 2, 3],
         },
       }),
+      TextStyle,
+      Color,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -86,11 +116,10 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     },
   });
 
-  // Fix: Watch for content prop changes and update editor when content differs
+  // Watch for content prop changes and update editor when content differs
   useEffect(() => {
     if (editor && content) {
       const currentContent = editor.getHTML();
-      // Only update if content is different (avoid loops)
       if (currentContent !== content) {
         editor.commands.setContent(content);
       }
@@ -125,8 +154,15 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   };
 
   const handleWidgetInsert = (shortcode: string, _displayName: string) => {
-    // Insert raw shortcode text only - no HTML wrapping
     editor.chain().focus().insertContent(shortcode).run();
+  };
+
+  const setFontSize = (size: string) => {
+    editor.chain().focus().setMark("textStyle", { fontSize: size }).run();
+  };
+
+  const setTextColor = (color: string) => {
+    editor.chain().focus().setColor(color).run();
   };
 
   const ToolbarButton = ({
@@ -196,6 +232,69 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         >
           <Heading3 className="w-4 h-4" />
         </ToolbarButton>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Font Size */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1"
+              title="גודל טקסט"
+            >
+              <Type className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-40 p-2">
+            <div className="space-y-1">
+              {FONT_SIZES.map((size) => (
+                <Button
+                  key={size.value}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => setFontSize(size.value)}
+                  style={{ fontSize: size.value }}
+                >
+                  {size.label}
+                </Button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Text Color */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1"
+              title="צבע טקסט"
+            >
+              <Palette className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-40 p-2">
+            <div className="grid grid-cols-4 gap-1">
+              {TEXT_COLORS.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  className="w-8 h-8 rounded-md border border-border hover:scale-110 transition-transform"
+                  style={{ backgroundColor: color.value }}
+                  onClick={() => setTextColor(color.value)}
+                  title={color.label}
+                />
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <div className="w-px h-6 bg-border mx-1" />
 

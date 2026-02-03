@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,71 +9,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight, ChevronLeft, Search } from "lucide-react";
-import { useState, useMemo } from "react";
 
 const ARTICLES_PER_PAGE = 12;
 
-const CategoryArchive = () => {
-  const { slug } = useParams<{ slug: string }>();
+const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch category details
-  const { data: category, isLoading: categoryLoading } = useQuery({
-    queryKey: ["category", slug],
+  // Fetch all published articles
+  const { data: allArticles, isLoading } = useQuery({
+    queryKey: ["all-articles"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!slug,
-  });
-
-  // Fetch all articles for this category (we'll filter client-side for search)
-  const { data: allArticles, isLoading: articlesLoading } = useQuery({
-    queryKey: ["category-all-articles", category?.id],
-    queryFn: async () => {
-      // First try to get articles via the junction table
-      const { data: junctionArticles, error: junctionError } = await supabase
-        .from("article_categories")
-        .select(`
-          article_id,
-          articles!inner (
-            id, title, slug, excerpt, featured_image, published_at, category, is_published
-          )
-        `)
-        .eq("category_id", category?.id);
-
-      if (!junctionError && junctionArticles && junctionArticles.length > 0) {
-        // Filter and transform junction table results
-        return junctionArticles
-          .map((item) => item.articles)
-          .filter((article: any) => 
-            article.is_published && 
-            new Date(article.published_at) <= new Date()
-          )
-          .sort((a: any, b: any) => 
-            new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-          );
-      }
-
-      // Fallback: query by legacy category name field
       const { data, error } = await supabase
         .from("articles")
         .select("id, title, slug, excerpt, featured_image, published_at, category")
         .eq("is_published", true)
         .lte("published_at", new Date().toISOString())
-        .eq("category", category?.name)
         .order("published_at", { ascending: false });
-
       if (error) throw error;
       return data;
     },
-    enabled: !!category?.id,
   });
 
   // Filter articles based on search query
@@ -83,7 +38,7 @@ const CategoryArchive = () => {
     
     const query = searchQuery.toLowerCase();
     return allArticles.filter(
-      (article: any) =>
+      (article) =>
         article.title.toLowerCase().includes(query) ||
         (article.excerpt && article.excerpt.toLowerCase().includes(query))
     );
@@ -105,7 +60,7 @@ const CategoryArchive = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   // Generate pagination numbers
@@ -138,98 +93,51 @@ const CategoryArchive = () => {
     return pages;
   };
 
-  if (categoryLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-12">
-          <Skeleton className="h-10 w-64 mb-4" />
-          <Skeleton className="h-6 w-96 mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-80 rounded-xl" />
-            ))}
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!category) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-24 text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-4">
-            קטגוריה לא נמצאה
-          </h1>
-          <p className="text-muted-foreground mb-8">
-            הקטגוריה שחיפשת אינה קיימת במערכת.
-          </p>
-          <Link to="/">
-            <Button>חזרה לדף הבית</Button>
-          </Link>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{category.name} | המדריך לצרכן</title>
+        <title>כל הכתבות | המדריך לצרכן</title>
         <meta
           name="description"
-          content={category.description || `כל המאמרים בקטגוריית ${category.name} - המדריך לצרכן`}
+          content="כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים - המדריך לצרכן"
         />
-        <link rel="canonical" href={`https://the-guide.co.il/category/${slug}`} />
+        <link rel="canonical" href="https://the-guide.co.il/blog" />
       </Helmet>
 
       <Header />
 
       <main className="container mx-auto px-4 py-12">
-        {/* Category Header with SEO Content */}
-        <div className="mb-10">
-          <nav className="text-sm text-muted-foreground mb-4">
-            <Link to="/" className="hover:text-accent transition-colors">
-              דף הבית
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="text-foreground">{category.name}</span>
-          </nav>
-          
+        {/* Page Header */}
+        <div className="mb-10 text-center">
           <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-            {category.name}
+            כל הכתבות
           </h1>
-          
-          {category.description && (
-            <p className="text-lg text-muted-foreground max-w-3xl mb-6">
-              {category.description}
-            </p>
-          )}
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            מאמרים, מדריכים וחדשות עדכניות בנושאי ביטוח, פנסיה ופיננסים
+          </p>
 
           {/* Search Bar */}
-          <div className="relative max-w-xl mb-4">
+          <div className="relative max-w-xl mx-auto">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={`חיפוש ב${category.name}...`}
+              placeholder="חיפוש כתבות..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pr-12 py-5 rounded-full border-2 border-border focus:border-accent"
+              className="pr-12 py-6 text-lg rounded-full border-2 border-border focus:border-accent"
             />
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            {filteredArticles.length} מאמרים
-            {searchQuery && ` עבור "${searchQuery}"`}
-          </p>
+          {filteredArticles.length > 0 && (
+            <p className="text-sm text-muted-foreground mt-4">
+              {filteredArticles.length} כתבות נמצאו
+              {searchQuery && ` עבור "${searchQuery}"`}
+            </p>
+          )}
         </div>
 
         {/* Articles Grid */}
-        {articlesLoading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-xl" />
@@ -238,7 +146,7 @@ const CategoryArchive = () => {
         ) : paginatedArticles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {paginatedArticles.map((article: any) => (
+              {paginatedArticles.map((article) => (
                 <ArticleCard
                   key={article.id}
                   id={article.id}
@@ -247,7 +155,7 @@ const CategoryArchive = () => {
                   slug={article.slug}
                   featured_image={article.featured_image || undefined}
                   published_at={article.published_at || new Date().toISOString()}
-                  category={article.category || category.name}
+                  category={article.category || undefined}
                 />
               ))}
             </div>
@@ -295,17 +203,13 @@ const CategoryArchive = () => {
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground mb-6">
               {searchQuery
-                ? `לא נמצאו מאמרים התואמים לחיפוש "${searchQuery}"`
-                : "אין עדיין מאמרים בקטגוריה זו."}
+                ? `לא נמצאו כתבות התואמות לחיפוש "${searchQuery}"`
+                : "אין עדיין כתבות"}
             </p>
-            {searchQuery ? (
+            {searchQuery && (
               <Button onClick={() => setSearchQuery("")} variant="outline">
                 נקה חיפוש
               </Button>
-            ) : (
-              <Link to="/">
-                <Button>חזרה לדף הבית</Button>
-              </Link>
             )}
           </div>
         )}
@@ -316,4 +220,4 @@ const CategoryArchive = () => {
   );
 };
 
-export default CategoryArchive;
+export default Blog;

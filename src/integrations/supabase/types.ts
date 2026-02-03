@@ -49,6 +49,42 @@ export type Database = {
           },
         ]
       }
+      article_categories: {
+        Row: {
+          article_id: string
+          category_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          article_id: string
+          category_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          article_id?: string
+          category_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_categories_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       article_views: {
         Row: {
           article_id: string
@@ -93,6 +129,7 @@ export type Database = {
           featured_image: string | null
           id: string
           image_alt_text: string | null
+          is_featured: boolean | null
           is_published: boolean
           preview_token: string | null
           published_at: string | null
@@ -117,6 +154,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           image_alt_text?: string | null
+          is_featured?: boolean | null
           is_published?: boolean
           preview_token?: string | null
           published_at?: string | null
@@ -141,6 +179,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           image_alt_text?: string | null
+          is_featured?: boolean | null
           is_published?: boolean
           preview_token?: string | null
           published_at?: string | null
