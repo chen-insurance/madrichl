@@ -204,7 +204,7 @@ const GlobalLeadForm = ({
     : "w-full max-w-md mx-auto bg-background rounded-2xl border border-border p-6 md:p-8 shadow-lg";
 
   return (
-    <div className={containerClasses}>
+    <div id="lead-form-section" className={containerClasses}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <ShieldCheck className="w-6 h-6 text-accent shrink-0" />
