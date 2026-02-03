@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calculator, HelpCircle, Megaphone, Loader2 } from "lucide-react";
+import { Calculator, HelpCircle, Megaphone, Loader2, ShieldCheck } from "lucide-react";
 
 interface InsertWidgetModalProps {
   open: boolean;
@@ -21,11 +21,21 @@ interface WidgetItem {
   id: string;
   name: string;
   shortcode: string;
-  type: "calculator" | "quiz" | "cta";
+  type: "form" | "calculator" | "quiz" | "cta";
 }
 
 const InsertWidgetModal = ({ open, onClose, onInsert }: InsertWidgetModalProps) => {
-  const [selectedType, setSelectedType] = useState<"calculator" | "quiz" | "cta" | null>(null);
+  const [selectedType, setSelectedType] = useState<"form" | "calculator" | "quiz" | "cta" | null>(null);
+
+  // Lead forms (built-in)
+  const leadForms: WidgetItem[] = [
+    {
+      id: "global-lead-form",
+      name: "טופס לידים גלובלי",
+      shortcode: "{{lead_form}}",
+      type: "form",
+    },
+  ];
 
   // Static list of calculators
   const calculators: WidgetItem[] = [
@@ -87,6 +97,13 @@ const InsertWidgetModal = ({ open, onClose, onInsert }: InsertWidgetModalProps) 
   };
 
   const categories = [
+    {
+      type: "form" as const,
+      label: "טפסי לידים",
+      icon: ShieldCheck,
+      items: leadForms,
+      loading: false,
+    },
     {
       type: "calculator" as const,
       label: "מחשבונים",
