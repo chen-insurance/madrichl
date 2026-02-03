@@ -92,9 +92,7 @@ const MortgageCalculatorWidget = () => {
             min={20}
             max={75}
             step={1}
-            className="w-full"
-            dir="ltr"
-            inverted
+            className="w-full [direction:rtl]"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>75</span>
