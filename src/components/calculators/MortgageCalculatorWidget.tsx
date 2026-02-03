@@ -1,0 +1,165 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Calculator, ArrowDown } from "lucide-react";
+
+const MortgageCalculatorWidget = () => {
+  const [mortgageAmount, setMortgageAmount] = useState<number>(900000);
+  const [age, setAge] = useState<number>(35);
+  const [isSmoker, setIsSmoker] = useState<boolean>(false);
+  const [result, setResult] = useState<number | null>(null);
+
+  const calculatePrice = () => {
+    // Base Price = (Mortgage Amount / 100,000) * 1.5
+    let basePrice = (mortgageAmount / 100000) * 1.5;
+
+    // Age Factor: Add 2 NIS for every year above 30
+    if (age > 30) {
+      basePrice += (age - 30) * 2;
+    }
+
+    // Smoker Factor: If "Yes", multiply total by 1.35
+    if (isSmoker) {
+      basePrice *= 1.35;
+    }
+
+    setResult(Math.round(basePrice));
+  };
+
+  const scrollToLeadForm = () => {
+    // Try to find a lead form on the page
+    const leadForm = document.querySelector('[data-lead-form]') || 
+                     document.querySelector('.global-lead-form') ||
+                     document.getElementById('lead-form');
+    
+    if (leadForm) {
+      leadForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // Scroll to bottom of page where forms typically are
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  const formatNumber = (num: number) => {
+    return num.toLocaleString('he-IL');
+  };
+
+  return (
+    <Card className="w-full bg-muted/50 border-border" dir="rtl">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-lg font-bold text-foreground">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Calculator className="w-5 h-5 text-primary" />
+          </div>
+          מחשבון בדיקת כדאיות - ביטוח משכנתא
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {/* Mortgage Amount Input */}
+        <div className="space-y-2">
+          <Label htmlFor="mortgage-amount" className="text-sm font-medium">
+            יתרת משכנתא (₪)
+          </Label>
+          <Input
+            id="mortgage-amount"
+            type="number"
+            value={mortgageAmount}
+            onChange={(e) => setMortgageAmount(Number(e.target.value))}
+            placeholder="לדוגמה: 900,000"
+            className="text-left"
+            dir="ltr"
+          />
+          <p className="text-xs text-muted-foreground">
+            הזן את יתרת המשכנתא הנוכחית שלך
+          </p>
+        </div>
+
+        {/* Age Slider */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">גיל הלווה</Label>
+            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {age} שנים
+            </span>
+          </div>
+          <Slider
+            value={[age]}
+            onValueChange={(value) => setAge(value[0])}
+            min={20}
+            max={75}
+            step={1}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>20</span>
+            <span>75</span>
+          </div>
+        </div>
+
+        {/* Smoker Toggle */}
+        <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
+          <Label htmlFor="smoker-toggle" className="text-sm font-medium cursor-pointer">
+            האם מעשן?
+          </Label>
+          <div className="flex items-center gap-3">
+            <span className={`text-sm ${!isSmoker ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
+              לא
+            </span>
+            <Switch
+              id="smoker-toggle"
+              checked={isSmoker}
+              onCheckedChange={setIsSmoker}
+            />
+            <span className={`text-sm ${isSmoker ? 'font-bold text-destructive' : 'text-muted-foreground'}`}>
+              כן
+            </span>
+          </div>
+        </div>
+
+        {/* Calculate Button */}
+        <Button
+          onClick={calculatePrice}
+          className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90 text-accent-foreground"
+        >
+          חשב כמה אני צריך לשלם
+        </Button>
+
+        {/* Result Section */}
+        {result !== null && (
+          <div className="mt-6 p-6 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border-2 border-primary/20 space-y-4">
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">המחיר המשוער עבורך:</p>
+              <p className="text-4xl font-bold text-primary">
+                {formatNumber(result)} ₪
+                <span className="text-lg font-normal text-muted-foreground mr-2">לחודש</span>
+              </p>
+            </div>
+
+            <p className="text-center text-sm font-bold text-destructive bg-destructive/10 p-3 rounded-lg">
+              משלם בבנק יותר? אפשר להוזיל את הביטוח משמעותית!
+            </p>
+
+            <Button
+              onClick={scrollToLeadForm}
+              className="w-full h-14 text-lg font-bold bg-accent hover:bg-accent/90 text-accent-foreground gap-2"
+            >
+              אני רוצה הצעה כזו
+              <ArrowDown className="w-5 h-5" />
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              * ההערכה מבוססת על ממוצע שוק ומיועדת להתרשמות ראשונית בלבד
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default MortgageCalculatorWidget;
