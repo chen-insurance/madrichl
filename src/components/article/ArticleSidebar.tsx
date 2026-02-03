@@ -13,12 +13,14 @@ const ArticleSidebar = ({ currentSlug, articleContent }: ArticleSidebarProps) =>
       {/* Table of Contents */}
       <TableOfContents content={articleContent || null} />
 
-      {/* Lead Form */}
-      <LeadForm
-        title="בדוק את זכאותך"
-        subtitle="גלו כמה אתם יכולים לחסוך"
-        variant="sidebar"
-      />
+      {/* Lead Form - Hidden on mobile, shown only on desktop */}
+      <div className="hidden lg:block">
+        <LeadForm
+          title="בדוק את זכאותך"
+          subtitle="גלו כמה אתם יכולים לחסוך"
+          variant="sidebar"
+        />
+      </div>
 
       {/* Trending Articles (Last 7 Days) */}
       <TrendingArticles excludeSlug={currentSlug} limit={5} />

@@ -67,6 +67,13 @@ const App = () => (
               <Route path="/preview" element={<Preview />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/category/:slug" element={<CategoryArchive />} />
+              {/* Insurance category shortcuts - same component as /category/:slug */}
+              <Route path="/health-insurance" element={<CategoryArchive />} />
+              <Route path="/life-insurance" element={<CategoryArchive />} />
+              <Route path="/car-insurance" element={<CategoryArchive />} />
+              <Route path="/property-insurance" element={<CategoryArchive />} />
+              <Route path="/pension" element={<CategoryArchive />} />
+              <Route path="/employer-insurance" element={<CategoryArchive />} />
               {/* Admin Routes */}
               <Route path="/admin" element={<ArticlesList />} />
               <Route path="/admin/dashboard" element={<Dashboard />} />

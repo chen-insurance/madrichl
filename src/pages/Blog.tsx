@@ -121,10 +121,10 @@ const Blog = () => {
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="חיפוש כתבות..."
+              placeholder="חפש כתבה או נושא..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pr-12 py-6 text-lg rounded-full border-2 border-border focus:border-accent"
+              className="pr-12 py-6 text-lg rounded-full border-2 border-border focus:border-accent bg-background"
             />
           </div>
 
