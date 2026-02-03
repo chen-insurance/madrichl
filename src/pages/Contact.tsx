@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import LeadForm from "@/components/LeadForm";
+import GlobalLeadForm from "@/components/GlobalLeadForm";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { Phone, Mail, MapPin } from "lucide-react";
 
@@ -21,7 +21,7 @@ const Contact = () => {
       <Header />
 
       <main className="flex-1 py-12 md:py-16">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             {/* Page Header */}
             <div className="text-center mb-12">
@@ -112,11 +112,7 @@ const Contact = () => {
 
               {/* Lead Form */}
               <div>
-                <LeadForm
-                  title="השאירו פרטים"
-                  subtitle="ונציג יחזור אליכם תוך 24 שעות"
-                  variant="card"
-                />
+                <GlobalLeadForm />
               </div>
             </div>
           </div>

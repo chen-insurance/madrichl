@@ -15,7 +15,7 @@ import MarkdownContent from "@/components/article/MarkdownContent";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
-import LeadForm from "@/components/LeadForm";
+import GlobalLeadForm from "@/components/GlobalLeadForm";
 import FAQSection from "@/components/article/FAQSection";
 import FAQSchema from "@/components/article/FAQSchema";
 import { format } from "date-fns";
@@ -239,12 +239,8 @@ const Article = () => {
               {faqItems.length > 0 && <FAQSection items={faqItems} />}
 
               {/* Bottom Lead Form (Mobile & Desktop) */}
-              <div className="mt-12">
-                <LeadForm
-                  title="בדוק את זכאותך עכשיו"
-                  subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
-                  variant="card"
-                />
+              <div id="lead-form-section" className="mt-12">
+                <GlobalLeadForm />
               </div>
 
               {/* Related Articles - Semantic similarity when available */}
