@@ -30,16 +30,10 @@ const MortgageCalculatorWidget = () => {
   };
 
   const scrollToLeadForm = () => {
-    // Try to find a lead form on the page
-    const leadForm = document.querySelector('[data-lead-form]') || 
-                     document.querySelector('.global-lead-form') ||
-                     document.getElementById('lead-form');
+    const leadForm = document.getElementById('lead-form-section');
     
     if (leadForm) {
       leadForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      // Scroll to bottom of page where forms typically are
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
   };
 
