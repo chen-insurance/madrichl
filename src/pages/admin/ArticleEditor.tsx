@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check, CalendarIcon } from "lucide-react";
+import { Loader2, Save, Eye, EyeOff, ArrowRight, Image, Link2, Copy, Check, CalendarIcon, Star } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import SEOScoreCard from "@/components/admin/SEOScoreCard";
@@ -87,11 +88,28 @@ const ArticleEditor = () => {
     },
   });
   const [isPublished, setIsPublished] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [publishedAt, setPublishedAt] = useState<Date | undefined>(undefined);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [previewToken, setPreviewToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
+
+  // Fetch article categories from junction table
+  const { data: articleCategories } = useQuery({
+    queryKey: ["article-categories", id],
+    queryFn: async () => {
+      if (isNew) return [];
+      const { data, error } = await supabase
+        .from("article_categories")
+        .select("category_id")
+        .eq("article_id", id);
+      if (error) throw error;
+      return data.map((item) => item.category_id);
+    },
+    enabled: !isNew,
+  });
 
   // Fetch existing article
   const { data: article, isLoading } = useQuery({
@@ -125,6 +143,7 @@ const ArticleEditor = () => {
         category_id: article.category_id || "",
       });
       setIsPublished(article.is_published);
+      setIsFeatured((article as any).is_featured || false);
       setPublishedAt(article.published_at ? new Date(article.published_at) : undefined);
       setPreviewToken(article.preview_token || null);
       // Load FAQ items from database
@@ -134,6 +153,13 @@ const ArticleEditor = () => {
       }
     }
   }, [article]);
+
+  // Load article categories when fetched
+  useEffect(() => {
+    if (articleCategories && articleCategories.length > 0) {
+      setSelectedCategories(articleCategories);
+    }
+  }, [articleCategories]);
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -156,9 +182,10 @@ const ArticleEditor = () => {
 
   // Save mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: ArticleFormData & { is_published: boolean; faq_items: FAQItem[]; published_at: Date | null }) => {
-      // Find category name for the legacy category field
-      const selectedCategory = categories?.find(c => c.id === data.category_id);
+    mutationFn: async (data: ArticleFormData & { is_published: boolean; is_featured: boolean; faq_items: FAQItem[]; published_at: Date | null; category_ids: string[] }) => {
+      // Find category name for the legacy category field (use first selected category)
+      const primaryCategoryId = data.category_ids[0] || data.category_id;
+      const selectedCategory = categories?.find(c => c.id === primaryCategoryId);
       
       if (isNew) {
         const insertData = {
@@ -172,9 +199,10 @@ const ArticleEditor = () => {
           seo_description: data.seo_description || null,
           author_name: data.author_name || null,
           author_bio: data.author_bio || null,
-          category_id: data.category_id || null,
+          category_id: primaryCategoryId || null,
           category: selectedCategory?.name || null,
           is_published: data.is_published,
+          is_featured: data.is_featured,
           published_at: data.published_at ? data.published_at.toISOString() : null,
           faq_items: JSON.parse(JSON.stringify(data.faq_items)),
         };
@@ -184,6 +212,16 @@ const ArticleEditor = () => {
           .select()
           .single();
         if (error) throw error;
+
+        // Save multi-category relationships
+        if (data.category_ids.length > 0) {
+          const categoryInserts = data.category_ids.map((catId) => ({
+            article_id: newArticle.id,
+            category_id: catId,
+          }));
+          await supabase.from("article_categories").insert(categoryInserts);
+        }
+
         return newArticle;
       } else {
         const updateData = {
@@ -197,9 +235,10 @@ const ArticleEditor = () => {
           seo_description: data.seo_description || null,
           author_name: data.author_name || null,
           author_bio: data.author_bio || null,
-          category_id: data.category_id || null,
+          category_id: primaryCategoryId || null,
           category: selectedCategory?.name || null,
           is_published: data.is_published,
+          is_featured: data.is_featured,
           published_at: data.published_at ? data.published_at.toISOString() : null,
           faq_items: JSON.parse(JSON.stringify(data.faq_items)),
         };
@@ -210,6 +249,17 @@ const ArticleEditor = () => {
           .select()
           .single();
         if (error) throw error;
+
+        // Update multi-category relationships
+        await supabase.from("article_categories").delete().eq("article_id", id);
+        if (data.category_ids.length > 0) {
+          const categoryInserts = data.category_ids.map((catId) => ({
+            article_id: id,
+            category_id: catId,
+          }));
+          await supabase.from("article_categories").insert(categoryInserts);
+        }
+
         return updatedArticle;
       }
     },
@@ -269,9 +319,11 @@ const ArticleEditor = () => {
     
     saveMutation.mutate({ 
       ...validation.data, 
-      is_published: shouldPublish, 
+      is_published: shouldPublish,
+      is_featured: isFeatured,
       faq_items: faqItems,
       published_at: dateToPublish,
+      category_ids: selectedCategories,
     });
     if (publish) {
       setIsPublished(true);
@@ -282,12 +334,22 @@ const ArticleEditor = () => {
   const handleUnpublish = () => {
     saveMutation.mutate({ 
       ...formData, 
-      is_published: false, 
+      is_published: false,
+      is_featured: isFeatured,
       faq_items: faqItems,
       published_at: null,
+      category_ids: selectedCategories,
     });
     setIsPublished(false);
     setPublishedAt(undefined);
+  };
+
+  const handleCategoryToggle = (categoryId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories((prev) => [...prev, categoryId]);
+    } else {
+      setSelectedCategories((prev) => prev.filter((id) => id !== categoryId));
+    }
   };
 
   const handleGeneratePreviewToken = async () => {
@@ -425,24 +487,39 @@ const ArticleEditor = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">קטגוריה</Label>
-                  <Select
-                    value={formData.category_id}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, category_id: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="בחר קטגוריה" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>קטגוריות</Label>
+                  <div className="grid grid-cols-2 gap-2 p-3 border rounded-lg bg-muted/30">
+                    {categories?.map((cat) => (
+                      <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox
+                          checked={selectedCategories.includes(cat.id)}
+                          onCheckedChange={(checked) => handleCategoryToggle(cat.id, !!checked)}
+                        />
+                        <span className="text-sm">{cat.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    ניתן לבחור מספר קטגוריות - המאמר יופיע בכולן
+                  </p>
+                </div>
+              </div>
+
+              {/* Featured Article Toggle */}
+              <div className="flex items-center gap-3 p-4 rounded-lg border border-accent/30 bg-accent/5">
+                <Checkbox
+                  id="is_featured"
+                  checked={isFeatured}
+                  onCheckedChange={(checked) => setIsFeatured(!!checked)}
+                />
+                <div className="flex-1">
+                  <Label htmlFor="is_featured" className="flex items-center gap-2 cursor-pointer">
+                    <Star className="w-4 h-4 text-accent" />
+                    סמן ככתבה ראשית
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    מאמר זה יוצג כהיירו ראשי בדף הבית
+                  </p>
                 </div>
               </div>
 

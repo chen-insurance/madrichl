@@ -1,7 +1,9 @@
 import { ArrowLeft, CheckCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/common/OptimizedImage";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FeaturedArticle {
   id: string;
@@ -18,8 +20,43 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ featuredArticle, secondaryArticles = [] }: HeroSectionProps) => {
-  // Fallback data for demo
-  const mainArticle = featuredArticle || {
+  // Fetch featured article from database (marked as is_featured or most recent)
+  const { data: dynamicFeatured } = useQuery({
+    queryKey: ["featured-article"],
+    queryFn: async () => {
+      // First try to get an article marked as featured
+      const { data: featured, error: featuredError } = await supabase
+        .from("articles")
+        .select("id, title, excerpt, slug, featured_image, published_at")
+        .eq("is_published", true)
+        .eq("is_featured", true)
+        .lte("published_at", new Date().toISOString())
+        .order("published_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!featuredError && featured) {
+        return featured;
+      }
+
+      // Fallback: get the most recent article
+      const { data: recent, error: recentError } = await supabase
+        .from("articles")
+        .select("id, title, excerpt, slug, featured_image, published_at")
+        .eq("is_published", true)
+        .lte("published_at", new Date().toISOString())
+        .order("published_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (recentError) throw recentError;
+      return recent;
+    },
+    enabled: !featuredArticle, // Only fetch if not provided via props
+  });
+
+  // Use provided featured article or fetched one
+  const mainArticle = featuredArticle || dynamicFeatured || {
     id: "1",
     title: "רפורמת הביטוח 2025: כל מה שצריך לדעת על השינויים הצפויים",
     excerpt: "משרד האוצר מפרסם טיוטה חדשה לרפורמה בענף הביטוח שצפויה לשנות את פני השוק. הרפורמה כוללת שינויים מהותיים בתחום הפנסיה והביטוח הסיעודי.",
