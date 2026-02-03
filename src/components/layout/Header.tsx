@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SearchDialog from "@/components/common/SearchDialog";
 
@@ -46,7 +47,7 @@ const Header = () => {
   return (
     <>
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo - Right side in RTL */}
             <Link to="/" className="flex items-center gap-3">
@@ -74,25 +75,25 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Desktop Actions */}
+            {/* Desktop Search Bar */}
             <div className="hidden lg:flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => setShowSearch(true)}
-                aria-label="חיפוש"
+                className="flex items-center gap-2 px-4 py-2 bg-secondary/50 border border-border rounded-full hover:bg-secondary transition-colors min-w-[200px]"
               >
-                <Search className="h-5 w-5" />
-              </Button>
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">חפש כתבה או נושא...</span>
+              </button>
             </div>
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-2 lg:hidden">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => setShowSearch(true)}
                 aria-label="חיפוש"
+                className="border-border"
               >
                 <Search className="h-5 w-5" />
               </Button>

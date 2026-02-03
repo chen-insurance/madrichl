@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,10 +13,24 @@ import { useState, useMemo } from "react";
 
 const ARTICLES_PER_PAGE = 12;
 
+// Map direct paths to category slugs
+const PATH_TO_SLUG_MAP: Record<string, string> = {
+  "/health-insurance": "health-insurance",
+  "/life-insurance": "life-insurance",
+  "/car-insurance": "car-insurance",
+  "/property-insurance": "property-insurance",
+  "/pension": "pension",
+  "/employer-insurance": "employer-insurance",
+};
+
 const CategoryArchive = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: paramSlug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Determine the category slug - either from URL param or from direct path mapping
+  const slug = paramSlug || PATH_TO_SLUG_MAP[location.pathname];
 
   // Fetch category details
   const { data: category, isLoading: categoryLoading } = useQuery({
