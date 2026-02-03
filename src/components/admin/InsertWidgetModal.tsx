@@ -45,6 +45,12 @@ const InsertWidgetModal = ({ open, onClose, onInsert }: InsertWidgetModalProps) 
       shortcode: "{{insurance_calculator}}",
       type: "calculator",
     },
+    {
+      id: "mortgage-insurance",
+      name: "מחשבון ביטוח משכנתא",
+      shortcode: "{{mortgage_calculator}}",
+      type: "calculator",
+    },
   ];
 
   // Fetch active quizzes
