@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import QuizWidget from "@/components/quiz/QuizWidget";
 import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
+import GlobalLeadForm from "@/components/GlobalLeadForm";
 
 interface CTABlock {
   id: string;
@@ -63,6 +64,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
     return parts.map((part) => {
       if (part === "{{insurance_calculator}}") {
         return { type: "insurance_calculator" as const };
+      }
+      if (part === "{{lead_form}}") {
+        return { type: "lead_form" as const };
       }
       const quizMatch = part.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
       if (quizMatch) {
@@ -134,6 +138,14 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         );
       }
       
+      if (part === "{{lead_form}}") {
+        return (
+          <div key={key} className="my-8 not-prose">
+            <GlobalLeadForm />
+          </div>
+        );
+      }
+      
       const quizMatch = part.match(/\{\{quiz_([a-zA-Z0-9-]+)\}\}/);
       if (quizMatch) {
         return (
@@ -179,6 +191,14 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
             return (
               <div className="my-8 not-prose">
                 <LifeInsuranceCalc />
+              </div>
+            );
+          }
+          
+          if (dataWidget === "{{lead_form}}") {
+            return (
+              <div className="my-8 not-prose">
+                <GlobalLeadForm />
               </div>
             );
           }
@@ -248,6 +268,14 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
           return (
             <div key={`calc-${index}`} className="my-8 not-prose">
               <LifeInsuranceCalc />
+            </div>
+          );
+        }
+
+        if (part.type === "lead_form") {
+          return (
+            <div key={`lead-${index}`} className="my-8 not-prose">
+              <GlobalLeadForm />
             </div>
           );
         }

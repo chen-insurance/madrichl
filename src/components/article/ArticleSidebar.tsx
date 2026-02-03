@@ -1,4 +1,4 @@
-import LeadForm from "@/components/LeadForm";
+import GlobalLeadForm from "@/components/GlobalLeadForm";
 import TableOfContents from "@/components/article/TableOfContents";
 import TrendingArticles from "@/components/article/TrendingArticles";
 
@@ -15,11 +15,7 @@ const ArticleSidebar = ({ currentSlug, articleContent }: ArticleSidebarProps) =>
 
       {/* Lead Form - Hidden on mobile, shown only on desktop */}
       <div className="hidden lg:block">
-        <LeadForm
-          title="בדוק את זכאותך"
-          subtitle="גלו כמה אתם יכולים לחסוך"
-          variant="sidebar"
-        />
+        <GlobalLeadForm variant="compact" />
       </div>
 
       {/* Trending Articles (Last 7 Days) */}
