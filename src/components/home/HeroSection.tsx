@@ -76,14 +76,6 @@ import { Library } from "lucide-react";
      },
      {
        id: "3",
-       title: "ביטוח הסייבר: הצורך הגובר של העסקים הקטנים",
-       excerpt: "עלייה של 40% בפניות לביטוח סייבר מעסקים קטנים ובינוניים",
-       slug: "cyber-insurance-smb",
-       featured_image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=400&fit=crop",
-       published_at: new Date().toISOString(),
-     },
-     {
-       id: "4",
        title: "מדריך השוואת ביטוחי בריאות: כל מה שצריך לדעת",
        excerpt: "השוואה מקיפה בין פוליסות ביטוח הבריאות המובילות",
        slug: "health-insurance-comparison",
