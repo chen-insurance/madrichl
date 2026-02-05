@@ -91,15 +91,15 @@ import { Library } from "lucide-react";
            {/* Main Featured Article */}
            <Link
              to={`/news/${mainArticle.slug}`}
-             className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300"
+            className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300 h-full flex flex-col"
            >
-             <div className="aspect-[16/10] md:aspect-[16/9] overflow-hidden relative">
+            <div className="flex-1 overflow-hidden relative min-h-[300px]">
                <OptimizedImage
                  src={mainArticle.featured_image}
                  alt={mainArticle.title}
                  aspectRatio="video"
                  priority={true}
-                 className="group-hover:scale-105 transition-transform duration-500"
+                className="group-hover:scale-105 transition-transform duration-500 !h-full object-cover"
                />
                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
              </div>
@@ -121,12 +121,12 @@ import { Library } from "lucide-react";
            </Link>
  
            {/* Secondary Articles */}
-           <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 h-full">
              {secondary.map((article, index) => (
                <Link
                  key={article.id}
                  to={`/news/${article.slug}`}
-                 className="group flex gap-4 bg-card rounded-xl p-4 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in"
+                className="group flex gap-4 bg-card rounded-xl p-4 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in flex-1"
                  style={{ animationDelay: `${index * 100}ms` }}
                >
                  <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-lg">
@@ -151,7 +151,7 @@ import { Library } from "lucide-react";
               {/* Explore All Card */}
               <Link
                 to="/blog"
-                className="group relative flex flex-col justify-center bg-primary rounded-xl p-5 shadow-soft hover:bg-primary/90 transition-all duration-300 overflow-hidden"
+                className="group relative flex flex-col justify-center bg-primary rounded-xl p-5 shadow-soft hover:bg-primary/90 transition-all duration-300 overflow-hidden flex-1"
               >
                 {/* Background Icon */}
                 <Library className="absolute -left-4 -bottom-4 w-24 h-24 text-primary-foreground/10" />
