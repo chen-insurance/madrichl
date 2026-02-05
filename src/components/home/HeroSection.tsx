@@ -1,5 +1,5 @@
  import { ArrowLeft } from "lucide-react";
-import { Library } from "lucide-react";
+import { Library, Compass } from "lucide-react";
  import { Link } from "react-router-dom";
  import OptimizedImage from "@/components/common/OptimizedImage";
  import { useQuery } from "@tanstack/react-query";
@@ -151,17 +151,20 @@ import { Library } from "lucide-react";
               {/* Explore All Card */}
               <Link
                 to="/blog"
-                className="group relative flex flex-col justify-center bg-primary rounded-xl p-5 shadow-soft hover:bg-primary/90 transition-all duration-300 overflow-hidden flex-1"
+                className="group relative flex flex-col justify-center bg-primary rounded-xl p-5 shadow-soft hover:bg-primary/80 hover:shadow-medium transition-all duration-300 overflow-hidden flex-1"
               >
                 {/* Background Icon */}
-                <Library className="absolute -left-4 -bottom-4 w-24 h-24 text-primary-foreground/10" />
+                <Library className="absolute -left-4 -bottom-4 w-24 h-24 text-primary-foreground/10 group-hover:text-primary-foreground/20 transition-colors duration-300" />
                 
                 <div className="relative z-10">
-                  <h3 className="font-display font-bold text-primary-foreground text-base leading-snug mb-2">
-                    לא מצאתם מה שחיפשתם?
-                  </h3>
-                  <p className="text-primary-foreground/80 text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
-                    <span>למעבר למגזין המלא ולכל המדריכים</span>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Compass className="w-5 h-5 text-accent group-hover:text-accent/90 transition-colors" />
+                    <h3 className="font-display font-bold text-primary-foreground text-base leading-snug group-hover:text-white transition-colors">
+                      לא מצאתם מה שחיפשתם?
+                    </h3>
+                  </div>
+                  <p className="text-primary-foreground/80 text-sm flex items-center gap-2 group-hover:gap-3 group-hover:text-primary-foreground transition-all">
+                    <span>למגזין המלא ולכל המדריכים</span>
                     <ArrowLeft className="w-4 h-4" />
                   </p>
                 </div>
