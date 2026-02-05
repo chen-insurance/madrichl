@@ -87,7 +87,23 @@ serve(async (req) => {
     <lastmod>${now}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
-  </url>`;
+ </url>
+   
+   <!-- Blog Archive -->
+   <url>
+     <loc>${baseUrl}/blog</loc>
+     <lastmod>${now}</lastmod>
+     <changefreq>daily</changefreq>
+     <priority>0.9</priority>
+   </url>
+   
+   <!-- Life Insurance Calculator -->
+   <url>
+     <loc>${baseUrl}/calculators/life</loc>
+     <lastmod>${now}</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.7</priority>
+   </url>`;
 
     // Add published static pages (from pages table)
     if (pages && pages.length > 0) {
