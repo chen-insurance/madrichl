@@ -93,7 +93,7 @@ const Index = () => {
         .eq("is_published", true)
         .lte("published_at", new Date().toISOString())
         .order("published_at", { ascending: false })
-        .limit(2);
+       .limit(3);
 
       if (homepageSettings?.hero_article_id) {
         query = query.neq("id", homepageSettings.hero_article_id);
