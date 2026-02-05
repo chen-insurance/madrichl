@@ -1,5 +1,5 @@
  import { ArrowLeft } from "lucide-react";
-import { Library, Compass } from "lucide-react";
+import { Compass } from "lucide-react";
  import { Link } from "react-router-dom";
  import OptimizedImage from "@/components/common/OptimizedImage";
  import { useQuery } from "@tanstack/react-query";
@@ -151,21 +151,21 @@ import { Library, Compass } from "lucide-react";
               {/* Explore All Card */}
               <Link
                 to="/blog"
-                className="group relative flex flex-col justify-center bg-primary rounded-xl p-5 shadow-soft hover:bg-primary/80 hover:shadow-medium transition-all duration-300 overflow-hidden flex-1"
+                className="group relative flex flex-col justify-end bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl p-6 shadow-medium hover:shadow-strong transition-all duration-300 overflow-hidden flex-1"
               >
-                {/* Background Icon */}
-                <Library className="absolute -left-4 -bottom-4 w-24 h-24 text-primary-foreground/10 group-hover:text-primary-foreground/20 transition-colors duration-300" />
+                {/* Large Watermark Icon */}
+                <Compass className="absolute -left-6 -bottom-6 w-36 h-36 text-primary-foreground/10 group-hover:text-primary-foreground/15 transition-colors duration-500 rotate-12" />
                 
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Compass className="w-5 h-5 text-accent group-hover:text-accent/90 transition-colors" />
-                    <h3 className="font-display font-bold text-primary-foreground text-base leading-snug group-hover:text-white transition-colors">
-                      לא מצאתם מה שחיפשתם?
-                    </h3>
-                  </div>
-                  <p className="text-primary-foreground/80 text-sm flex items-center gap-2 group-hover:gap-3 group-hover:text-primary-foreground transition-all">
+                {/* Decorative accent line */}
+                <div className="absolute top-0 right-0 w-1 h-full bg-accent/60 rounded-l-full" />
+                
+                <div className="relative z-10 text-right">
+                  <h3 className="font-display font-bold text-primary-foreground text-lg md:text-xl leading-tight mb-3 group-hover:text-white transition-colors">
+                    לא מצאתם מה שחיפשתם?
+                  </h3>
+                  <p className="text-accent font-medium text-sm md:text-base flex items-center justify-end gap-2 group-hover:gap-3 transition-all">
+                    <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-4px] transition-transform" />
                     <span>למגזין המלא ולכל המדריכים</span>
-                    <ArrowLeft className="w-4 h-4" />
                   </p>
                 </div>
               </Link>
