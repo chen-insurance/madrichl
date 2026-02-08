@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/select";
 import AIAssistModal from "./AIAssistModal";
 import InsertWidgetModal from "./InsertWidgetModal";
+import { MediaLibraryModal } from "./MediaLibrary";
 
 interface RichTextEditorProps {
   content: string;
@@ -74,6 +75,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [showAIAssist, setShowAIAssist] = useState(false);
   const [showWidgetModal, setShowWidgetModal] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -397,9 +399,19 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
                 onChange={(e) => setImageUrl(e.target.value)}
                 dir="ltr"
               />
-              <Button size="sm" onClick={addImage}>
-                הוספת תמונה
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={addImage}>
+                  הוספת תמונה
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowMediaLibrary(true)}
+                >
+                  <ImageIcon className="w-3 h-3 ml-1" />
+                  בחירה מהספרייה
+                </Button>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -466,6 +478,15 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         open={showWidgetModal}
         onClose={() => setShowWidgetModal(false)}
         onInsert={handleWidgetInsert}
+      />
+
+      {/* Media Library Modal */}
+      <MediaLibraryModal
+        open={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onSelect={(url) => {
+          editor.chain().focus().setImage({ src: url }).run();
+        }}
       />
     </div>
   );
