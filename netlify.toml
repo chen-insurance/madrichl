@@ -1,5 +1,12 @@
- # SPA fallback - must be last
- [[redirects]]
-   from = "/*"
-   to = "/index.html"
-   status = 200
+# Proxy sitemap.xml to Edge Function
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://awxmwvyoellhdhgvxife.supabase.co/functions/v1/serve-sitemap"
+  status = 200
+  force = true
+
+# SPA fallback - must be last
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
