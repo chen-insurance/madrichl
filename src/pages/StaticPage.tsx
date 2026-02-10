@@ -103,13 +103,15 @@ const StaticPage = () => {
             content={page.seo_description || `${page.title} - המדריך לצרכן`}
           />
           <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
+          {/* Only preload hero image for desktop - mobile uses CSS gradient */}
           {heroImageUrl && (
             <link
               rel="preload"
               as="image"
               href={getPreloadUrl(heroImageUrl, 800)}
-              imageSrcSet={`${getPreloadUrl(heroImageUrl, 400)} 400w, ${getPreloadUrl(heroImageUrl, 800)} 800w, ${getPreloadUrl(heroImageUrl, 1280)} 1280w`}
-              imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+              imageSrcSet={`${getPreloadUrl(heroImageUrl, 800)} 800w, ${getPreloadUrl(heroImageUrl, 1280)} 1280w`}
+              imageSizes="(max-width: 768px) 0px, (max-width: 1024px) 50vw, 800px"
+              media="(min-width: 768px)"
             />
           )}
         </Helmet>

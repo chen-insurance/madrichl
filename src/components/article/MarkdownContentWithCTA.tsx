@@ -265,12 +265,42 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         }
       }
       
-      // Optimize <img> elements with WebP, srcset, lazy loading
+// Optimize <img> elements with WebP, srcset, lazy loading
+      // On mobile: hide hero image entirely and show gradient placeholder for LCP
       if (domNode instanceof Element && domNode.name === "img") {
         const src = domNode.attribs?.src || "";
         const alt = domNode.attribs?.alt || "";
         const isFirst = imageCountRef.current === 0;
         imageCountRef.current++;
+        
+        if (isFirst) {
+          return (
+            <>
+              {/* Mobile: gradient placeholder instead of heavy image */}
+              <div
+                className="block md:hidden w-full rounded-lg"
+                style={{
+                  aspectRatio: "16/9",
+                  background: "linear-gradient(135deg, hsl(220 45% 20%), hsl(220 45% 35%), hsl(30 80% 55%))",
+                }}
+                role="img"
+                aria-label={alt}
+              />
+              {/* Desktop: full image with optimization */}
+              <img
+                src={getOptimizedSrc(src, 800)}
+                srcSet={buildSrcSet(src)}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+                alt={alt}
+                loading="eager"
+                fetchPriority="high"
+                decoding="sync"
+                className={`hidden md:block ${domNode.attribs?.class || ""}`}
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            </>
+          );
+        }
         
         return (
           <img
@@ -278,9 +308,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
             srcSet={buildSrcSet(src)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
             alt={alt}
-            loading={isFirst ? "eager" : "lazy"}
-            fetchPriority={isFirst ? "high" : "auto"}
-            decoding={isFirst ? "sync" : "async"}
+            loading="lazy"
+            fetchPriority="auto"
+            decoding="async"
             className={domNode.attribs?.class || ""}
             style={{ maxWidth: "100%", height: "auto" }}
           />
@@ -328,15 +358,44 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
       const imgSrc = src || "";
       const isFirst = imageCountRef.current === 0;
       imageCountRef.current++;
+      
+      if (isFirst) {
+        return (
+          <>
+            <div
+              className="block md:hidden w-full rounded-lg"
+              style={{
+                aspectRatio: "16/9",
+                background: "linear-gradient(135deg, hsl(220 45% 20%), hsl(220 45% 35%), hsl(30 80% 55%))",
+              }}
+              role="img"
+              aria-label={alt || ""}
+            />
+            <img
+              src={getOptimizedSrc(imgSrc, 800)}
+              srcSet={buildSrcSet(imgSrc)}
+              sizes="(max-width: 1024px) 50vw, 800px"
+              alt={alt || ""}
+              loading="eager"
+              fetchPriority="high"
+              decoding="sync"
+              className="hidden md:block"
+              style={{ maxWidth: "100%", height: "auto" }}
+              {...props}
+            />
+          </>
+        );
+      }
+      
       return (
         <img
           src={getOptimizedSrc(imgSrc, 800)}
           srcSet={buildSrcSet(imgSrc)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
           alt={alt || ""}
-          loading={isFirst ? "eager" : "lazy"}
-          fetchPriority={isFirst ? "high" : "auto"}
-          decoding={isFirst ? "sync" : "async"}
+          loading="lazy"
+          fetchPriority="auto"
+          decoding="async"
           style={{ maxWidth: "100%", height: "auto" }}
           {...props}
         />
