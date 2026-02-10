@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, lazy, Suspense } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import parse, { domToReact, HTMLReactParserOptions, Element, DOMNode } from "html-react-parser";
@@ -8,7 +8,9 @@ import { Link } from "react-router-dom";
 import QuizWidget from "@/components/quiz/QuizWidget";
 import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
 import MortgageCalculatorWidget from "@/components/calculators/MortgageCalculatorWidget";
-import GlobalLeadForm from "@/components/GlobalLeadForm";
+
+// Lazy-load heavy below-fold components to reduce main thread work
+const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
 
 interface CTABlock {
   id: string;
@@ -170,7 +172,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
       if (part === "{{lead_form}}") {
         return (
           <div key={key} className="my-8 not-prose">
-            <GlobalLeadForm />
+            <Suspense fallback={<div className="h-96 bg-secondary/30 rounded-xl animate-pulse" />}>
+              <GlobalLeadForm />
+            </Suspense>
           </div>
         );
       }
@@ -235,7 +239,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
           if (dataWidget === "{{lead_form}}") {
             return (
               <div className="my-8 not-prose">
-                <GlobalLeadForm />
+                <Suspense fallback={<div className="h-96 bg-secondary/30 rounded-xl animate-pulse" />}>
+                  <GlobalLeadForm />
+                </Suspense>
               </div>
             );
           }
@@ -360,7 +366,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         if (part.type === "lead_form") {
           return (
             <div key={`lead-${index}`} className="my-8 not-prose">
-              <GlobalLeadForm />
+              <Suspense fallback={<div className="h-96 bg-secondary/30 rounded-xl animate-pulse" />}>
+                <GlobalLeadForm />
+              </Suspense>
             </div>
           );
         }

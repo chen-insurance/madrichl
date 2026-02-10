@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
@@ -8,6 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import logoIcon from "@/assets/logo-icon.png";
+
+// Extract the first image URL from HTML/Markdown content for preloading
+const extractFirstImageUrl = (content: string | null): string | null => {
+  if (!content) return null;
+  // Try HTML img tag first
+  const htmlMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (htmlMatch) return htmlMatch[1];
+  // Try markdown image
+  const mdMatch = content.match(/!\[[^\]]*\]\(([^)]+)\)/);
+  if (mdMatch) return mdMatch[1];
+  return null;
+};
+
+// Build optimized URL for preload
+const getPreloadUrl = (url: string, width: number): string => {
+  if (url.includes("supabase.co/storage")) {
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}width=${width}&quality=80&format=webp`;
+  }
+  return url;
+};
 
 const StaticPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,6 +50,12 @@ const StaticPage = () => {
   });
 
   const isLandingPage = page?.is_landing_page || false;
+
+  // Extract hero image for preloading (LCP optimization)
+  const heroImageUrl = useMemo(() => {
+    if (!page?.content) return null;
+    return extractFirstImageUrl(page.content);
+  }, [page?.content]);
 
   if (isLoading) {
     return (
@@ -75,6 +103,15 @@ const StaticPage = () => {
             content={page.seo_description || `${page.title} - המדריך לצרכן`}
           />
           <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
+          {heroImageUrl && (
+            <link
+              rel="preload"
+              as="image"
+              href={getPreloadUrl(heroImageUrl, 800)}
+              imageSrcSet={`${getPreloadUrl(heroImageUrl, 400)} 400w, ${getPreloadUrl(heroImageUrl, 800)} 800w, ${getPreloadUrl(heroImageUrl, 1280)} 1280w`}
+              imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+            />
+          )}
         </Helmet>
 
         <main className="min-h-screen flex items-center justify-center py-12">
