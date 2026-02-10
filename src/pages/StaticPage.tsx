@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
@@ -58,13 +58,6 @@ const StaticPage = () => {
     return extractFirstImageUrl(page.content);
   }, [page?.content]);
 
-  // For the therapists page, strip the first image from CMS content to avoid duplication
-  const processedContent = useMemo(() => {
-    if (!isTherapistsPage || !page?.content) return page?.content ?? null;
-    const withoutHtmlImg = page.content.replace(/<img[^>]*>/, "");
-    if (withoutHtmlImg !== page.content) return withoutHtmlImg;
-    return page.content.replace(/!\[[^\]]*\]\([^)]+\)/, "");
-  }, [isTherapistsPage, page?.content]);
 
   if (isLoading) {
     return (
@@ -160,10 +153,10 @@ const StaticPage = () => {
               />
             )}
 
-            {/* Content with widget support */}
+            {/* Content with widget support - skip first CMS image on therapists page */}
             <article className="prose prose-lg max-w-none rtl">
-              {processedContent ? (
-                <MarkdownContentWithCTA content={processedContent} />
+              {page.content ? (
+                <MarkdownContentWithCTA content={page.content} skipFirstImage={isTherapistsPage} />
               ) : (
                 <p className="text-muted-foreground text-center">אין תוכן לעמוד זה.</p>
               )}
