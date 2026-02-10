@@ -25,6 +25,7 @@ interface CTABlock {
 
 interface MarkdownContentWithCTAProps {
   content: string;
+  skipFirstImage?: boolean;
 }
 
 // Clean content: convert span placeholders back to shortcodes and normalize
@@ -57,7 +58,7 @@ const buildSrcSet = (url: string): string => {
   return widths.map((w) => `${getOptimizedSrc(url, w)} ${w}w`).join(", ");
 };
 
-const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
+const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownContentWithCTAProps) => {
   // Track whether first image has been rendered (for LCP priority)
   const imageCountRef = useRef(0);
 
@@ -274,6 +275,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         imageCountRef.current++;
         
         if (isFirst) {
+          if (skipFirstImage) {
+            return <></>;
+          }
           return (
             <>
               {/* Mobile: gradient placeholder instead of heavy image */}
@@ -362,6 +366,9 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
       imageCountRef.current++;
       
       if (isFirst) {
+        if (skipFirstImage) {
+          return <></>;
+        }
         return (
           <>
             <div
