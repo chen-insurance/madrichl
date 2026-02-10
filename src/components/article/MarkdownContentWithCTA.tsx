@@ -276,7 +276,7 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
         
         if (isFirst) {
           if (skipFirstImage) {
-            return <></>;
+            return <span style={{ display: "none" }} />;
           }
           return (
             <>
@@ -367,7 +367,7 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
       
       if (isFirst) {
         if (skipFirstImage) {
-          return <></>;
+          return <span style={{ display: "none" }} />;
         }
         return (
           <>
