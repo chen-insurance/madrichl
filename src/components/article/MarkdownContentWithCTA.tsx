@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import parse, { domToReact, HTMLReactParserOptions, Element, DOMNode } from "html-react-parser";
@@ -41,7 +41,24 @@ const isHtmlContent = (content: string): boolean => {
   return /<[a-z][\s\S]*>/i.test(content);
 };
 
+// Optimize image URLs for WebP and responsive sizes
+const getOptimizedSrc = (url: string, width: number, quality = 80): string => {
+  if (url.includes("supabase.co/storage")) {
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}width=${width}&quality=${quality}&format=webp`;
+  }
+  return url;
+};
+
+const buildSrcSet = (url: string): string => {
+  const widths = [320, 640, 768, 1024, 1280];
+  return widths.map((w) => `${getOptimizedSrc(url, w)} ${w}w`).join(", ");
+};
+
 const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
+  // Track whether first image has been rendered (for LCP priority)
+  const imageCountRef = useRef(0);
+
   // Normalize content first (convert span placeholders to shortcodes)
   const normalizedContent = useMemo(() => normalizeContent(content), [content]);
   
@@ -242,6 +259,28 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
         }
       }
       
+      // Optimize <img> elements with WebP, srcset, lazy loading
+      if (domNode instanceof Element && domNode.name === "img") {
+        const src = domNode.attribs?.src || "";
+        const alt = domNode.attribs?.alt || "";
+        const isFirst = imageCountRef.current === 0;
+        imageCountRef.current++;
+        
+        return (
+          <img
+            src={getOptimizedSrc(src, 800)}
+            srcSet={buildSrcSet(src)}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+            alt={alt}
+            loading={isFirst ? "eager" : "lazy"}
+            fetchPriority={isFirst ? "high" : "auto"}
+            decoding={isFirst ? "sync" : "async"}
+            className={domNode.attribs?.class || ""}
+            style={{ maxWidth: "100%", height: "auto" }}
+          />
+        );
+      }
+
       // Handle h2 and h3 for TOC anchors
       if (domNode instanceof Element && (domNode.name === "h2" || domNode.name === "h3")) {
         const children = domNode.children;
@@ -278,6 +317,24 @@ const MarkdownContentWithCTA = ({ content }: MarkdownContentWithCTAProps) => {
       const text = String(children);
       const id = text.replace(/[^\w\u0590-\u05FF\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
       return <h3 id={id} className="scroll-mt-24">{children}</h3>;
+    },
+    img: ({ src, alt, ...props }) => {
+      const imgSrc = src || "";
+      const isFirst = imageCountRef.current === 0;
+      imageCountRef.current++;
+      return (
+        <img
+          src={getOptimizedSrc(imgSrc, 800)}
+          srcSet={buildSrcSet(imgSrc)}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+          alt={alt || ""}
+          loading={isFirst ? "eager" : "lazy"}
+          fetchPriority={isFirst ? "high" : "auto"}
+          decoding={isFirst ? "sync" : "async"}
+          style={{ maxWidth: "100%", height: "auto" }}
+          {...props}
+        />
+      );
     },
   };
 
