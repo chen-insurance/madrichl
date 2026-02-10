@@ -92,6 +92,8 @@ const StaticPage = () => {
     );
   }
 
+  const isTherapistsPage = slug === "therapists-liability-insurance";
+
   // Landing Page Mode - Clean, focused layout
   if (isLandingPage) {
     return (
@@ -104,7 +106,7 @@ const StaticPage = () => {
           />
           <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
           {/* Only preload hero image for desktop - mobile uses CSS gradient */}
-          {heroImageUrl && (
+          {!isTherapistsPage && heroImageUrl && (
             <link
               rel="preload"
               as="image"
@@ -132,6 +134,20 @@ const StaticPage = () => {
                 </div>
               </Link>
             </div>
+
+            {/* Static Hero Image for therapists page */}
+            {isTherapistsPage && (
+              <img
+                src="/hero-insurance.webp"
+                alt="ביטוח אחריות מקצועית למטפלים"
+                width={800}
+                height={420}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                className="w-full h-auto rounded-lg mb-8"
+              />
+            )}
 
             {/* Title */}
             <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-8">
