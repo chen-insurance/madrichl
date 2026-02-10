@@ -1,3 +1,9 @@
+# Default: no cache for HTML pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Cache static assets with long-term immutable headers
 [[headers]]
   for = "/assets/*"
