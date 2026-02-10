@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
@@ -50,12 +50,21 @@ const StaticPage = () => {
   });
 
   const isLandingPage = page?.is_landing_page || false;
+  const isTherapistsPage = slug === "therapists-liability-insurance";
 
   // Extract hero image for preloading (LCP optimization)
   const heroImageUrl = useMemo(() => {
     if (!page?.content) return null;
     return extractFirstImageUrl(page.content);
   }, [page?.content]);
+
+  // For the therapists page, strip the first image from CMS content to avoid duplication
+  const processedContent = useMemo(() => {
+    if (!isTherapistsPage || !page?.content) return page?.content ?? null;
+    const withoutHtmlImg = page.content.replace(/<img[^>]*>/, "");
+    if (withoutHtmlImg !== page.content) return withoutHtmlImg;
+    return page.content.replace(/!\[[^\]]*\]\([^)]+\)/, "");
+  }, [isTherapistsPage, page?.content]);
 
   if (isLoading) {
     return (
@@ -92,8 +101,6 @@ const StaticPage = () => {
     );
   }
 
-  const isTherapistsPage = slug === "therapists-liability-insurance";
-
   // Landing Page Mode - Clean, focused layout
   if (isLandingPage) {
     return (
@@ -105,7 +112,6 @@ const StaticPage = () => {
             content={page.seo_description || `${page.title} - המדריך לצרכן`}
           />
           <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
-          {/* Only preload hero image for desktop - mobile uses CSS gradient */}
           {!isTherapistsPage && heroImageUrl && (
             <link
               rel="preload"
@@ -135,7 +141,12 @@ const StaticPage = () => {
               </Link>
             </div>
 
-            {/* Static Hero Image for therapists page */}
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-8">
+              {page.title}
+            </h1>
+
+            {/* Static Hero Image for therapists page - placed AFTER title */}
             {isTherapistsPage && (
               <img
                 src="/hero-insurance.webp"
@@ -145,19 +156,14 @@ const StaticPage = () => {
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                className="w-full h-auto rounded-lg mb-8"
+                className="w-full h-auto rounded-lg shadow-md mb-8"
               />
             )}
 
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-8">
-              {page.title}
-            </h1>
-
             {/* Content with widget support */}
             <article className="prose prose-lg max-w-none rtl">
-              {page.content ? (
-                <MarkdownContentWithCTA content={page.content} />
+              {processedContent ? (
+                <MarkdownContentWithCTA content={processedContent} />
               ) : (
                 <p className="text-muted-foreground text-center">אין תוכן לעמוד זה.</p>
               )}
