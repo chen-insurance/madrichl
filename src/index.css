@@ -34,6 +34,19 @@ html.highlight-links a {
 
 /* Google Fonts loaded via <link> in index.html for non-render-blocking performance */
 
+/* Ensure text is visible during font load */
+@font-face {
+  font-family: 'Heebo';
+  font-display: swap;
+  src: local('Heebo');
+}
+
+@font-face {
+  font-family: 'Rubik';
+  font-display: swap;
+  src: local('Rubik');
+}
+
 @layer base {
   :root {
     /* Core colors - Deep navy & warm gold palette */

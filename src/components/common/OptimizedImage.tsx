@@ -51,7 +51,7 @@ const OptimizedImage = ({
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
-        decoding={priority ? "sync" : "async"}
+        decoding="async"
         className={cn("w-full h-full object-cover", className)}
         onError={(e) => {
           // Fallback to original URL if optimization fails
