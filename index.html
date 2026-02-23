@@ -14,15 +14,13 @@
     <!-- Preconnect to Google Fonts for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Load fonts via link tag (non-render-blocking) instead of CSS @import -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap&text=" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap" /></noscript>
-    <title>המדריך לצרכן | מגזין ביטוח ופיננסים</title>
-    <meta name="description" content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן.">
-    <meta name="author" content="המדריך לצרכן" />
-
+    <!-- Non-render-blocking font loading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Rubik:wght@400;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Rubik:wght@400;600;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Rubik:wght@400;600;700&display=swap" /></noscript>
     <!-- Favicon -->
-    <!-- Hero image preload moved to StaticPage component via React Helmet -->
+    <!-- Preload LCP hero image for landing page -->
+    <link rel="preload" as="image" href="/hero-insurance.webp" fetchpriority="high" />
     <link rel="icon" type="image/png" href="/favicon-v2.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-v2.png" />
 
