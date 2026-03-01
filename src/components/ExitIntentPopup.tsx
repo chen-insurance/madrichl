@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -86,7 +87,7 @@ const ExitIntentPopup = () => {
         {image && (
           <div className="w-full h-40 bg-muted overflow-hidden">
             <img
-              src={image}
+              src={optimizeImageUrl(image, 600)}
               alt=""
               className="w-full h-full object-cover"
             />

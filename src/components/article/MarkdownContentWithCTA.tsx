@@ -1,4 +1,5 @@
 import { useMemo, useRef, lazy, Suspense } from "react";
+import { optimizeImageUrl as getOptimizedSrc, buildSrcSet } from "@/lib/image-utils";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import parse, { domToReact, HTMLReactParserOptions, Element, DOMNode } from "html-react-parser";
@@ -44,19 +45,7 @@ const isHtmlContent = (content: string): boolean => {
   return /<[a-z][\s\S]*>/i.test(content);
 };
 
-// Optimize image URLs for WebP and responsive sizes
-const getOptimizedSrc = (url: string, width: number, quality = 80): string => {
-  if (url.includes("supabase.co/storage")) {
-    const sep = url.includes("?") ? "&" : "?";
-    return `${url}${sep}width=${width}&quality=${quality}&format=webp`;
-  }
-  return url;
-};
 
-const buildSrcSet = (url: string): string => {
-  const widths = [320, 640, 768, 1024, 1280];
-  return widths.map((w) => `${getOptimizedSrc(url, w)} ${w}w`).join(", ");
-};
 
 const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownContentWithCTAProps) => {
   // Track whether first image has been rendered (for LCP priority)

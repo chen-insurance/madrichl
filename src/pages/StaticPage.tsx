@@ -10,25 +10,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import logoIcon from "@/assets/logo-icon.png";
 
+import { optimizeImageUrl } from "@/lib/image-utils";
+
 // Extract the first image URL from HTML/Markdown content for preloading
 const extractFirstImageUrl = (content: string | null): string | null => {
   if (!content) return null;
-  // Try HTML img tag first
   const htmlMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
   if (htmlMatch) return htmlMatch[1];
-  // Try markdown image
   const mdMatch = content.match(/!\[[^\]]*\]\(([^)]+)\)/);
   if (mdMatch) return mdMatch[1];
   return null;
-};
-
-// Build optimized URL for preload
-const getPreloadUrl = (url: string, width: number): string => {
-  if (url.includes("supabase.co/storage")) {
-    const sep = url.includes("?") ? "&" : "?";
-    return `${url}${sep}width=${width}&quality=80&format=webp`;
-  }
-  return url;
 };
 
 const StaticPage = () => {
@@ -109,8 +100,8 @@ const StaticPage = () => {
             <link
               rel="preload"
               as="image"
-              href={getPreloadUrl(heroImageUrl, 800)}
-              imageSrcSet={`${getPreloadUrl(heroImageUrl, 800)} 800w, ${getPreloadUrl(heroImageUrl, 1280)} 1280w`}
+              href={optimizeImageUrl(heroImageUrl, 800)}
+              imageSrcSet={`${optimizeImageUrl(heroImageUrl, 800)} 800w, ${optimizeImageUrl(heroImageUrl, 1280)} 1280w`}
               imageSizes="(max-width: 768px) 0px, (max-width: 1024px) 50vw, 800px"
               media="(min-width: 768px)"
             />
