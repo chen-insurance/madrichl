@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Menu, Search } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
@@ -7,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import SearchDialog from "@/components/common/SearchDialog";
+
+// Lazy load SearchDialog - only needed on click
+const SearchDialog = lazy(() => import("@/components/common/SearchDialog"));
 
 interface MenuItem {
   id: string;
@@ -153,7 +156,11 @@ const Header = () => {
       </header>
 
       {/* Search Dialog */}
-      <SearchDialog open={showSearch} onOpenChange={setShowSearch} />
+      {showSearch && (
+        <Suspense fallback={null}>
+          <SearchDialog open={showSearch} onOpenChange={setShowSearch} />
+        </Suspense>
+      )}
     </>
   );
 };

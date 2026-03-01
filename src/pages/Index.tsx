@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,8 +7,10 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
-import ComparisonTable from "@/components/market/ComparisonTable";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
+
+// Lazy load heavy below-fold components (ComparisonTable pulls in Dialog, LeadForm, zod, react-hook-form)
+const ComparisonTable = lazy(() => import("@/components/market/ComparisonTable"));
 
 const Index = () => {
   // Inject dynamic head scripts from site settings
@@ -167,7 +170,9 @@ const Index = () => {
           featuredArticle={heroArticle || undefined}
           secondaryArticles={secondaryArticles || undefined}
         />
-        <ComparisonTable />
+        <Suspense fallback={<div className="py-10"><div className="container mx-auto"><div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-64 bg-muted rounded" /></div></div></div>}>
+          <ComparisonTable />
+        </Suspense>
         <CategorySection />
         <LatestArticles articles={latestArticles || undefined} />
       </main>
