@@ -116,6 +116,50 @@ const Index = () => {
           content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן."
         />
         <link rel="canonical" href="https://the-guide.co.il" />
+        <meta property="og:title" content={headline} />
+        <meta property="og:description" content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://the-guide.co.il" />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={headline} />
+        <meta name="twitter:description" content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל." />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "המדריך לצרכן",
+            url: "https://the-guide.co.il",
+            description: "המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל",
+            inLanguage: "he",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: "https://the-guide.co.il/blog?q={search_term_string}",
+              },
+              "query-input": "required name=search_term_string",
+            },
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "המדריך לצרכן",
+            url: "https://the-guide.co.il",
+            logo: "https://the-guide.co.il/logo.png",
+            description: "מגזין ביטוח ופיננסים מוביל בישראל",
+            sameAs: [],
+            contactPoint: {
+              "@type": "ContactPoint",
+              telephone: "*2580",
+              contactType: "customer service",
+              availableLanguage: "Hebrew",
+            },
+          })}
+        </script>
       </Helmet>
       <Header />
       <main className="flex-1">
