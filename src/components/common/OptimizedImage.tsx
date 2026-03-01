@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { optimizeImageUrl, buildSrcSet } from "@/lib/image-utils";
 
 interface OptimizedImageProps {
   src: string;
@@ -8,18 +9,6 @@ interface OptimizedImageProps {
   priority?: boolean;
   sizes?: string;
 }
-
-// Supabase Storage image transformation parameters
-const getOptimizedUrl = (url: string, width: number, quality: number = 80): string => {
-  // Check if it's a Supabase storage URL
-  if (url.includes("supabase.co/storage")) {
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}width=${width}&quality=${quality}&format=webp`;
-  }
-  
-  // For external URLs, return as-is (consider using an image CDN in production)
-  return url;
-};
 
 const aspectRatioClasses = {
   video: "aspect-video", // 16:9
@@ -36,17 +25,11 @@ const OptimizedImage = ({
   priority = false,
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
 }: OptimizedImageProps) => {
-  // Generate srcset for responsive images
-  const widths = [320, 640, 768, 1024, 1280];
-  const srcSet = widths
-    .map((w) => `${getOptimizedUrl(src, w)} ${w}w`)
-    .join(", ");
-
   return (
     <div className={cn("overflow-hidden bg-secondary", aspectRatioClasses[aspectRatio])}>
       <img
-        src={getOptimizedUrl(src, 800)}
-        srcSet={srcSet}
+        src={optimizeImageUrl(src, 800)}
+        srcSet={buildSrcSet(src)}
         sizes={sizes}
         alt={alt}
         loading={priority ? "eager" : "lazy"}

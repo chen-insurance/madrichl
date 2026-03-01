@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -141,7 +142,7 @@ const MediaLibrary = ({ onSelect, isModal = false }: MediaLibraryProps) => {
               onClick={() => isModal && handleSelect(file.url)}
             >
               <img
-                src={file.url}
+                src={optimizeImageUrl(file.url, 400)}
                 alt={file.name}
                 className="w-full h-full object-cover"
                 loading="lazy"
