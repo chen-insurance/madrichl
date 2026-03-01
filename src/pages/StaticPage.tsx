@@ -170,13 +170,22 @@ const StaticPage = () => {
   // Normal Page Layout
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
+        <Helmet>
         <title>{page.seo_title || page.title} | המדריך לצרכן</title>
         <meta
           name="description"
           content={page.seo_description || `${page.title} - המדריך לצרכן`}
         />
         <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
+        <meta property="og:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
+        <meta property="og:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://the-guide.co.il/${slug}`} />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
+        <meta name="twitter:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
       </Helmet>
 
       <Header />

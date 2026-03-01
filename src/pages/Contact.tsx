@@ -16,6 +16,16 @@ const Contact = () => {
           name="description"
           content="צרו קשר עם המדריך לצרכן - מגזין הביטוח והפיננסים המוביל בישראל. נשמח לעזור לכם בכל שאלה."
         />
+        <link rel="canonical" href="https://the-guide.co.il/contact" />
+        <meta property="og:title" content="צור קשר | המדריך לצרכן" />
+        <meta property="og:description" content="צרו קשר עם המדריך לצרכן - מגזין הביטוח והפיננסים המוביל בישראל." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://the-guide.co.il/contact" />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="צור קשר | המדריך לצרכן" />
+        <meta name="twitter:description" content="צרו קשר עם המדריך לצרכן - מגזין הביטוח והפיננסים המוביל בישראל." />
       </Helmet>
 
       <Header />

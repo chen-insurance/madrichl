@@ -199,6 +199,15 @@ const CategoryArchive = () => {
           content={category.description || `כל המאמרים בקטגוריית ${category.name} - המדריך לצרכן`}
         />
         <link rel="canonical" href={`https://the-guide.co.il/category/${slug}`} />
+        <meta property="og:title" content={`${category.name} | המדריך לצרכן`} />
+        <meta property="og:description" content={category.description || `כל המאמרים בקטגוריית ${category.name} - המדריך לצרכן`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://the-guide.co.il/category/${slug}`} />
+        <meta property="og:site_name" content="המדריך לצרכן" />
+        <meta property="og:locale" content="he_IL" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${category.name} | המדריך לצרכן`} />
+        <meta name="twitter:description" content={category.description || `כל המאמרים בקטגוריית ${category.name}`} />
       </Helmet>
 
       <Header />
