@@ -13,45 +13,21 @@ interface MenuItem {
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  // Fetch footer menus
-  const { data: footerCol1 } = useQuery({
-    queryKey: ["public-menus", "footer_col_1"],
+  // Batch all footer menus into a single query
+  const { data: footerMenus } = useQuery({
+    queryKey: ["public-menus", "footer-all"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("menus")
-        .select("items_json")
-        .eq("location", "footer_col_1")
-        .maybeSingle();
+        .select("location, items_json")
+        .in("location", ["footer_col_1", "footer_col_2", "footer_col_3"]);
       if (error) throw error;
-      return (data?.items_json as unknown as MenuItem[]) || [];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
 
-  const { data: footerCol2 } = useQuery({
-    queryKey: ["public-menus", "footer_col_2"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("menus")
-        .select("items_json")
-        .eq("location", "footer_col_2")
-        .maybeSingle();
-      if (error) throw error;
-      return (data?.items_json as unknown as MenuItem[]) || [];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const { data: footerCol3 } = useQuery({
-    queryKey: ["public-menus", "footer_col_3"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("menus")
-        .select("items_json")
-        .eq("location", "footer_col_3")
-        .maybeSingle();
-      if (error) throw error;
-      return (data?.items_json as unknown as MenuItem[]) || [];
+      const map: Record<string, MenuItem[]> = {};
+      data?.forEach((row) => {
+        map[row.location] = (row.items_json as unknown as MenuItem[]) || [];
+      });
+      return map;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -73,9 +49,9 @@ const Footer = () => {
     { label: "מדיניות פרטיות", url: "/privacy" },
   ];
 
-  const col1Links = footerCol1 && footerCol1.length > 0 ? footerCol1 : defaultCol1;
-  const col2Links = footerCol2 && footerCol2.length > 0 ? footerCol2 : defaultCol2;
-  const col3Links = footerCol3 && footerCol3.length > 0 ? footerCol3 : defaultCol3;
+  const col1Links = footerMenus?.footer_col_1?.length ? footerMenus.footer_col_1 : defaultCol1;
+  const col2Links = footerMenus?.footer_col_2?.length ? footerMenus.footer_col_2 : defaultCol2;
+  const col3Links = footerMenus?.footer_col_3?.length ? footerMenus.footer_col_3 : defaultCol3;
 
   return (
     <footer className="bg-primary text-primary-foreground">

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -8,22 +9,23 @@ import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/article/Breadcrumbs";
 import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import ArticleSchema from "@/components/article/ArticleSchema";
-import ArticleSidebar from "@/components/article/ArticleSidebar";
-import InArticleCTA from "@/components/article/InArticleCTA";
-import AuthorBox from "@/components/article/AuthorBox";
-import RelatedArticles from "@/components/article/RelatedArticles";
-import MarkdownContent from "@/components/article/MarkdownContent";
-import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
-import GlobalLeadForm from "@/components/GlobalLeadForm";
-import FAQSection from "@/components/article/FAQSection";
-import FAQSchema from "@/components/article/FAQSchema";
+import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import { format } from "date-fns";
 import { Loader2, Calendar } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
+
+// Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
+const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
+const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
+const RelatedArticles = lazy(() => import("@/components/article/RelatedArticles"));
+const FAQSection = lazy(() => import("@/components/article/FAQSection"));
+const FAQSchema = lazy(() => import("@/components/article/FAQSchema"));
+const InArticleCTA = lazy(() => import("@/components/article/InArticleCTA"));
+const AuthorBox = lazy(() => import("@/components/article/AuthorBox"));
 
 interface FAQItem {
   question: string;
@@ -160,7 +162,9 @@ const Article = () => {
       {/* Structured Data */}
       <ArticleSchema article={article} />
       <BreadcrumbSchema items={breadcrumbSchemaItems} />
-      {faqItems.length > 0 && <FAQSchema items={faqItems} />}
+      <Suspense fallback={null}>
+        {faqItems.length > 0 && <FAQSchema items={faqItems} />}
+      </Suspense>
 
       <Header />
 
@@ -225,31 +229,41 @@ const Article = () => {
                 {firstPart && <MarkdownContentWithCTA content={firstPart} />}
 
                 {/* In-Article CTA after 2nd paragraph */}
-                {contentParagraphs.length > 2 && <InArticleCTA />}
+                <Suspense fallback={null}>
+                  {contentParagraphs.length > 2 && <InArticleCTA />}
+                </Suspense>
 
                 {secondPart && <MarkdownContentWithCTA content={secondPart} />}
               </div>
 
               {/* Author Box - E-E-A-T */}
-              <AuthorBox
-                authorName={article.author_name}
-                authorBio={article.author_bio}
-              />
+              <Suspense fallback={null}>
+                <AuthorBox
+                  authorName={article.author_name}
+                  authorBio={article.author_bio}
+                />
+              </Suspense>
 
               {/* FAQ Section */}
-              {faqItems.length > 0 && <FAQSection items={faqItems} />}
+              <Suspense fallback={null}>
+                {faqItems.length > 0 && <FAQSection items={faqItems} />}
+              </Suspense>
 
               {/* Bottom Lead Form (Mobile & Desktop) */}
               <div id="lead-form-section" className="mt-12">
-                <GlobalLeadForm />
+                <Suspense fallback={<div className="h-64 bg-muted rounded animate-pulse" />}>
+                  <GlobalLeadForm />
+                </Suspense>
               </div>
 
               {/* Related Articles - Semantic similarity when available */}
-              <RelatedArticles
-                currentSlug={slug}
-                category={article.category}
-                articleId={article.id}
-              />
+              <Suspense fallback={null}>
+                <RelatedArticles
+                  currentSlug={slug}
+                  category={article.category}
+                  articleId={article.id}
+                />
+              </Suspense>
 
               {/* Article Footer */}
               <div className="mt-8 pt-8 border-t border-border">
@@ -260,7 +274,9 @@ const Article = () => {
             </article>
 
             {/* Sidebar */}
-            <ArticleSidebar currentSlug={slug} articleContent={article.content} />
+            <Suspense fallback={<div className="space-y-6"><div className="h-48 bg-muted rounded animate-pulse" /></div>}>
+              <ArticleSidebar currentSlug={slug} articleContent={article.content} />
+            </Suspense>
           </div>
         </div>
       </main>
