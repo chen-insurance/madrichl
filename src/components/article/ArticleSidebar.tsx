@@ -1,6 +1,9 @@
-import GlobalLeadForm from "@/components/GlobalLeadForm";
+import { lazy, Suspense } from "react";
 import TableOfContents from "@/components/article/TableOfContents";
-import TrendingArticles from "@/components/article/TrendingArticles";
+
+// Lazy-load heavy sidebar components (GlobalLeadForm pulls zod/react-hook-form, TrendingArticles does RPC)
+const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
+const TrendingArticles = lazy(() => import("@/components/article/TrendingArticles"));
 
 interface ArticleSidebarProps {
   currentSlug?: string;
@@ -15,11 +18,15 @@ const ArticleSidebar = ({ currentSlug, articleContent }: ArticleSidebarProps) =>
 
       {/* Lead Form - Hidden on mobile, shown only on desktop */}
       <div className="hidden lg:block">
-        <GlobalLeadForm variant="compact" />
+        <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse" />}>
+          <GlobalLeadForm variant="compact" />
+        </Suspense>
       </div>
 
       {/* Trending Articles (Last 7 Days) */}
-      <TrendingArticles excludeSlug={currentSlug} limit={5} />
+      <Suspense fallback={null}>
+        <TrendingArticles excludeSlug={currentSlug} limit={5} />
+      </Suspense>
     </aside>
   );
 };

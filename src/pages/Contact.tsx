@@ -1,9 +1,11 @@
+import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import GlobalLeadForm from "@/components/GlobalLeadForm";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { Phone, Mail, MapPin } from "lucide-react";
+
+const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
 
 const Contact = () => {
   useHeadScripts();
@@ -122,7 +124,9 @@ const Contact = () => {
 
               {/* Lead Form */}
               <div>
-                <GlobalLeadForm />
+                <Suspense fallback={<div className="h-64 bg-muted rounded animate-pulse" />}>
+                  <GlobalLeadForm />
+                </Suspense>
               </div>
             </div>
           </div>
