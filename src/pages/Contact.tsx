@@ -124,7 +124,9 @@ const Contact = () => {
 
               {/* Lead Form */}
               <div>
-                <GlobalLeadForm />
+                <Suspense fallback={<div className="h-64 bg-muted rounded animate-pulse" />}>
+                  <GlobalLeadForm />
+                </Suspense>
               </div>
             </div>
           </div>
