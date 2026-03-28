@@ -9,12 +9,17 @@ interface ArticleSchemaProps {
     updated_at: string;
     author_name?: string | null;
     slug: string;
+    content?: string | null;
   };
 }
 
 const ArticleSchema = ({ article }: ArticleSchemaProps) => {
   const siteUrl = "https://the-guide.co.il";
   const logoUrl = `${siteUrl}/logo.png`;
+
+  // Calculate reading time (Hebrew ~200 wpm)
+  const wordCount = article.content?.trim().split(/\s+/).length || 0;
+  const readingMinutes = Math.max(1, Math.round(wordCount / 200));
 
   const newsArticleSchema = {
     "@context": "https://schema.org",
@@ -28,6 +33,9 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
     image: article.featured_image || `${siteUrl}/placeholder.svg`,
     datePublished: article.published_at || article.updated_at,
     dateModified: article.updated_at,
+    wordCount,
+    timeRequired: `PT${readingMinutes}M`,
+    inLanguage: "he",
     author: {
       "@type": "Person",
       name: article.author_name || "מערכת המדריך",

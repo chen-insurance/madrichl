@@ -13,10 +13,11 @@ import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import { format } from "date-fns";
-import { Loader2, Calendar } from "lucide-react";
+import { Loader2, Calendar, Clock } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
+import { getReadingTime } from "@/lib/reading-time";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
@@ -213,6 +214,10 @@ const Article = () => {
                       </span>
                     </div>
                   )}
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{getReadingTime(article.content)} דק׳ קריאה</span>
+                  </div>
                   {article.author_name && (
                     <span className="text-foreground font-medium">
                       מאת: {article.author_name}
