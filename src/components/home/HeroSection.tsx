@@ -86,25 +86,27 @@ import { Compass } from "lucide-react";
      },
    ];
  
-   return (
-     <section className="py-8 md:py-12">
-       <div className="container mx-auto">
-         <div className="grid lg:grid-cols-3 gap-6">
-           {/* Main Featured Article */}
-           <Link
-             to={`/news/${mainArticle.slug}`}
-            className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300 h-full flex flex-col"
-           >
-            <div className="flex-1 overflow-hidden relative min-h-[300px]">
-               <OptimizedImage
-                 src={mainArticle.featured_image}
-                 alt={mainArticle.title}
-                 aspectRatio="video"
-                 priority={true}
-                className="group-hover:scale-105 transition-transform duration-500 !h-full object-cover"
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
-             </div>
+    return (
+      <section className="py-8 md:py-12">
+        <div className="container mx-auto">
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Main Featured Article */}
+            <Link
+              to={`/news/${mainArticle.slug}`}
+             className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300 h-full flex flex-col"
+            >
+             {/* Fixed aspect ratio container to prevent CLS */}
+             <div className="flex-1 overflow-hidden relative aspect-[16/9] lg:aspect-auto lg:min-h-[400px]">
+                <OptimizedImage
+                  src={mainArticle.featured_image}
+                  alt={mainArticle.title}
+                  aspectRatio="video"
+                  priority={true}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
+                 className="group-hover:scale-105 transition-transform duration-500 !h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
+              </div>
              <div className="absolute bottom-0 right-0 left-0 p-6 md:p-8">
                <span className="inline-block bg-accent text-accent-foreground text-xs font-semibold px-3 py-1 rounded-full mb-4">
                  כתבה ראשית
