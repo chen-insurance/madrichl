@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import ArticleCard from "@/components/home/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
