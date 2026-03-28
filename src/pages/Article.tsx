@@ -13,9 +13,11 @@ import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import { format } from "date-fns";
-import { Loader2, Calendar } from "lucide-react";
+import { Loader2, Calendar, Clock } from "lucide-react";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
+import { useContentTracker } from "@/hooks/useContentTracker";
+import { getReadingTime } from "@/lib/reading-time";
 import { useContentTracker } from "@/hooks/useContentTracker";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
