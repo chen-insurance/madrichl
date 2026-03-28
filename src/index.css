@@ -417,3 +417,47 @@ html.highlight-links a {
     padding: 0 !important;
   }
 }
+
+/* Internal Links - Article Links */
+.internal-link {
+  color: hsl(var(--accent));
+  text-decoration: none;
+  border-bottom: 1.5px solid hsl(var(--accent) / 0.3);
+  padding-bottom: 1px;
+  transition: border-color 0.2s, color 0.2s;
+  position: relative;
+}
+
+.internal-link:hover {
+  color: hsl(var(--accent));
+  border-bottom-color: hsl(var(--accent));
+}
+
+/* Article link: small arrow icon after */
+.internal-link--article::after {
+  content: " ←";
+  font-size: 0.75em;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.internal-link--article:hover::after {
+  opacity: 1;
+}
+
+/* Glossary link: dotted underline + book icon */
+.internal-link--glossary {
+  border-bottom-style: dotted;
+  border-bottom-color: hsl(var(--accent) / 0.4);
+}
+
+.internal-link--glossary::after {
+  content: " 📖";
+  font-size: 0.65em;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.internal-link--glossary:hover::after {
+  opacity: 1;
+}
