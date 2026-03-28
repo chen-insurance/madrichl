@@ -39,6 +39,27 @@ export function useInternalLinks(currentSlug?: string) {
 }
 
 /**
+ * Fetches all glossary terms for internal linking within articles.
+ */
+export function useGlossaryLinks() {
+  const { data: terms } = useQuery({
+    queryKey: ["internal-links-glossary"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("glossary_terms")
+        .select("term_name, slug")
+        .order("term_name");
+      if (error) throw error;
+      return (data || []) as GlossaryLink[];
+    },
+    staleTime: 30 * 60 * 1000,
+  });
+
+  // Sort by term length (longest first) to avoid partial matches
+  return (terms || []).sort((a, b) => b.term_name.length - a.term_name.length);
+}
+
+/**
  * Injects internal links into content text (supports both HTML and Markdown).
  * - Only links each article title once (first occurrence)
  * - Skips titles inside headings, existing links, or shortcodes
