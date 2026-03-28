@@ -114,5 +114,38 @@ export function injectInternalLinks(
     }
   }
 
+  // Glossary term linking (up to 5 additional glossary links)
+  let glossaryLinked = 0;
+  for (const term of glossaryTerms) {
+    if (glossaryLinked >= 5) break;
+    if (term.term_name.length < 3) continue;
+
+    const escapedTerm = term.term_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(?<=[\\s>،.,:;]|^)(${escapedTerm})(?=[\\s<،.,:;?!]|$)`, "i");
+
+    const match = result.match(regex);
+    if (match && match.index !== undefined) {
+      const before = result.substring(Math.max(0, match.index - 300), match.index);
+
+      if (/<[^>]*$/.test(before)) continue;
+      if (/<a\s[^>]*>[^<]*$/i.test(before)) continue;
+      if (/<h[1-6][^>]*>[^<]*$/i.test(before)) continue;
+      if (/^#{1,6}\s.*$/m.test(before.split("\n").pop() || "")) continue;
+      if (/\[[^\]]*$/.test(before)) continue;
+
+      const linkText = match[1];
+      let replacement: string;
+
+      if (isHtml) {
+        replacement = `<a href="/glossary/${term.slug}" title="מילון מונחים: ${term.term_name}" style="color: inherit; text-decoration: underline; text-decoration-style: dotted;">${linkText}</a>`;
+      } else {
+        replacement = `[${linkText}](/glossary/${term.slug} "מילון מונחים: ${term.term_name}")`;
+      }
+
+      result = result.substring(0, match.index) + replacement + result.substring(match.index + linkText.length);
+      glossaryLinked++;
+    }
+  }
+
   return result;
 }
