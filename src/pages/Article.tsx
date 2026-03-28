@@ -74,12 +74,13 @@ const Article = () => {
   // Track content engagement (scroll depth, time on page)
   useContentTracker({ articleId: article?.id || "", enabled: !!article });
 
-  // Internal linking - inject links to related articles (before early returns for hooks rules)
+  // Internal linking - inject links to related articles and glossary terms
   const linkableArticles = useInternalLinks(slug);
+  const glossaryTerms = useGlossaryLinks();
 
   const linkedContent = useMemo(
-    () => injectInternalLinks(article?.content || "", linkableArticles),
-    [article?.content, linkableArticles]
+    () => injectInternalLinks(article?.content || "", linkableArticles, glossaryTerms),
+    [article?.content, linkableArticles, glossaryTerms]
   );
 
   // Handle redirect
