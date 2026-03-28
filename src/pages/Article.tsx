@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
