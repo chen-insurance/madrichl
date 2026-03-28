@@ -215,6 +215,10 @@ const Article = () => {
                       </span>
                     </div>
                   )}
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{getReadingTime(article.content)} דק׳ קריאה</span>
+                  </div>
                   {article.author_name && (
                     <span className="text-foreground font-medium">
                       מאת: {article.author_name}
