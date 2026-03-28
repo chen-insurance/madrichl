@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +18,7 @@ import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
 import { getReadingTime } from "@/lib/reading-time";
+import { useInternalLinks, injectInternalLinks } from "@/hooks/useInternalLinks";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
@@ -73,6 +74,14 @@ const Article = () => {
   // Track content engagement (scroll depth, time on page)
   useContentTracker({ articleId: article?.id || "", enabled: !!article });
 
+  // Internal linking - inject links to related articles (before early returns for hooks rules)
+  const linkableArticles = useInternalLinks(slug);
+
+  const linkedContent = useMemo(
+    () => injectInternalLinks(article?.content || "", linkableArticles),
+    [article?.content, linkableArticles]
+  );
+
   // Handle redirect
   if (redirect) {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
@@ -110,7 +119,7 @@ const Article = () => {
   }
 
   // Split content into paragraphs to insert CTA after 2nd paragraph
-  const contentParagraphs = article.content?.split("\n\n") || [];
+  const contentParagraphs = linkedContent.split("\n\n") || [];
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
