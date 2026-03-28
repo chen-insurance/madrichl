@@ -102,7 +102,7 @@ export function injectInternalLinks(
       let replacement: string;
 
       if (isHtml) {
-        replacement = `<a href="/news/${article.slug}" style="color: inherit; text-decoration: underline;">${linkText}</a>`;
+        replacement = `<a href="/news/${article.slug}" class="internal-link internal-link--article">${linkText}</a>`;
       } else {
         replacement = `[${linkText}](/news/${article.slug})`;
       }
@@ -137,7 +137,7 @@ export function injectInternalLinks(
       let replacement: string;
 
       if (isHtml) {
-        replacement = `<a href="/glossary/${term.slug}" title="מילון מונחים: ${term.term_name}" style="color: inherit; text-decoration: underline; text-decoration-style: dotted;">${linkText}</a>`;
+        replacement = `<a href="/glossary/${term.slug}" title="מילון מונחים: ${term.term_name}" class="internal-link internal-link--glossary">${linkText}</a>`;
       } else {
         replacement = `[${linkText}](/glossary/${term.slug} "מילון מונחים: ${term.term_name}")`;
       }
