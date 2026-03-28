@@ -65,7 +65,9 @@ import { Compass } from "lucide-react";
      published_at: new Date().toISOString(),
    };
  
-   const secondary = secondaryArticles.length > 0 ? secondaryArticles : [
+    // Filter out the main article from secondary list to prevent duplicates
+    const filteredSecondary = secondaryArticles.filter(a => a.id !== mainArticle.id);
+    const secondary = filteredSecondary.length > 0 ? filteredSecondary : secondaryArticles.length > 0 ? secondaryArticles : [
      {
        id: "2",
        title: "חברות הביטוח מדווחות על רווחי שיא ברבעון השלישי",
