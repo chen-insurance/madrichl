@@ -4,4 +4,8 @@ Disallow: /admin/
 Disallow: /auth
 Disallow: /preview/
 
+# Sitemap
 Sitemap: https://the-guide.co.il/sitemap.xml
+
+# Crawl-delay (optional, for polite crawlers)
+Crawl-delay: 1
