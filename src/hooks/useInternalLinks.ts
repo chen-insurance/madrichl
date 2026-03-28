@@ -102,7 +102,7 @@ export function injectInternalLinks(
       let replacement: string;
 
       if (isHtml) {
-        replacement = `<a href="/news/${article.slug}" style="color: inherit; text-decoration: underline;">${linkText}</a>`;
+        replacement = `<a href="/news/${article.slug}" class="internal-link internal-link--article">${linkText}</a>`;
       } else {
         replacement = `[${linkText}](/news/${article.slug})`;
       }
