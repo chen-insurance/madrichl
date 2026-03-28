@@ -303,20 +303,22 @@ const Article = () => {
               </Suspense>
 
               {/* Bottom Lead Form (Mobile & Desktop) */}
-              <div id="lead-form-section" className="mt-12">
+              <div id="lead-form-section" className="mt-12" style={{ contentVisibility: "auto", containIntrinsicSize: "0 400px" }}>
                 <Suspense fallback={<div className="h-64 bg-muted rounded animate-pulse" />}>
                   <GlobalLeadForm />
                 </Suspense>
               </div>
 
               {/* Related Articles - Semantic similarity when available */}
-              <Suspense fallback={null}>
-                <RelatedArticles
-                  currentSlug={slug}
-                  category={article.category}
-                  articleId={article.id}
-                />
-              </Suspense>
+              <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
+                <Suspense fallback={null}>
+                  <RelatedArticles
+                    currentSlug={slug}
+                    category={article.category}
+                    articleId={article.id}
+                  />
+                </Suspense>
+              </div>
 
               {/* Article Footer */}
               <div className="mt-8 pt-8 border-t border-border">
