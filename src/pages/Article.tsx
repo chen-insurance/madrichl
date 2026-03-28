@@ -177,6 +177,16 @@ const Article = () => {
           name="description"
           content={article.seo_description || article.excerpt || ""}
         />
+        {/* Preload featured image for LCP */}
+        {article.featured_image && (
+          <link
+            rel="preload"
+            as="image"
+            href={optimizeImageUrl(article.featured_image, 800)}
+            imageSrcSet={`${optimizeImageUrl(article.featured_image, 480)} 480w, ${optimizeImageUrl(article.featured_image, 800)} 800w, ${optimizeImageUrl(article.featured_image, 1280)} 1280w`}
+            imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+          />
+        )}
         {/* Open Graph */}
         <meta property="og:title" content={article.seo_title || article.title} />
         <meta
