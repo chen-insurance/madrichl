@@ -47,6 +47,11 @@
   status = 200
   force = true
 
+# Edge Functions for bot prerendering
+[[edge_functions]]
+  function = "bot-prerender"
+  path = "/*"
+
 # SPA fallback - must be last
 [[redirects]]
   from = "/*"
