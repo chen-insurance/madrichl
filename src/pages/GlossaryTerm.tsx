@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Loader2, ArrowRight, BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -125,6 +126,14 @@ const GlossaryTerm = () => {
           </script>
         )}
       </Helmet>
+
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: "מילון מונחים", url: "/glossary" },
+          { name: term.term_name, url: `/glossary/${term.slug}` },
+        ]}
+      />
 
       <Header />
 

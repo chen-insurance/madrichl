@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import ArticleCard from "@/components/home/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -209,6 +210,13 @@ const CategoryArchive = () => {
         <meta name="twitter:title" content={`${category.name} | המדריך לצרכן`} />
         <meta name="twitter:description" content={category.description || `כל המאמרים בקטגוריית ${category.name}`} />
       </Helmet>
+
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: category.name, url: `/category/${slug}` },
+        ]}
+      />
 
       <Header />
 

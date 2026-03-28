@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Loader2, BookOpen } from "lucide-react";
 
 interface GlossaryTerm {
@@ -61,6 +62,13 @@ const GlossaryIndex = () => {
         <meta name="twitter:description" content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים." />
         <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
       </Helmet>
+
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: "מילון מונחים", url: "/glossary" },
+        ]}
+      />
 
       <Header />
 
