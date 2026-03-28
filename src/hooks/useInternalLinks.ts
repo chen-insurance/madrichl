@@ -67,7 +67,8 @@ export function useGlossaryLinks() {
  */
 export function injectInternalLinks(
   content: string,
-  articles: ArticleLink[]
+  articles: ArticleLink[],
+  glossaryTerms: GlossaryLink[] = []
 ): string {
   if (!content || articles.length === 0) return content;
 
