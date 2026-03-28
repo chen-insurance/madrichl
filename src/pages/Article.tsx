@@ -67,6 +67,7 @@ const Article = () => {
       return data;
     },
     enabled: !!slug && !redirect,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Track article view (with debounce)
