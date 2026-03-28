@@ -18,7 +18,6 @@ import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
 import { getReadingTime } from "@/lib/reading-time";
-import { useContentTracker } from "@/hooks/useContentTracker";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
