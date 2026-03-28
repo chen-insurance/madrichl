@@ -69,7 +69,40 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T9PT6N8X"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline critical shell for instant FCP – replaced by React on hydration -->
+      <style>
+        .shell-header{background:#1a2744;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;direction:rtl}
+        .shell-logo{color:#d4a436;font-weight:700;font-size:20px;font-family:Heebo,sans-serif}
+        .shell-nav{display:flex;gap:20px}
+        .shell-nav span{width:60px;height:12px;background:rgba(255,255,255,.15);border-radius:4px;display:inline-block}
+        .shell-hero{background:linear-gradient(180deg,#1a2744,#141e35);padding:48px 24px;text-align:center;direction:rtl}
+        .shell-hero-title{width:50%;max-width:400px;height:28px;background:rgba(255,255,255,.1);border-radius:6px;margin:0 auto 16px}
+        .shell-hero-sub{width:70%;max-width:560px;height:16px;background:rgba(255,255,255,.07);border-radius:4px;margin:0 auto}
+        .shell-cards{max-width:1200px;margin:32px auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+        .shell-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px -2px rgba(26,39,68,.08)}
+        .shell-card-img{width:100%;aspect-ratio:16/9;background:#e8ecf1}
+        .shell-card-body{padding:16px}
+        .shell-card-body div{height:14px;background:#e8ecf1;border-radius:4px;margin-bottom:8px}
+        .shell-card-body div:last-child{width:60%}
+        @media(max-width:640px){.shell-nav{display:none}.shell-hero{padding:32px 16px}.shell-hero-title{width:80%}.shell-cards{grid-template-columns:1fr;padding:0 16px}}
+        @keyframes shell-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        .shell-card-img,.shell-card-body div,.shell-hero-title,.shell-hero-sub,.shell-nav span{animation:shell-pulse 1.5s ease-in-out infinite}
+      </style>
+      <div class="shell-header">
+        <div class="shell-logo">המדריך לצרכן</div>
+        <div class="shell-nav"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="shell-hero">
+        <div class="shell-hero-title"></div>
+        <div class="shell-hero-sub"></div>
+      </div>
+      <div class="shell-cards">
+        <div class="shell-card"><div class="shell-card-img"></div><div class="shell-card-body"><div></div><div></div></div></div>
+        <div class="shell-card"><div class="shell-card-img"></div><div class="shell-card-body"><div></div><div></div></div></div>
+        <div class="shell-card"><div class="shell-card-img"></div><div class="shell-card-body"><div></div><div></div></div></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
