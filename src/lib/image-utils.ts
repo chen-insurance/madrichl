@@ -12,7 +12,7 @@ export const optimizeImageUrl = (url: string, width: number, quality: number = 8
   return url;
 };
 
-export const buildSrcSet = (url: string, widths = [320, 640, 768, 1024, 1280]): string => {
+export const buildSrcSet = (url: string, widths = [320, 480, 640, 800, 1024, 1280]): string => {
   return widths
     .map((w) => `${optimizeImageUrl(url, w)} ${w}w`)
     .join(", ");

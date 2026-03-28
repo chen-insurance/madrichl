@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useMemo, useState, useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +13,8 @@ import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import { format } from "date-fns";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
@@ -66,6 +67,7 @@ const Article = () => {
       return data;
     },
     enabled: !!slug && !redirect,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Track article view (with debounce)
@@ -92,8 +94,34 @@ const Article = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        <main className="flex-1 py-8 md:py-12">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <Skeleton className="h-5 w-48 mb-6" />
+            <div className="grid lg:grid-cols-[1fr_320px] gap-8 lg:gap-12">
+              <div className="min-w-0 space-y-4">
+                {/* Featured image skeleton */}
+                <Skeleton className="w-full aspect-video rounded-xl" />
+                {/* Title skeleton */}
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-4 w-1/3" />
+                {/* Content skeleton */}
+                <div className="space-y-3 pt-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+              <div className="hidden lg:block space-y-6">
+                <Skeleton className="h-48 rounded" />
+                <Skeleton className="h-32 rounded" />
+              </div>
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
@@ -150,6 +178,16 @@ const Article = () => {
           name="description"
           content={article.seo_description || article.excerpt || ""}
         />
+        {/* Preload featured image for LCP */}
+        {article.featured_image && (
+          <link
+            rel="preload"
+            as="image"
+            href={optimizeImageUrl(article.featured_image, 800)}
+            imageSrcSet={`${optimizeImageUrl(article.featured_image, 480)} 480w, ${optimizeImageUrl(article.featured_image, 800)} 800w, ${optimizeImageUrl(article.featured_image, 1280)} 1280w`}
+            imageSizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+          />
+        )}
         {/* Open Graph */}
         <meta property="og:title" content={article.seo_title || article.title} />
         <meta
