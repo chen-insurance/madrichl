@@ -34,10 +34,10 @@ export function useInternalLinks(currentSlug?: string) {
 }
 
 /**
- * Injects internal links into content text.
+ * Injects internal links into content text (supports both HTML and Markdown).
  * - Only links each article title once (first occurrence)
  * - Skips titles inside headings, existing links, or shortcodes
- * - Case-insensitive matching for Hebrew
+ * - Uses lookaround for Hebrew text (no \b word boundaries)
  */
 export function injectInternalLinks(
   content: string,
@@ -45,47 +45,44 @@ export function injectInternalLinks(
 ): string {
   if (!content || articles.length === 0) return content;
 
-  // Track which articles we've already linked
+  const isHtml = /<[a-z][\s\S]*>/i.test(content);
   const linked = new Set<string>();
   let result = content;
 
   for (const article of articles) {
     if (linked.has(article.slug)) continue;
+    if (article.title.length < 6) continue;
 
-    // Skip very short titles (< 4 chars) to avoid false matches
-    if (article.title.length < 4) continue;
-
-    // Escape special regex chars in title
     const escapedTitle = article.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    // Match title not inside:
-    // - HTML tags (< >)
-    // - Existing links [text](url) or <a> tags  
-    // - Headings (## or <h2>)
-    // - Shortcodes {{ }}
-    const regex = new RegExp(
-      `(?<![#<\\[{/])\\b(${escapedTitle})\\b(?![\\]}>})`,
-      "i"
-    );
+    // Use non-word-char boundaries instead of \b for Hebrew support
+    const regex = new RegExp(`(?<=[\\s>،.,:;]|^)(${escapedTitle})(?=[\\s<،.,:;?!]|$)`, "i");
 
     const match = result.match(regex);
     if (match && match.index !== undefined) {
-      // Check context: skip if inside a heading line, link, or HTML tag
-      const before = result.substring(Math.max(0, match.index - 200), match.index);
-      
-      // Skip if inside a markdown heading
-      if (/^#{1,6}\s.*$/m.test(before.split("\n").pop() || "")) continue;
-      // Skip if inside an existing markdown link
-      if (/\[[^\]]*$/.test(before)) continue;
-      // Skip if inside an HTML tag
+      const before = result.substring(Math.max(0, match.index - 300), match.index);
+      const after = result.substring(match.index + match[1].length, match.index + match[1].length + 50);
+
+      // Skip if inside an HTML tag attribute or <a>/<h1-h6> element
       if (/<[^>]*$/.test(before)) continue;
+      if (/<a\s[^>]*>[^<]*$/i.test(before)) continue;
+      if (/<h[1-6][^>]*>[^<]*$/i.test(before)) continue;
+      // Skip if inside markdown heading or link
+      if (/^#{1,6}\s.*$/m.test(before.split("\n").pop() || "")) continue;
+      if (/\[[^\]]*$/.test(before)) continue;
 
       const linkText = match[1];
-      const replacement = `[${linkText}](/news/${article.slug})`;
+      let replacement: string;
+
+      if (isHtml) {
+        replacement = `<a href="/news/${article.slug}" style="color: inherit; text-decoration: underline;">${linkText}</a>`;
+      } else {
+        replacement = `[${linkText}](/news/${article.slug})`;
+      }
+
       result = result.substring(0, match.index) + replacement + result.substring(match.index + linkText.length);
       linked.add(article.slug);
 
-      // Limit to 5 internal links per article to keep it natural
       if (linked.size >= 5) break;
     }
   }
