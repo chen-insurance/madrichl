@@ -95,6 +95,8 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
       </div>
     </Link>
   );
-};
+});
+
+ArticleCard.displayName = "ArticleCard";
 
 export default ArticleCard;
