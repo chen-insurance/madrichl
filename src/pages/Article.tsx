@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useMemo, useState, useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { optimizeImageUrl } from "@/lib/image-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +13,8 @@ import MobileTableOfContents from "@/components/article/MobileTableOfContents";
 import OptimizedImage from "@/components/common/OptimizedImage";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
 import { format } from "date-fns";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHeadScripts } from "@/hooks/useHeadScripts";
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
