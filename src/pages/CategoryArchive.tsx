@@ -211,6 +211,13 @@ const CategoryArchive = () => {
         <meta name="twitter:description" content={category.description || `כל המאמרים בקטגוריית ${category.name}`} />
       </Helmet>
 
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: category.name, url: `/category/${slug}` },
+        ]}
+      />
+
       <Header />
 
       <main className="container mx-auto px-4 py-12">

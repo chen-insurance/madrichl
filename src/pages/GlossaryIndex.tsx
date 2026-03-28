@@ -63,6 +63,13 @@ const GlossaryIndex = () => {
         <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
       </Helmet>
 
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: "מילון מונחים", url: "/glossary" },
+        ]}
+      />
+
       <Header />
 
       <main className="flex-1 py-8 md:py-12">

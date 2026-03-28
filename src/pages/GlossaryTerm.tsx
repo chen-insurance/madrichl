@@ -127,6 +127,14 @@ const GlossaryTerm = () => {
         )}
       </Helmet>
 
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: "מילון מונחים", url: "/glossary" },
+          { name: term.term_name, url: `/glossary/${term.slug}` },
+        ]}
+      />
+
       <Header />
 
       <main className="flex-1 py-8 md:py-12">
