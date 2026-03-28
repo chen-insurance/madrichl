@@ -22,7 +22,7 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
   published_at,
   category,
   variant = "default",
-}: ArticleCardProps) => {
+}: ArticleCardProps, ref) => {
   const formattedDate = format(new Date(published_at), "dd/MM/yyyy");
 
   const placeholderImage = "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop";
