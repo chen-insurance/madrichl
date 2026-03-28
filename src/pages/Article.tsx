@@ -110,8 +110,15 @@ const Article = () => {
     );
   }
 
+  // Internal linking - inject links to related articles
+  const linkableArticles = useInternalLinks(slug);
+
   // Split content into paragraphs to insert CTA after 2nd paragraph
-  const contentParagraphs = article.content?.split("\n\n") || [];
+  const linkedContent = useMemo(
+    () => injectInternalLinks(article.content || "", linkableArticles),
+    [article.content, linkableArticles]
+  );
+  const contentParagraphs = linkedContent.split("\n\n") || [];
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
