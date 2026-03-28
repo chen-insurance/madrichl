@@ -173,8 +173,12 @@ const Index = () => {
         <Suspense fallback={<div className="py-10"><div className="container mx-auto"><div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-64 bg-muted rounded" /></div></div></div>}>
           <ComparisonTable />
         </Suspense>
-        <CategorySection />
-        <LatestArticles articles={latestArticles || undefined} />
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+          <CategorySection />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 800px" }}>
+          <LatestArticles articles={latestArticles || undefined} />
+        </div>
       </main>
       <Footer />
     </div>
