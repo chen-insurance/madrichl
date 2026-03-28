@@ -74,6 +74,14 @@ const Article = () => {
   // Track content engagement (scroll depth, time on page)
   useContentTracker({ articleId: article?.id || "", enabled: !!article });
 
+  // Internal linking - inject links to related articles (before early returns for hooks rules)
+  const linkableArticles = useInternalLinks(slug);
+
+  const linkedContent = useMemo(
+    () => injectInternalLinks(article?.content || "", linkableArticles),
+    [article?.content, linkableArticles]
+  );
+
   // Handle redirect
   if (redirect) {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
@@ -110,14 +118,7 @@ const Article = () => {
     );
   }
 
-  // Internal linking - inject links to related articles
-  const linkableArticles = useInternalLinks(slug);
-
   // Split content into paragraphs to insert CTA after 2nd paragraph
-  const linkedContent = useMemo(
-    () => injectInternalLinks(article.content || "", linkableArticles),
-    [article.content, linkableArticles]
-  );
   const contentParagraphs = linkedContent.split("\n\n") || [];
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
