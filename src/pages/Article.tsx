@@ -93,8 +93,34 @@ const Article = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        <main className="flex-1 py-8 md:py-12">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <Skeleton className="h-5 w-48 mb-6" />
+            <div className="grid lg:grid-cols-[1fr_320px] gap-8 lg:gap-12">
+              <div className="min-w-0 space-y-4">
+                {/* Featured image skeleton */}
+                <Skeleton className="w-full aspect-video rounded-xl" />
+                {/* Title skeleton */}
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-4 w-1/3" />
+                {/* Content skeleton */}
+                <div className="space-y-3 pt-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+              <div className="hidden lg:block space-y-6">
+                <Skeleton className="h-48 rounded" />
+                <Skeleton className="h-32 rounded" />
+              </div>
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
