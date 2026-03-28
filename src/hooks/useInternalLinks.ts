@@ -6,6 +6,11 @@ interface ArticleLink {
   slug: string;
 }
 
+interface GlossaryLink {
+  term_name: string;
+  slug: string;
+}
+
 /**
  * Fetches all published article titles and slugs for internal linking.
  * Results are cached for 30 minutes to minimize API calls.
