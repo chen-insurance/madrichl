@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
+import NavigationSchema from "@/components/layout/NavigationSchema";
 import { Menu, Search } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
 import { useState } from "react";
