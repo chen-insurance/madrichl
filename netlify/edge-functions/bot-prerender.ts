@@ -29,6 +29,40 @@ function stripMarkdown(md: string): string {
     .trim();
 }
 
+/** Extract FAQ items from markdown H3 headings ending with ? */
+function extractFAQFromContent(content: string): Array<{question: string; answer: string}> {
+  if (!content) return [];
+  const lines = content.split("\n");
+  const faqs: Array<{question: string; answer: string}> = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    const h3Match = line.match(/^###\s+(.+\?)\s*$/);
+    if (h3Match) {
+      const question = h3Match[1].trim();
+      const answerParts: string[] = [];
+      i++;
+      while (i < lines.length) {
+        const next = lines[i].trim();
+        if (!next) {
+          if (answerParts.length > 0 && i + 1 < lines.length && lines[i + 1].trim() === "") break;
+          i++;
+          continue;
+        }
+        if (next.startsWith("#")) break;
+        answerParts.push(next);
+        i++;
+      }
+      if (answerParts.length > 0) {
+        faqs.push({ question, answer: answerParts.join(" ") });
+      }
+    } else {
+      i++;
+    }
+  }
+  return faqs;
+}
+
 async function supabaseGet(table: string, query: string) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
     headers: {
@@ -56,13 +90,19 @@ async function renderArticle(slug: string): Promise<string | null> {
   const url = `${SITE}/news/${slug}`;
   const plainContent = stripMarkdown(a.content || "").slice(0, 5000);
 
-  // FAQ structured data
+  // FAQ structured data: merge manual + auto-detected from H3 questions
+  const manualFAQ: Array<{question: string; answer: string}> = 
+    a.faq_items && Array.isArray(a.faq_items) ? a.faq_items : [];
+  const autoFAQ = extractFAQFromContent(a.content || "");
+  const manualQuestions = new Set(manualFAQ.map((f: any) => f.question));
+  const allFAQ = [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
+
   let faqSchema = "";
-  if (a.faq_items && Array.isArray(a.faq_items) && a.faq_items.length > 0) {
+  if (allFAQ.length > 0) {
     const faqLD = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: a.faq_items.map((f: any) => ({
+      mainEntity: allFAQ.map((f: any) => ({
         "@type": "Question",
         name: f.question,
         acceptedAnswer: { "@type": "Answer", text: f.answer },
@@ -98,6 +138,15 @@ async function renderArticle(slug: string): Promise<string | null> {
     extraHead: `
       <script type="application/ld+json">${JSON.stringify(articleLD)}</script>
       ${faqSchema}
+      <script type="application/ld+json">${JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ראשי", item: SITE },
+          ...(a.category ? [{ "@type": "ListItem", position: 2, name: a.category, item: `${SITE}/category/${encodeURIComponent(a.category)}` }] : []),
+          { "@type": "ListItem", position: a.category ? 3 : 2, name: a.title, item: url },
+        ],
+      })}</script>
     `,
     body: `
       <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
@@ -108,7 +157,7 @@ async function renderArticle(slug: string): Promise<string | null> {
           ${a.author_name ? `<p>מאת: ${escapeHtml(a.author_name)}</p>` : ""}
           ${a.category ? `<p>קטגוריה: ${escapeHtml(a.category)}</p>` : ""}
           <div>${escapeHtml(plainContent)}</div>
-          ${a.faq_items && Array.isArray(a.faq_items) ? a.faq_items.map((f: any) => `<section><h2>${escapeHtml(f.question)}</h2><p>${escapeHtml(f.answer)}</p></section>`).join("") : ""}
+          ${allFAQ.length > 0 ? `<section><h2>שאלות נפוצות</h2>${allFAQ.map((f: any) => `<h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p>`).join("")}</section>` : ""}
         </article>
       </main>
     `,
