@@ -173,13 +173,15 @@ const QuizWidget = ({ quizId }: QuizWidgetProps) => {
             <p className="text-muted-foreground mb-6">
               מלאו את הפרטים ונחזור אליכם עם הצעה מותאמת
             </p>
-            <LeadForm
-              title=""
-              subtitle=""
-              variant="inline"
-              onSuccess={handleLeadFormSuccess}
-              extraData={{ quiz_answers: answers, quiz_id: quizId }}
-            />
+            <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse" />}>
+              <LeadForm
+                title=""
+                subtitle=""
+                variant="inline"
+                onSuccess={handleLeadFormSuccess}
+                extraData={{ quiz_answers: answers, quiz_id: quizId }}
+              />
+            </Suspense>
           </div>
         ) : (
           // Question Step

@@ -173,11 +173,12 @@ const Preview = () => {
 
               {/* Bottom Lead Form */}
               <div className="mt-12">
-                <LeadForm
-                  title="בדוק את זכאותך עכשיו"
-                  subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
-                  variant="card"
-                />
+                <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse" />}>
+                  <LeadForm
+                    title="בדוק את זכאותך עכשיו"
+                    subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
+                    variant="card"
+                  />
               </div>
             </article>
 
