@@ -29,6 +29,40 @@ function stripMarkdown(md: string): string {
     .trim();
 }
 
+/** Extract FAQ items from markdown H3 headings ending with ? */
+function extractFAQFromContent(content: string): Array<{question: string; answer: string}> {
+  if (!content) return [];
+  const lines = content.split("\n");
+  const faqs: Array<{question: string; answer: string}> = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    const h3Match = line.match(/^###\s+(.+\?)\s*$/);
+    if (h3Match) {
+      const question = h3Match[1].trim();
+      const answerParts: string[] = [];
+      i++;
+      while (i < lines.length) {
+        const next = lines[i].trim();
+        if (!next) {
+          if (answerParts.length > 0 && i + 1 < lines.length && lines[i + 1].trim() === "") break;
+          i++;
+          continue;
+        }
+        if (next.startsWith("#")) break;
+        answerParts.push(next);
+        i++;
+      }
+      if (answerParts.length > 0) {
+        faqs.push({ question, answer: answerParts.join(" ") });
+      }
+    } else {
+      i++;
+    }
+  }
+  return faqs;
+}
+
 async function supabaseGet(table: string, query: string) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
     headers: {
