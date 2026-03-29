@@ -207,10 +207,36 @@ async function renderHomepage(): Promise<string> {
     .map((a: any) => `<li><a href="${SITE}/news/${a.slug}">${escapeHtml(a.title)}</a>${a.excerpt ? ` - ${escapeHtml(a.excerpt)}` : ""}</li>`)
     .join("");
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "המדריך לצרכן",
+    url: SITE,
+    inLanguage: "he",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE}/blog?search={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "המדריך לצרכן",
+    url: SITE,
+    logo: { "@type": "ImageObject", url: `${SITE}/logo.png` },
+    sameAs: [],
+  };
+
   return buildHtml({
     title: "המדריך לצרכן | מגזין ביטוח ופיננסים",
     desc: "המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן.",
     url: SITE,
+    extraHead: `
+      <script type="application/ld+json">${JSON.stringify(websiteSchema)}</script>
+      <script type="application/ld+json">${JSON.stringify(orgSchema)}</script>
+    `,
     body: `
       <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
       <main>
