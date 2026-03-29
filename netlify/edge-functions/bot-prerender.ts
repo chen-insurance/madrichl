@@ -90,13 +90,19 @@ async function renderArticle(slug: string): Promise<string | null> {
   const url = `${SITE}/news/${slug}`;
   const plainContent = stripMarkdown(a.content || "").slice(0, 5000);
 
-  // FAQ structured data
+  // FAQ structured data: merge manual + auto-detected from H3 questions
+  const manualFAQ: Array<{question: string; answer: string}> = 
+    a.faq_items && Array.isArray(a.faq_items) ? a.faq_items : [];
+  const autoFAQ = extractFAQFromContent(a.content || "");
+  const manualQuestions = new Set(manualFAQ.map((f: any) => f.question));
+  const allFAQ = [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
+
   let faqSchema = "";
-  if (a.faq_items && Array.isArray(a.faq_items) && a.faq_items.length > 0) {
+  if (allFAQ.length > 0) {
     const faqLD = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: a.faq_items.map((f: any) => ({
+      mainEntity: allFAQ.map((f: any) => ({
         "@type": "Question",
         name: f.question,
         acceptedAnswer: { "@type": "Answer", text: f.answer },
