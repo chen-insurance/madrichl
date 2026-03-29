@@ -153,10 +153,16 @@ const Article = () => {
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
-  // Parse FAQ items from database
-  const faqItems: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
+  // Parse FAQ items: merge manual (DB) + auto-detected from content H3 questions
+  const manualFAQ: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
     ? (article.faq_items as unknown as FAQItem[])
     : [];
+  const autoFAQ = useMemo(() => extractFAQFromContent(article.content || ""), [article.content]);
+  const faqItems = useMemo(() => {
+    const manualQuestions = new Set(manualFAQ.map(f => f.question));
+    // Manual items take priority; add auto-detected ones that aren't duplicates
+    return [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
+  }, [manualFAQ, autoFAQ]);
 
   // Breadcrumb data for UI and Schema
   const categoryLabel = article.category || "חדשות";
