@@ -138,6 +138,15 @@ async function renderArticle(slug: string): Promise<string | null> {
     extraHead: `
       <script type="application/ld+json">${JSON.stringify(articleLD)}</script>
       ${faqSchema}
+      <script type="application/ld+json">${JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ראשי", item: SITE },
+          ...(a.category ? [{ "@type": "ListItem", position: 2, name: a.category, item: `${SITE}/category/${encodeURIComponent(a.category)}` }] : []),
+          { "@type": "ListItem", position: a.category ? 3 : 2, name: a.title, item: url },
+        ],
+      })}</script>
     `,
     body: `
       <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
