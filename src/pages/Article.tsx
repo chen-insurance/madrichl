@@ -20,6 +20,7 @@ import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
 import { getReadingTime } from "@/lib/reading-time";
 import { useInternalLinks, useGlossaryLinks, injectInternalLinks } from "@/hooks/useInternalLinks";
+import { extractFAQFromContent } from "@/lib/extract-faq-from-content";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
