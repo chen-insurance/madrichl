@@ -86,7 +86,9 @@ const Article = () => {
     [article?.content, linkableArticles, glossaryTerms]
   );
 
-  // Handle redirect
+  // Auto-detect FAQ from content H3 questions
+  const autoFAQ = useMemo(() => extractFAQFromContent(article?.content || ""), [article?.content]);
+
   if (redirect) {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
   }
