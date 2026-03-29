@@ -20,6 +20,7 @@ import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
 import { getReadingTime } from "@/lib/reading-time";
 import { useInternalLinks, useGlossaryLinks, injectInternalLinks } from "@/hooks/useInternalLinks";
+import { extractFAQFromContent } from "@/lib/extract-faq-from-content";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
@@ -85,7 +86,9 @@ const Article = () => {
     [article?.content, linkableArticles, glossaryTerms]
   );
 
-  // Handle redirect
+  // Auto-detect FAQ from content H3 questions
+  const autoFAQ = useMemo(() => extractFAQFromContent(article?.content || ""), [article?.content]);
+
   if (redirect) {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
   }
@@ -152,10 +155,12 @@ const Article = () => {
   const firstPart = contentParagraphs.slice(0, 2).join("\n\n");
   const secondPart = contentParagraphs.slice(2).join("\n\n");
 
-  // Parse FAQ items from database
-  const faqItems: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
+  // Parse FAQ items: merge manual (DB) + auto-detected from content H3 questions
+  const manualFAQ: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
     ? (article.faq_items as unknown as FAQItem[])
     : [];
+  const manualQuestions = new Set(manualFAQ.map(f => f.question));
+  const faqItems = [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
 
   // Breadcrumb data for UI and Schema
   const categoryLabel = article.category || "חדשות";
