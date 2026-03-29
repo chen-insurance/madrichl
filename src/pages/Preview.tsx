@@ -179,6 +179,7 @@ const Preview = () => {
                     subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
                     variant="card"
                   />
+                </Suspense>
               </div>
             </article>
 
