@@ -159,10 +159,8 @@ const Article = () => {
   const manualFAQ: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
     ? (article.faq_items as unknown as FAQItem[])
     : [];
-  const autoFAQ = useMemo(() => extractFAQFromContent(article.content || ""), [article.content]);
   const faqItems = useMemo(() => {
     const manualQuestions = new Set(manualFAQ.map(f => f.question));
-    // Manual items take priority; add auto-detected ones that aren't duplicates
     return [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
   }, [manualFAQ, autoFAQ]);
 
