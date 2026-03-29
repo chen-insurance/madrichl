@@ -159,10 +159,8 @@ const Article = () => {
   const manualFAQ: FAQItem[] = article.faq_items && Array.isArray(article.faq_items)
     ? (article.faq_items as unknown as FAQItem[])
     : [];
-  const faqItems = useMemo(() => {
-    const manualQuestions = new Set(manualFAQ.map(f => f.question));
-    return [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
-  }, [manualFAQ, autoFAQ]);
+  const manualQuestions = new Set(manualFAQ.map(f => f.question));
+  const faqItems = [...manualFAQ, ...autoFAQ.filter(f => !manualQuestions.has(f.question))];
 
   // Breadcrumb data for UI and Schema
   const categoryLabel = article.category || "חדשות";
