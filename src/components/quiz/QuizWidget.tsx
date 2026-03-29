@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import LeadForm from "@/components/LeadForm";
 import { CheckCircle, ArrowRight, XCircle } from "lucide-react";
+
+const LeadForm = lazy(() => import("@/components/LeadForm"));
 
 type ActionType = "next_question" | "jump_to_lead_form" | "disqualify";
 
