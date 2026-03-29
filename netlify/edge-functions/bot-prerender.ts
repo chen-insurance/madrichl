@@ -148,7 +148,7 @@ async function renderArticle(slug: string): Promise<string | null> {
           ${a.author_name ? `<p>מאת: ${escapeHtml(a.author_name)}</p>` : ""}
           ${a.category ? `<p>קטגוריה: ${escapeHtml(a.category)}</p>` : ""}
           <div>${escapeHtml(plainContent)}</div>
-          ${a.faq_items && Array.isArray(a.faq_items) ? a.faq_items.map((f: any) => `<section><h2>${escapeHtml(f.question)}</h2><p>${escapeHtml(f.answer)}</p></section>`).join("") : ""}
+          ${allFAQ.length > 0 ? `<section><h2>שאלות נפוצות</h2>${allFAQ.map((f: any) => `<h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p>`).join("")}</section>` : ""}
         </article>
       </main>
     `,
