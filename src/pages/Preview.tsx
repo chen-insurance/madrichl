@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { useSearchParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
@@ -10,9 +11,10 @@ import InArticleCTA from "@/components/article/InArticleCTA";
 import AuthorBox from "@/components/article/AuthorBox";
 import MarkdownContent from "@/components/article/MarkdownContent";
 import OptimizedImage from "@/components/common/OptimizedImage";
-import LeadForm from "@/components/LeadForm";
 import { format } from "date-fns";
 import { Loader2, Calendar, AlertTriangle } from "lucide-react";
+
+const LeadForm = lazy(() => import("@/components/LeadForm"));
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Preview = () => {
@@ -171,11 +173,13 @@ const Preview = () => {
 
               {/* Bottom Lead Form */}
               <div className="mt-12">
-                <LeadForm
-                  title="בדוק את זכאותך עכשיו"
-                  subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
-                  variant="card"
-                />
+                <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse" />}>
+                  <LeadForm
+                    title="בדוק את זכאותך עכשיו"
+                    subtitle="השאירו פרטים ומומחה יחזור אליכם ללא עלות"
+                    variant="card"
+                  />
+                </Suspense>
               </div>
             </article>
 

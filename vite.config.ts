@@ -53,6 +53,8 @@ export default defineConfig(({ mode }) => ({
           ],
           // Charts (admin dashboard)
           "vendor-charts": ["recharts"],
+          // Form validation (lazy-loaded with LeadForm)
+          "vendor-forms": ["zod", "react-hook-form", "@hookform/resolvers"],
         },
       },
     },
