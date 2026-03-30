@@ -152,7 +152,7 @@ const MortgageCalculatorWidget = () => {
               onClick={scrollToLeadForm}
               className="w-full h-14 text-lg font-bold bg-accent hover:bg-accent/90 text-accent-foreground gap-2"
             >
-              אני רוצה הצעה כזו
+              רוצה לבדוק את המחיר שלי
               <ArrowDown className="w-5 h-5" />
             </Button>
 

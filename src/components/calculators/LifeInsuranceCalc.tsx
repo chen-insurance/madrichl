@@ -284,7 +284,7 @@ const LifeInsuranceCalc = () => {
             size="lg"
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6"
           >
-            קבל הצעה מדויקת למחיר זה
+            קבל הצעת מחיר לביטוח חיים
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
