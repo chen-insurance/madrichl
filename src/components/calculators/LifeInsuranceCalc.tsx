@@ -150,7 +150,7 @@ const LifeInsuranceCalc = () => {
             <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center">
               <Calculator className="w-5 h-5 text-accent" />
             </div>
-            <CardTitle className="font-display text-xl">מחשבון ביטוח חיים</CardTitle>
+            <CardTitle className="font-display text-xl text-white">מחשבון ביטוח חיים</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
@@ -284,7 +284,7 @@ const LifeInsuranceCalc = () => {
             size="lg"
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6"
           >
-            קבל הצעה מדויקת למחיר זה
+            קבל הצעת מחיר לביטוח חיים
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
@@ -298,7 +298,7 @@ const LifeInsuranceCalc = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-right">
-              קבל הצעת מחיר
+              השאר פרטים לבדיקת מחיר
             </DialogTitle>
           </DialogHeader>
           <LeadForm
