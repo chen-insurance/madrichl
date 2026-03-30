@@ -298,7 +298,7 @@ const LifeInsuranceCalc = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-right">
-              קבל הצעת מחיר
+              השאר פרטים לבדיקת מחיר
             </DialogTitle>
           </DialogHeader>
           <LeadForm
