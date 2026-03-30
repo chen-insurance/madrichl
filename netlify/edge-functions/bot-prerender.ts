@@ -211,6 +211,7 @@ async function renderHomepage(): Promise<string> {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "המדריך לצרכן",
+    alternateName: ["The Guide", "המדריך"],
     url: SITE,
     inLanguage: "he",
     potentialAction: {
