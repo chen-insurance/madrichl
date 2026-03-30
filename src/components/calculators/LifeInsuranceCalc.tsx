@@ -150,7 +150,7 @@ const LifeInsuranceCalc = () => {
             <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center">
               <Calculator className="w-5 h-5 text-accent" />
             </div>
-            <CardTitle className="font-display text-xl">מחשבון ביטוח חיים</CardTitle>
+            <CardTitle className="font-display text-xl text-white">מחשבון ביטוח חיים</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
