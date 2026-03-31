@@ -112,6 +112,8 @@ const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesPr
                 src={article.featured_image}
                 alt={article.title}
                 aspectRatio="video"
+                maxWidth={480}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 className="group-hover:scale-105 transition-transform duration-300"
               />
             )}
