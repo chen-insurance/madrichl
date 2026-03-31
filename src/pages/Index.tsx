@@ -13,8 +13,6 @@ import CategorySection from "@/components/home/CategorySection";
 const ComparisonTable = lazy(() => import("@/components/market/ComparisonTable"));
 
 const Index = () => {
-  // Inject dynamic head scripts from site settings
-  useHeadScripts();
 
   // Fetch homepage settings
   const { data: homepageSettings } = useQuery({
