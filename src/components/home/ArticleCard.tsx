@@ -38,6 +38,8 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
             src={featured_image || placeholderImage}
             alt={title}
             aspectRatio="video"
+            maxWidth={320}
+            sizes="128px"
             className="group-hover:scale-105 transition-transform duration-300"
           />
         </div>
