@@ -96,7 +96,7 @@ import { Compass } from "lucide-react";
              className="lg:col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-medium hover:shadow-strong transition-all duration-300 h-full flex flex-col"
             >
              {/* Fixed aspect ratio container to prevent CLS */}
-             <div className="flex-1 overflow-hidden relative aspect-[16/9] lg:aspect-auto lg:min-h-[400px]">
+             <div className="flex-1 overflow-hidden relative aspect-[16/9]">
                 <OptimizedImage
                   src={mainArticle.featured_image}
                   alt={mainArticle.title}
