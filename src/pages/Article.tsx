@@ -15,7 +15,7 @@ import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA"
 import { format } from "date-fns";
 import { Calendar, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useHeadScripts } from "@/hooks/useHeadScripts";
+
 import { useArticleView } from "@/hooks/useArticleView";
 import { useContentTracker } from "@/hooks/useContentTracker";
 import { getReadingTime } from "@/lib/reading-time";
@@ -38,7 +38,7 @@ interface FAQItem {
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
-  useHeadScripts();
+  
 
   // Check for redirect first
   const { data: redirect, isLoading: isRedirectLoading } = useQuery({
