@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useHeadScripts } from "@/hooks/useHeadScripts";
+
 import { Phone, Mail, MapPin } from "lucide-react";
 
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
