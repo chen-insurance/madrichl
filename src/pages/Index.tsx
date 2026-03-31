@@ -113,7 +113,7 @@ const Index = () => {
   const heroImageUrl = useMemo(() => {
     const src = heroArticle?.featured_image;
     if (!src) return null;
-    return optimizeImageUrl(src, 800);
+    return optimizeImageUrl(src, 640);
   }, [heroArticle?.featured_image]);
 
   return (
