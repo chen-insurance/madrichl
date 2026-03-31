@@ -25,9 +25,12 @@ const OptimizedImage = ({
   priority = false,
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
 }: OptimizedImageProps) => {
-  // Use smaller default width on mobile for priority images
-  const defaultWidth = priority ? 800 : 800;
-  const mobileSrcSet = buildSrcSet(src, [320, 480, 640, 800, 1024, 1280]);
+  // Priority images (hero): use 640 default (mobile-first) with smaller srcset
+  // Non-priority: use 640 default with standard srcset
+  const defaultWidth = priority ? 640 : 640;
+  const mobileSrcSet = priority
+    ? buildSrcSet(src, [320, 480, 640, 800, 1024])  // Skip 1280 for hero — rarely needed at full width
+    : buildSrcSet(src, [320, 480, 640, 800, 1024, 1280]);
 
   return (
     <div className={cn("overflow-hidden bg-secondary", aspectRatioClasses[aspectRatio])}>
