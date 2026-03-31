@@ -4,7 +4,7 @@
  * Also optimizes Unsplash URLs with proper width/quality/format params.
  */
 
-export const optimizeImageUrl = (url: string, width: number, quality: number = 75): string => {
+export const optimizeImageUrl = (url: string, width: number, quality: number = 70): string => {
   if (!url) return url;
   // Supabase Storage
   if (url.includes("supabase.co/storage")) {
