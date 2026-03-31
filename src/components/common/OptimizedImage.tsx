@@ -26,13 +26,30 @@ const OptimizedImage = ({
   className,
   priority = false,
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+  maxWidth,
 }: OptimizedImageProps) => {
-  // Priority images (hero): use 640 default (mobile-first) with smaller srcset
-  // Non-priority: use 640 default with standard srcset
-  const defaultWidth = priority ? 640 : 640;
-  const mobileSrcSet = priority
-    ? buildSrcSet(src, [320, 480, 640, 800, 1024])  // Skip 1280 for hero — rarely needed at full width
-    : buildSrcSet(src, [320, 480, 640, 800, 1024, 1280]);
+  // Determine srcset widths based on actual display size
+  const effectiveMax = maxWidth || (priority ? 1024 : 1280);
+  const allWidths = [320, 480, 640, 800, 1024, 1280];
+  const filteredWidths = allWidths.filter(w => w <= effectiveMax);
+  // Always include the effective max if not already in list
+  if (!filteredWidths.includes(effectiveMax) && effectiveMax <= 1280) {
+    filteredWidths.push(effectiveMax);
+    filteredWidths.sort((a, b) => a - b);
+  }
+  const defaultWidth = Math.min(effectiveMax, 640);
+  const mobileSrcSet = buildSrcSet(src, filteredWidths);
+
+  // Compute intrinsic dimensions for width/height attributes (CLS prevention)
+  const aspectDimensions = {
+    video: { w: 16, h: 9 },
+    square: { w: 1, h: 1 },
+    portrait: { w: 3, h: 4 },
+    wide: { w: 21, h: 9 },
+  };
+  const dims = aspectDimensions[aspectRatio];
+  const intrinsicWidth = effectiveMax;
+  const intrinsicHeight = Math.round(effectiveMax * dims.h / dims.w);
 
   return (
     <div className={cn("overflow-hidden bg-secondary", aspectRatioClasses[aspectRatio])}>
