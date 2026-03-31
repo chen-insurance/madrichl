@@ -7,7 +7,7 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
-import { useHeadScripts } from "@/hooks/useHeadScripts";
+
 
 // Lazy load heavy below-fold components (ComparisonTable pulls in Dialog, LeadForm, zod, react-hook-form)
 const ComparisonTable = lazy(() => import("@/components/market/ComparisonTable"));
