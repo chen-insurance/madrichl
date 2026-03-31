@@ -1,7 +1,27 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+
+/**
+ * Vite plugin: converts CSS <link> tags to non-render-blocking async loads.
+ * Safe because index.html already has inline critical CSS for the skeleton shell.
+ */
+function asyncCssPlugin(): Plugin {
+  return {
+    name: "async-css",
+    enforce: "post",
+    transformIndexHtml(html) {
+      // Convert <link rel="stylesheet" href="..."> to async pattern
+      // media="print" prevents render-blocking; onload switches to "all"
+      return html.replace(
+        /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/g,
+        `<link rel="stylesheet" href="$1" media="print" onload="this.media='all'" crossorigin>
+<noscript><link rel="stylesheet" href="$1" crossorigin></noscript>`
+      );
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -12,7 +32,7 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [react(), asyncCssPlugin(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
