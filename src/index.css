@@ -34,20 +34,32 @@ html.highlight-links a {
 
 /* Google Fonts loaded via <link> in index.html for non-render-blocking performance */
 
-/* Ensure text is visible during font load */
+/* Font metric overrides to reduce CLS during font swap */
 @font-face {
   font-family: 'Heebo';
   font-display: swap;
   src: local('Heebo');
+  size-adjust: 100%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @font-face {
   font-family: 'Rubik';
   font-display: swap;
   src: local('Rubik');
+  size-adjust: 100%;
+  ascent-override: 88%;
+  descent-override: 24%;
+  line-gap-override: 0%;
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   :root {
     /* Core colors - Deep navy & warm gold palette */
     --background: 210 20% 98%;
