@@ -8,7 +8,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
 
 const Contact = () => {
-  useHeadScripts();
+  
 
   return (
     <div className="min-h-screen flex flex-col">

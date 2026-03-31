@@ -38,7 +38,7 @@ interface FAQItem {
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
-  useHeadScripts();
+  
 
   // Check for redirect first
   const { data: redirect, isLoading: isRedirectLoading } = useQuery({
