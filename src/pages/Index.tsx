@@ -109,10 +109,20 @@ const Index = () => {
 
   const headline = homepageSettings?.homepage_headline || "המדריך לצרכן | מגזין ביטוח ופיננסים";
 
+  // Preload hero image for faster LCP
+  const heroImageUrl = useMemo(() => {
+    const src = heroArticle?.featured_image;
+    if (!src) return null;
+    return optimizeImageUrl(src, 800);
+  }, [heroArticle?.featured_image]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>{headline}</title>
+        {heroImageUrl && (
+          <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
+        )}
         <meta
           name="description"
           content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן."
