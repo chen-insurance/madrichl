@@ -4,21 +4,46 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 /**
- * Vite plugin: converts CSS <link> tags to non-render-blocking async loads.
- * Safe because index.html already has inline critical CSS for the skeleton shell.
+ * Vite plugin: 
+ * 1. Converts CSS <link> tags to non-render-blocking async loads
+ * 2. Adds modulepreload hints for critical vendor chunks (react, query, supabase)
  */
-function asyncCssPlugin(): Plugin {
+function performancePlugin(): Plugin {
   return {
-    name: "async-css",
+    name: "performance-hints",
     enforce: "post",
     transformIndexHtml(html) {
-      // Convert <link rel="stylesheet" href="..."> to async pattern
-      // media="print" prevents render-blocking; onload switches to "all"
-      return html.replace(
+      // 1. Async CSS: media="print" prevents render-blocking; onload switches to "all"
+      let result = html.replace(
         /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/g,
         `<link rel="stylesheet" href="$1" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="$1" crossorigin></noscript>`
       );
+
+      // 2. Find critical chunks and add modulepreload hints
+      const criticalChunks = ["vendor-react", "vendor-query", "vendor-supabase"];
+      const modulePreloadRegex = /<link rel="modulepreload" crossorigin href="(\/assets\/[^"]+\.js)">/g;
+      const preloadHints: string[] = [];
+      let match;
+
+      while ((match = modulePreloadRegex.exec(result)) !== null) {
+        const href = match[1];
+        if (criticalChunks.some(chunk => href.includes(chunk))) {
+          // Upgrade from modulepreload to high-priority preload
+          preloadHints.push(`<link rel="preload" href="${href}" as="script" crossorigin>`);
+        }
+      }
+
+      // Inject preload hints right after <head> opening for earliest discovery
+      if (preloadHints.length > 0) {
+        const headTag = '<meta charset="UTF-8" />';
+        result = result.replace(
+          headTag,
+          `${headTag}\n    ${preloadHints.join("\n    ")}`
+        );
+      }
+
+      return result;
     },
   };
 }
