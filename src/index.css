@@ -56,6 +56,10 @@ html.highlight-links a {
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   :root {
     /* Core colors - Deep navy & warm gold palette */
     --background: 210 20% 98%;
