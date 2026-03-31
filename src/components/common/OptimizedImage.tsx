@@ -8,6 +8,8 @@ interface OptimizedImageProps {
   className?: string;
   priority?: boolean;
   sizes?: string;
+  /** Maximum display width – controls srcset generation and default src */
+  maxWidth?: number;
 }
 
 const aspectRatioClasses = {
