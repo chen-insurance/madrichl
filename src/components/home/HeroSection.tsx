@@ -135,13 +135,14 @@ import { Compass } from "lucide-react";
                >
                   {/* Fixed dimensions to prevent CLS */}
                   <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-lg">
-                    <OptimizedImage
-                      src={article.featured_image}
-                      alt={article.title}
-                      aspectRatio="square"
-                      sizes="112px"
-                      className="group-hover:scale-105 transition-transform duration-300"
-                    />
+                     <OptimizedImage
+                       src={article.featured_image}
+                       alt={article.title}
+                       aspectRatio="square"
+                       maxWidth={320}
+                       sizes="112px"
+                       className="group-hover:scale-105 transition-transform duration-300"
+                     />
                   </div>
                  <div className="flex-1 flex flex-col justify-center">
                    <h3 className="font-display font-semibold text-foreground text-sm md:text-base leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors">

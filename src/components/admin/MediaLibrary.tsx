@@ -76,7 +76,7 @@ const MediaLibrary = ({ onSelect, isModal = false }: MediaLibraryProps) => {
 
       const { error } = await supabase.storage
         .from("media")
-        .upload(fileName, file, { cacheControl: "3600", upsert: false });
+        .upload(fileName, file, { cacheControl: "31536000", upsert: false });
 
       if (error) throw error;
 

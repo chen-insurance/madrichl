@@ -38,6 +38,8 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
             src={featured_image || placeholderImage}
             alt={title}
             aspectRatio="video"
+            maxWidth={320}
+            sizes="128px"
             className="group-hover:scale-105 transition-transform duration-300"
           />
         </div>
@@ -77,6 +79,8 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
         src={featured_image || placeholderImage}
         alt={title}
         aspectRatio="video"
+        maxWidth={480}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
         className="group-hover:scale-105 transition-transform duration-300"
       />
       <div className="p-5">
