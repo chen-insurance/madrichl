@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSiteSettings } from "./useSiteSettings";
+import { validateScriptElement } from "@/lib/script-validator";
 
 /**
  * Injects custom head and body scripts from site_settings.
