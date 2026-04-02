@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSiteSettings } from "./useSiteSettings";
+import { validateScriptElement } from "@/lib/script-validator";
 
 /**
  * Injects custom head and body scripts from site_settings.
@@ -22,6 +23,10 @@ export const useCustomScripts = () => {
       temp.innerHTML = headScripts;
 
       Array.from(temp.children).forEach((child) => {
+        if (!validateScriptElement(child)) {
+          console.warn("[Security] Blocked untrusted script source:", child.getAttribute("src"));
+          return;
+        }
         if (child.tagName === "SCRIPT") {
           const script = document.createElement("script");
           Array.from(child.attributes).forEach((attr) => {
@@ -52,6 +57,10 @@ export const useCustomScripts = () => {
       temp.innerHTML = bodyScripts;
 
       Array.from(temp.children).forEach((child) => {
+        if (!validateScriptElement(child)) {
+          console.warn("[Security] Blocked untrusted script source:", child.getAttribute("src"));
+          return;
+        }
         if (child.tagName === "SCRIPT") {
           const script = document.createElement("script");
           Array.from(child.attributes).forEach((attr) => {

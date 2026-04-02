@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           article_id: string | null
@@ -585,6 +603,40 @@ export type Database = {
     }
     Functions: {
       generate_preview_token: { Args: never; Returns: string }
+      get_article_by_preview_token: {
+        Args: { p_token: string }
+        Returns: {
+          author_bio: string | null
+          author_id: string | null
+          author_name: string | null
+          category: string | null
+          category_id: string | null
+          content: string | null
+          created_at: string
+          embedding: string | null
+          excerpt: string | null
+          faq_items: Json | null
+          featured_image: string | null
+          id: string
+          image_alt_text: string | null
+          is_featured: boolean | null
+          is_published: boolean
+          preview_token: string | null
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+          view_count: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "articles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_trending_articles: {
         Args: { p_exclude_slug?: string; p_limit?: number }
         Returns: {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { validateScriptElement } from "@/lib/script-validator";
 
 export const useHeadScripts = () => {
   const { data: settings } = useQuery({
@@ -40,6 +41,10 @@ export const useHeadScripts = () => {
       
       // Process all elements
       Array.from(temp.children).forEach((child) => {
+        if (!validateScriptElement(child)) {
+          console.warn("[Security] Blocked untrusted script source:", child.getAttribute("src"));
+          return;
+        }
         if (child.tagName === "SCRIPT") {
           const script = document.createElement("script");
           Array.from(child.attributes).forEach((attr) => {
