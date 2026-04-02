@@ -60,30 +60,15 @@ const Auth = () => {
     setIsSubmitting(true);
 
     try {
-      if (isLogin) {
-        const { error } = await signIn(email, password);
-        if (error) {
-          recordAttempt(LOGIN_RATE_KEY, LOGIN_WINDOW_MS);
-          if (error.message.includes("Invalid login credentials")) {
-            throw new Error("פרטי התחברות שגויים");
-          }
-          throw error;
+      const { error } = await signIn(email, password);
+      if (error) {
+        recordAttempt(LOGIN_RATE_KEY, LOGIN_WINDOW_MS);
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("פרטי התחברות שגויים");
         }
-        navigate("/admin");
-      } else {
-        const { error } = await signUp(email, password);
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            throw new Error("משתמש זה כבר רשום במערכת");
-          }
-          throw error;
-        }
-        toast({
-          title: "הרשמה הצליחה!",
-          description: "כעת ניתן להתחבר למערכת",
-        });
-        setIsLogin(true);
+        throw error;
       }
+      navigate("/admin");
     } catch (error) {
       toast({
         title: "שגיאה",
