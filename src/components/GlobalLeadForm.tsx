@@ -106,6 +106,12 @@ const GlobalLeadForm = ({
   };
 
   const onSubmit = async (data: LeadFormData) => {
+    // Honeypot check - silently reject bot submissions
+    if (honeypot) {
+      setIsSuccess(true);
+      return;
+    }
+
     // Rate limiting check
     if (isRateLimited(LEAD_RATE_KEY, LEAD_MAX_ATTEMPTS, LEAD_WINDOW_MS)) {
       toast({
