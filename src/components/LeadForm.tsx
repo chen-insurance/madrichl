@@ -96,6 +96,12 @@ const LeadForm = ({
   };
 
   const onSubmit = async (data: LeadFormData) => {
+    // Honeypot check - silently reject bot submissions
+    if (honeypot) {
+      setIsSuccess(true);
+      return;
+    }
+
     // Validate birth year is selected
     if (!birthYear) {
       setAgeError("נא לבחור שנת לידה");
