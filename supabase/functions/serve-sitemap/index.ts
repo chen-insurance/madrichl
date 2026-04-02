@@ -44,7 +44,7 @@ ${urls.join("\n")}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const today = new Date().toISOString().split("T")[0];
@@ -97,13 +97,13 @@ serve(async (req) => {
     console.log(`Sitemap: ${articlesRes.data?.length || 0} articles, ${categoriesRes.data?.length || 0} categories, ${pagesRes.data?.length || 0} pages, ${glossaryRes.data?.length || 0} glossary`);
 
     return new Response(buildSitemap(urls), {
-      headers: { ...corsHeaders, "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" },
     });
   } catch (error) {
     console.error("Sitemap error:", error);
     const fallback = STATIC_ROUTES.map(r => buildUrl(`${BASE_URL}${r.path}`, today, r.changefreq, r.priority));
     return new Response(buildSitemap(fallback), {
-      headers: { ...corsHeaders, "Content-Type": "application/xml; charset=utf-8" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/xml; charset=utf-8" },
     });
   }
 });
