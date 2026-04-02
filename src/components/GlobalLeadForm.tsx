@@ -105,6 +105,16 @@ const GlobalLeadForm = ({
   };
 
   const onSubmit = async (data: LeadFormData) => {
+    // Rate limiting check
+    if (isRateLimited(LEAD_RATE_KEY, LEAD_MAX_ATTEMPTS, LEAD_WINDOW_MS)) {
+      toast({
+        title: "יותר מדי ניסיונות",
+        description: "אנא נסה שוב בעוד מספר דקות",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate birth year is selected
     if (!birthYear) {
       setAgeError("נא לבחור שנת לידה");
