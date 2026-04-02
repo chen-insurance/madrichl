@@ -241,6 +241,17 @@ const GlobalLeadForm = ({
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Honeypot - hidden from real users */}
+        <div className="absolute opacity-0 pointer-events-none" style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true" tabIndex={-1}>
+          <input
+            type="text"
+            name="website_url"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            autoComplete="off"
+            tabIndex={-1}
+          />
+        </div>
         {/* Full Name */}
         <div className="space-y-1.5">
           <Label htmlFor="name" className="text-sm font-medium">

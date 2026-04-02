@@ -57,6 +57,10 @@ export const useCustomScripts = () => {
       temp.innerHTML = bodyScripts;
 
       Array.from(temp.children).forEach((child) => {
+        if (!validateScriptElement(child)) {
+          console.warn("[Security] Blocked untrusted script source:", child.getAttribute("src"));
+          return;
+        }
         if (child.tagName === "SCRIPT") {
           const script = document.createElement("script");
           Array.from(child.attributes).forEach((attr) => {
