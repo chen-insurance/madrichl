@@ -169,6 +169,8 @@ const GlobalLeadForm = ({
 
       if (error) throw error;
 
+      recordAttempt(LEAD_RATE_KEY, LEAD_WINDOW_MS);
+
       sendWebhook({
         ...leadData,
         page_title: pageTitle,
