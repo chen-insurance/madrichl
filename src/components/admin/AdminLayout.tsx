@@ -46,8 +46,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }, [user, loading]);
 
   useEffect(() => {
-    // If user is logged in but not an admin, redirect to homepage
-    if (!loading && user && !isAdminUser && !hasShownDenied) {
+    if (!loading && !checkingAdmin && user && isAdminUser === false && !hasShownDenied) {
       setHasShownDenied(true);
       toast({
         title: "גישה נדחתה",
@@ -56,10 +55,16 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       });
       navigate("/");
     }
-  }, [user, loading, isAdminUser, navigate, toast, hasShownDenied]);
+  }, [user, loading, checkingAdmin, isAdminUser, navigate, toast, hasShownDenied]);
 
   // Show loading spinner while checking auth state
-  if (loading) {
+  if (loading || checkingAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
