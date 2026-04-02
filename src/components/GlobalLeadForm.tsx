@@ -11,6 +11,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, ShieldCheck } from "lucide-react";
 import { getTrafficData } from "@/hooks/useTrafficSource";
+import { isRateLimited, recordAttempt } from "@/lib/rate-limiter";
+
+const LEAD_RATE_KEY = 'lead_submit';
+const LEAD_MAX_ATTEMPTS = 3;
+const LEAD_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // Age restriction constants
 const MIN_BIRTH_YEAR = 1960;
