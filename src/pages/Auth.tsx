@@ -143,15 +143,7 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {isLogin ? "אין לך חשבון? הירשם" : "יש לך חשבון? התחבר"}
-            </button>
-          </div>
+          {/* Signup option removed for security */}
         </CardContent>
       </Card>
     </div>
