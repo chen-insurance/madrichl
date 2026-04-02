@@ -8,6 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import { isRateLimited, recordAttempt } from "@/lib/rate-limiter";
+
+const LOGIN_RATE_KEY = 'login';
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "כתובת אימייל לא תקינה" }),
