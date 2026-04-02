@@ -8,6 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import { isRateLimited, recordAttempt } from "@/lib/rate-limiter";
+
+const LOGIN_RATE_KEY = 'login';
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "כתובת אימייל לא תקינה" }),
@@ -15,11 +20,10 @@ const authSchema = z.object({
 });
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,6 +35,15 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isRateLimited(LOGIN_RATE_KEY, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS)) {
+      toast({
+        title: "יותר מדי ניסיונות",
+        description: "אנא נסה שוב בעוד מספר דקות",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const validation = authSchema.safeParse({ email, password });
     if (!validation.success) {
@@ -45,29 +58,15 @@ const Auth = () => {
     setIsSubmitting(true);
 
     try {
-      if (isLogin) {
-        const { error } = await signIn(email, password);
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            throw new Error("פרטי התחברות שגויים");
-          }
-          throw error;
+      const { error } = await signIn(email, password);
+      if (error) {
+        recordAttempt(LOGIN_RATE_KEY, LOGIN_WINDOW_MS);
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("פרטי התחברות שגויים");
         }
-        navigate("/admin");
-      } else {
-        const { error } = await signUp(email, password);
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            throw new Error("משתמש זה כבר רשום במערכת");
-          }
-          throw error;
-        }
-        toast({
-          title: "הרשמה הצליחה!",
-          description: "כעת ניתן להתחבר למערכת",
-        });
-        setIsLogin(true);
+        throw error;
       }
+      navigate("/admin");
     } catch (error) {
       toast({
         title: "שגיאה",
@@ -95,10 +94,10 @@ const Auth = () => {
             <span className="text-primary font-display font-bold text-2xl">מ</span>
           </div>
           <CardTitle className="font-display text-2xl">
-            {isLogin ? "כניסה לממשק הניהול" : "הרשמה לממשק הניהול"}
+            כניסה לממשק הניהול
           </CardTitle>
           <CardDescription>
-            {isLogin ? "התחברו כדי לנהל את תוכן האתר" : "צרו חשבון חדש"}
+            התחברו כדי לנהל את תוכן האתר
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -135,23 +134,11 @@ const Auth = () => {
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : isLogin ? (
-                "התחברות"
               ) : (
-                "הרשמה"
+                "התחברות"
               )}
             </Button>
           </form>
-
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {isLogin ? "אין לך חשבון? הירשם" : "יש לך חשבון? התחבר"}
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>

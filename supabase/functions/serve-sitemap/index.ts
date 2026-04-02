@@ -1,10 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://the-guide.co.il",
+  "https://www.the-guide.co.il",
+  "https://madrichl.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 const BASE_URL = "https://the-guide.co.il";
 
@@ -34,7 +44,7 @@ ${urls.join("\n")}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const today = new Date().toISOString().split("T")[0];
@@ -87,13 +97,13 @@ serve(async (req) => {
     console.log(`Sitemap: ${articlesRes.data?.length || 0} articles, ${categoriesRes.data?.length || 0} categories, ${pagesRes.data?.length || 0} pages, ${glossaryRes.data?.length || 0} glossary`);
 
     return new Response(buildSitemap(urls), {
-      headers: { ...corsHeaders, "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" },
     });
   } catch (error) {
     console.error("Sitemap error:", error);
     const fallback = STATIC_ROUTES.map(r => buildUrl(`${BASE_URL}${r.path}`, today, r.changefreq, r.priority));
     return new Response(buildSitemap(fallback), {
-      headers: { ...corsHeaders, "Content-Type": "application/xml; charset=utf-8" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/xml; charset=utf-8" },
     });
   }
 });

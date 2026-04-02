@@ -11,6 +11,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, ShieldCheck } from "lucide-react";
 import { getTrafficData } from "@/hooks/useTrafficSource";
+import { isRateLimited, recordAttempt } from "@/lib/rate-limiter";
+
+const LEAD_RATE_KEY = 'lead_submit';
+const LEAD_MAX_ATTEMPTS = 3;
+const LEAD_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // Age restriction constants
 const MIN_BIRTH_YEAR = 1960;
@@ -100,6 +105,16 @@ const GlobalLeadForm = ({
   };
 
   const onSubmit = async (data: LeadFormData) => {
+    // Rate limiting check
+    if (isRateLimited(LEAD_RATE_KEY, LEAD_MAX_ATTEMPTS, LEAD_WINDOW_MS)) {
+      toast({
+        title: "יותר מדי ניסיונות",
+        description: "אנא נסה שוב בעוד מספר דקות",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate birth year is selected
     if (!birthYear) {
       setAgeError("נא לבחור שנת לידה");
@@ -153,6 +168,8 @@ const GlobalLeadForm = ({
       const { error } = await supabase.from("leads").insert([leadData]);
 
       if (error) throw error;
+
+      recordAttempt(LEAD_RATE_KEY, LEAD_WINDOW_MS);
 
       sendWebhook({
         ...leadData,

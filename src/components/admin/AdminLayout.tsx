@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Menu, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AdminSidebar from "./AdminSidebar";
@@ -8,9 +9,6 @@ import Auth from "@/pages/Auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Whitelist of allowed admin emails
-const ADMIN_EMAILS = ["bensagi981@gmail.com"];
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -23,12 +21,32 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [hasShownDenied, setHasShownDenied] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
+  const [isAdminUser, setIsAdminUser] = useState<boolean | null>(null);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
 
-  const isAdminUser = user?.email && ADMIN_EMAILS.includes(user.email);
+  // Check admin status via server-side DB function
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdminUser(null);
+        setCheckingAdmin(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase.rpc('is_admin_user');
+        if (error) throw error;
+        setIsAdminUser(!!data);
+      } catch {
+        setIsAdminUser(false);
+      } finally {
+        setCheckingAdmin(false);
+      }
+    };
+    if (!loading) checkAdmin();
+  }, [user, loading]);
 
   useEffect(() => {
-    // If user is logged in but not an admin, redirect to homepage
-    if (!loading && user && !isAdminUser && !hasShownDenied) {
+    if (!loading && !checkingAdmin && user && isAdminUser === false && !hasShownDenied) {
       setHasShownDenied(true);
       toast({
         title: "גישה נדחתה",
@@ -37,10 +55,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       });
       navigate("/");
     }
-  }, [user, loading, isAdminUser, navigate, toast, hasShownDenied]);
+  }, [user, loading, checkingAdmin, isAdminUser, navigate, toast, hasShownDenied]);
 
   // Show loading spinner while checking auth state
-  if (loading) {
+  if (loading || checkingAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
