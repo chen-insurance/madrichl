@@ -27,15 +27,13 @@ const Preview = () => {
       if (!token) throw new Error("No preview token provided");
 
       const { data, error } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("preview_token", token)
-        .maybeSingle();
+        .rpc("get_article_by_preview_token", { p_token: token });
 
       if (error) throw error;
-      if (!data) throw new Error("Article not found or invalid token");
+      const article = Array.isArray(data) ? data[0] : data;
+      if (!article) throw new Error("Article not found or invalid token");
       
-      return data;
+      return article;
     },
     enabled: !!token,
     retry: false,
