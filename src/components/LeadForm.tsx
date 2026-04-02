@@ -49,6 +49,7 @@ const LeadForm = ({
   const [birthYear, setBirthYear] = useState<string>("");
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [ageError, setAgeError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
   const { toast } = useToast();
 
   const currentYear = new Date().getFullYear();
