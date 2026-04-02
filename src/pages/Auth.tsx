@@ -21,10 +21,9 @@ const authSchema = z.object({
 
 const Auth = () => {
   const [email, setEmail] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -37,7 +36,6 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Rate limiting check
     if (isRateLimited(LOGIN_RATE_KEY, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS)) {
       toast({
         title: "יותר מדי ניסיונות",
@@ -96,10 +94,10 @@ const Auth = () => {
             <span className="text-primary font-display font-bold text-2xl">מ</span>
           </div>
           <CardTitle className="font-display text-2xl">
-            {isLogin ? "כניסה לממשק הניהול" : "הרשמה לממשק הניהול"}
+            כניסה לממשק הניהול
           </CardTitle>
           <CardDescription>
-            {isLogin ? "התחברו כדי לנהל את תוכן האתר" : "צרו חשבון חדש"}
+            התחברו כדי לנהל את תוכן האתר
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,15 +134,11 @@ const Auth = () => {
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : isLogin ? (
-                "התחברות"
               ) : (
-                "הרשמה"
+                "התחברות"
               )}
             </Button>
           </form>
-
-          {/* Signup option removed for security */}
         </CardContent>
       </Card>
     </div>
