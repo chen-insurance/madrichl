@@ -19,7 +19,7 @@ function getCorsHeaders(req: Request) {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -200,7 +200,7 @@ serve(async (req) => {
 
     return new Response(xml, {
       headers: {
-        ...corsHeaders,
+        ...getCorsHeaders(req),
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=60", // Cache for 1 minute
       },
@@ -218,7 +218,7 @@ serve(async (req) => {
 </urlset>`,
       {
         headers: {
-          ...corsHeaders,
+          ...getCorsHeaders(req),
           "Content-Type": "application/xml; charset=utf-8",
         },
       }
