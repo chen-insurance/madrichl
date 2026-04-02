@@ -32,6 +32,16 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Rate limiting check
+    if (isRateLimited(LOGIN_RATE_KEY, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS)) {
+      toast({
+        title: "יותר מדי ניסיונות",
+        description: "אנא נסה שוב בעוד מספר דקות",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const validation = authSchema.safeParse({ email, password });
     if (!validation.success) {
       toast({
