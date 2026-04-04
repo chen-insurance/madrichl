@@ -9,7 +9,8 @@ import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
-import logoIcon from "@/assets/logo-icon.png";
+// Served from /public — Netlify Image CDN resizes to 96px WebP at edge
+const logoIcon = "/.netlify/images?url=%2Flogo-icon.png&w=96&h=96&fit=cover&fm=webp&q=90";
 
 import { optimizeImageUrl } from "@/lib/image-utils";
 

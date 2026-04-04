@@ -15,6 +15,7 @@ interface ArticleSchemaProps {
 
 const ArticleSchema = ({ article }: ArticleSchemaProps) => {
   const siteUrl = "https://the-guide.co.il";
+  // logo.png is in /public — accessible at this URL
   const logoUrl = `${siteUrl}/logo.png`;
 
   // Calculate reading time (Hebrew ~200 wpm)

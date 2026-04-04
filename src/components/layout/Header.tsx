@@ -2,7 +2,8 @@ import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import NavigationSchema from "@/components/layout/NavigationSchema";
 import { Menu, Search } from "lucide-react";
-import logoIcon from "@/assets/logo-icon.png";
+// Served from /public — Netlify Image CDN resizes to 96px WebP at edge
+const logoIcon = "/.netlify/images?url=%2Flogo-icon.png&w=96&h=96&fit=cover&fm=webp&q=90";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
