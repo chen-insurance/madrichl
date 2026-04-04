@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { optimizeImageUrl, buildSrcSet } from "@/lib/image-utils";
+import { optimizeImageUrl, buildSrcSet, canOptimizeUrl } from "@/lib/image-utils";
 
 interface OptimizedImageProps {
   src: string;
@@ -38,7 +38,11 @@ const OptimizedImage = ({
     filteredWidths.sort((a, b) => a - b);
   }
   const defaultWidth = Math.min(effectiveMax, 640);
-  const mobileSrcSet = buildSrcSet(src, filteredWidths);
+  // Only generate srcset for URLs we can actually resize server-side.
+  // For Google Storage / unknown CDNs every srcset entry would be the same
+  // full-size file, wasting bandwidth instead of saving it.
+  const optimizable = canOptimizeUrl(src);
+  const mobileSrcSet = optimizable ? buildSrcSet(src, filteredWidths) : undefined;
 
   // Compute intrinsic dimensions for width/height attributes (CLS prevention)
   const aspectDimensions = {
@@ -56,9 +60,11 @@ const OptimizedImage = ({
       <img
         src={optimizeImageUrl(src, defaultWidth)}
         srcSet={mobileSrcSet}
-        sizes={priority
-          ? "(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
-          : sizes
+        sizes={optimizable
+          ? (priority
+              ? "(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+              : sizes)
+          : undefined
         }
         alt={alt}
         width={intrinsicWidth}

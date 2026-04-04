@@ -80,16 +80,28 @@ export default defineConfig(({ mode }) => ({
           "vendor-react": ["react", "react-dom", "react-router-dom"],
           // Data fetching
           "vendor-query": ["@tanstack/react-query"],
-          // UI primitives (shared across pages)
-          "vendor-radix": [
+          // Radix primitives used on every page (Header, Sheet, Tooltip…)
+          "vendor-radix-core": [
             "@radix-ui/react-dialog",
             "@radix-ui/react-popover",
             "@radix-ui/react-tooltip",
             "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-slot",
+          ],
+          // Radix primitives used only in article / form pages (lazy-loaded)
+          "vendor-radix-content": [
             "@radix-ui/react-accordion",
             "@radix-ui/react-tabs",
             "@radix-ui/react-select",
+            "@radix-ui/react-checkbox",
+            "@radix-ui/react-radio-group",
+            "@radix-ui/react-switch",
+            "@radix-ui/react-slider",
           ],
+          // Icons — cached independently from app code
+          "vendor-icons": ["lucide-react"],
+          // Date utilities — cached independently
+          "vendor-dates": ["date-fns"],
           // Supabase client
           "vendor-supabase": ["@supabase/supabase-js"],
           // Markdown rendering

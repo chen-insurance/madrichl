@@ -1,8 +1,9 @@
 # Default: no cache for HTML pages + security headers
+# stale-while-revalidate lets CDN serve instantly while fetching fresh copy in bg
 [[headers]]
   for = "/*"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+    Cache-Control = "public, max-age=0, stale-while-revalidate=86400"
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
