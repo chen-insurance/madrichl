@@ -30,10 +30,12 @@ export function useInternalLinks(currentSlug?: string) {
     staleTime: 30 * 60 * 1000, // 30 minutes
   });
 
-  // Filter out current article, sort by title length (longest first) to avoid partial matches
+  // Filter out current article, sort by title length (longest first) to avoid partial matches.
+  // Cap at 200 to keep the matching loop O(1) regardless of site size.
   const linkableArticles = (articles || [])
     .filter((a) => a.slug !== currentSlug)
-    .sort((a, b) => b.title.length - a.title.length);
+    .sort((a, b) => b.title.length - a.title.length)
+    .slice(0, 200);
 
   return linkableArticles;
 }
@@ -76,9 +78,14 @@ export function injectInternalLinks(
   const linked = new Set<string>();
   let result = content;
 
+  const resultLower = result.toLowerCase();
+
   for (const article of articles) {
     if (linked.has(article.slug)) continue;
     if (article.title.length < 6) continue;
+
+    // Fast pre-filter: skip regex entirely if title not in content
+    if (!resultLower.includes(article.title.toLowerCase())) continue;
 
     const escapedTitle = article.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -119,6 +126,9 @@ export function injectInternalLinks(
   for (const term of glossaryTerms) {
     if (glossaryLinked >= 5) break;
     if (term.term_name.length < 3) continue;
+
+    // Fast pre-filter: skip regex if term not present in content
+    if (!resultLower.includes(term.term_name.toLowerCase())) continue;
 
     const escapedTerm = term.term_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(`(?<=[\\s>،.,:;]|^)(${escapedTerm})(?=[\\s<،.,:;?!]|$)`, "i");

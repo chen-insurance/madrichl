@@ -22,6 +22,7 @@ export const useContentTracker = ({ articleId, enabled = true }: UseContentTrack
   const maxScrollDepth = useRef(0);
   const hasTrackedScroll = useRef<Set<number>>(new Set());
   const hasSentTimeOnPage = useRef(false);
+  const rafRef = useRef<number | null>(null);
 
   const trackEvent = useCallback(async (eventType: string, value: number) => {
     if (!enabled || !articleId) return;
@@ -50,21 +51,27 @@ export const useContentTracker = ({ articleId, enabled = true }: UseContentTrack
 
   const handleScroll = useCallback(() => {
     if (!enabled) return;
-    
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollPercent = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
-    
-    maxScrollDepth.current = Math.max(maxScrollDepth.current, scrollPercent);
-    
-    // Track milestone depths: 25%, 50%, 75%, 100%
-    const milestones = [25, 50, 75, 100];
-    for (const milestone of milestones) {
-      if (scrollPercent >= milestone && !hasTrackedScroll.current.has(milestone)) {
-        hasTrackedScroll.current.add(milestone);
-        trackEvent("scroll_depth", milestone);
+    // Throttle: skip if a rAF is already scheduled
+    if (rafRef.current !== null) return;
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
+
+      maxScrollDepth.current = Math.max(maxScrollDepth.current, scrollPercent);
+
+      // Track milestone depths: 25%, 50%, 75%, 100%
+      const milestones = [25, 50, 75, 100];
+      for (const milestone of milestones) {
+        if (scrollPercent >= milestone && !hasTrackedScroll.current.has(milestone)) {
+          hasTrackedScroll.current.add(milestone);
+          trackEvent("scroll_depth", milestone);
+        }
       }
-    }
+    });
   }, [enabled, trackEvent]);
 
   useEffect(() => {
@@ -94,6 +101,10 @@ export const useContentTracker = ({ articleId, enabled = true }: UseContentTrack
     window.addEventListener("beforeunload", handleBeforeUnload);
     
     return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleBeforeUnload);

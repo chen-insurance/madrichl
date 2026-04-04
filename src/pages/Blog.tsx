@@ -111,6 +111,27 @@ const Blog = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="כל הכתבות | המדריך לצרכן" />
         <meta name="twitter:description" content="כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים - המדריך לצרכן" />
+        {allArticles && allArticles.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "CollectionPage",
+              name: "כל הכתבות - המדריך לצרכן",
+              url: "https://the-guide.co.il/blog",
+              description: "כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים",
+              inLanguage: "he",
+              mainEntity: {
+                "@type": "ItemList",
+                itemListElement: allArticles.slice(0, 50).map((a, i) => ({
+                  "@type": "ListItem",
+                  position: i + 1,
+                  url: `https://the-guide.co.il/news/${a.slug}`,
+                  name: a.title,
+                })),
+              },
+            })}
+          </script>
+        )}
       </Helmet>
 
       <Header />

@@ -40,20 +40,7 @@ const Article = () => {
   const { slug } = useParams<{ slug: string }>();
   
 
-  // Check for redirect first
-  const { data: redirect, isLoading: isRedirectLoading } = useQuery({
-    queryKey: ["redirect-check", slug],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("redirects")
-        .select("new_slug")
-        .eq("old_slug", slug)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!slug,
-  });
-
+  // Fetch article first — no redirect check needed for the vast majority of pages.
   const { data: article, isLoading, error } = useQuery({
     queryKey: ["article", slug],
     queryFn: async () => {
@@ -67,8 +54,25 @@ const Article = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!slug && !redirect,
+    enabled: !!slug,
     staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Only check for a redirect when the article was not found (slug may have moved).
+  // This avoids a wasted DB query on every normal article page-load.
+  const articleNotFound = !isLoading && article === null;
+  const { data: redirect, isLoading: isRedirectLoading } = useQuery({
+    queryKey: ["redirect-check", slug],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("redirects")
+        .select("new_slug")
+        .eq("old_slug", slug)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!slug && articleNotFound,
+    staleTime: 10 * 60 * 1000,
   });
 
   // Track article view (with debounce)
@@ -93,6 +97,8 @@ const Article = () => {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
   }
 
+  // Show skeleton while fetching the article, or while checking for a redirect
+  // (redirect check only fires when article === null, so normal pages skip it entirely)
   if (isLoading || isRedirectLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -321,6 +327,7 @@ const Article = () => {
                     currentSlug={slug}
                     category={article.category}
                     articleId={article.id}
+                    articleEmbedding={(article as any).embedding}
                   />
                 </Suspense>
               </div>

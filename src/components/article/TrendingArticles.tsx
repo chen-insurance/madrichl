@@ -12,6 +12,7 @@ interface TrendingArticlesProps {
 const TrendingArticles = ({ excludeSlug, limit = 5 }: TrendingArticlesProps) => {
   const { data: trendingArticles, isLoading } = useQuery({
     queryKey: ["trending-articles", excludeSlug, limit],
+    staleTime: 5 * 60 * 1000, // 5 minutes — trending data doesn't change by the second
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_trending_articles", {
         p_limit: limit,

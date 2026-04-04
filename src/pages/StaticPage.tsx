@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MarkdownContentWithCTA from "@/components/article/MarkdownContentWithCTA";
@@ -89,6 +90,12 @@ const StaticPage = () => {
   if (isLandingPage) {
     return (
       <div className="min-h-screen bg-background">
+        <BreadcrumbSchema
+          items={[
+            { name: "ראשי", url: "/" },
+            { name: page.title, url: `/${slug}` },
+          ]}
+        />
         <Helmet>
           <title>{page.seo_title || page.title} | המדריך לצרכן</title>
           <meta
@@ -96,6 +103,17 @@ const StaticPage = () => {
             content={page.seo_description || `${page.title} - המדריך לצרכן`}
           />
           <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
+          <meta property="og:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
+          <meta property="og:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={`https://the-guide.co.il/${slug}`} />
+          <meta property="og:site_name" content="המדריך לצרכן" />
+          <meta property="og:locale" content="he_IL" />
+          <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
+          <meta name="twitter:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
+          <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
           {!isTherapistsPage && heroImageUrl && (
             <link
               rel="preload"
@@ -161,7 +179,13 @@ const StaticPage = () => {
   // Normal Page Layout
   return (
     <div className="min-h-screen bg-background">
-        <Helmet>
+      <BreadcrumbSchema
+        items={[
+          { name: "ראשי", url: "/" },
+          { name: page.title, url: `/${slug}` },
+        ]}
+      />
+      <Helmet>
         <title>{page.seo_title || page.title} | המדריך לצרכן</title>
         <meta
           name="description"
@@ -170,13 +194,15 @@ const StaticPage = () => {
         <link rel="canonical" href={`https://the-guide.co.il/${slug}`} />
         <meta property="og:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
         <meta property="og:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
-        <meta property="og:type" content="article" />
+        <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://the-guide.co.il/${slug}`} />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
         <meta name="twitter:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
       </Helmet>
 
       <Header />

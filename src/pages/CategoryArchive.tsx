@@ -209,6 +209,27 @@ const CategoryArchive = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${category.name} | המדריך לצרכן`} />
         <meta name="twitter:description" content={category.description || `כל המאמרים בקטגוריית ${category.name}`} />
+        {allArticles && allArticles.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "CollectionPage",
+              name: `${category.name} - המדריך לצרכן`,
+              url: `https://the-guide.co.il/category/${slug}`,
+              description: category.description || `כל המאמרים בקטגוריית ${category.name}`,
+              inLanguage: "he",
+              mainEntity: {
+                "@type": "ItemList",
+                itemListElement: (allArticles as any[]).slice(0, 50).map((a: any, i: number) => ({
+                  "@type": "ListItem",
+                  position: i + 1,
+                  url: `https://the-guide.co.il/news/${a.slug}`,
+                  name: a.title,
+                })),
+              },
+            })}
+          </script>
+        )}
       </Helmet>
 
       <BreadcrumbSchema

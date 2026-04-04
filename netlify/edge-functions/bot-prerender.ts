@@ -234,6 +234,7 @@ async function renderHomepage(): Promise<string> {
     title: "המדריך לצרכן | מגזין ביטוח ופיננסים",
     desc: "המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל. מדריכים, חדשות וניתוחים לטובת הצרכן.",
     url: SITE,
+    ogType: "website",
     extraHead: `
       <script type="application/ld+json">${JSON.stringify(websiteSchema)}</script>
       <script type="application/ld+json">${JSON.stringify(orgSchema)}</script>
@@ -287,16 +288,116 @@ async function renderGlossary(termSlug?: string): Promise<string | null> {
   });
 }
 
+// ── Blog listing renderer ────────────────────────────────
+async function renderBlog(): Promise<string> {
+  const articles = await supabaseGet(
+    "articles",
+    "is_published=eq.true&select=title,slug,excerpt,category,published_at&order=published_at.desc&limit=50"
+  );
+
+  const articleLinks = (articles || [])
+    .map((a: any) => `<li><a href="${SITE}/news/${a.slug}">${escapeHtml(a.title)}</a>${a.excerpt ? ` - ${escapeHtml(a.excerpt)}` : ""}</li>`)
+    .join("");
+
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "כל הכתבות - המדריך לצרכן",
+    url: `${SITE}/blog`,
+    description: "כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים",
+    inLanguage: "he",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: (articles || []).slice(0, 50).map((a: any, i: number) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE}/news/${a.slug}`,
+        name: a.title,
+      })),
+    },
+  };
+
+  return buildHtml({
+    title: "כל הכתבות | המדריך לצרכן",
+    desc: "כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים - המדריך לצרכן",
+    url: `${SITE}/blog`,
+    ogType: "website",
+    extraHead: `<script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>`,
+    body: `
+      <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
+      <main>
+        <h1>כל הכתבות</h1>
+        <p>מאמרים, מדריכים וחדשות עדכניות בנושאי ביטוח, פנסיה ופיננסים</p>
+        <ul>${articleLinks}</ul>
+      </main>
+    `,
+  });
+}
+
+// ── Static page renderer ─────────────────────────────────
+async function renderStaticPage(slug: string): Promise<string | null> {
+  const pages = await supabaseGet(
+    "pages",
+    `slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=title,seo_title,seo_description,content,updated_at&limit=1`
+  );
+  if (!pages || pages.length === 0) return null;
+  const p = pages[0];
+
+  const title = escapeHtml(p.seo_title || p.title);
+  const desc = escapeHtml(p.seo_description || `${p.title} - המדריך לצרכן`);
+  const url = `${SITE}/${slug}`;
+  const plainContent = stripMarkdown(p.content || "").slice(0, 3000);
+
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: p.title,
+    description: p.seo_description || `${p.title} - המדריך לצרכן`,
+    url,
+    inLanguage: "he",
+    isPartOf: { "@type": "WebSite", name: "המדריך לצרכן", url: SITE },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ראשי", item: SITE },
+      { "@type": "ListItem", position: 2, name: p.title, item: url },
+    ],
+  };
+
+  return buildHtml({
+    title: `${title} | המדריך לצרכן`,
+    desc,
+    url,
+    ogType: "website",
+    extraHead: `
+      <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
+      <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
+    `,
+    body: `
+      <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
+      <main>
+        <h1>${escapeHtml(p.title)}</h1>
+        <div>${escapeHtml(plainContent)}</div>
+      </main>
+    `,
+  });
+}
+
 // ── HTML template ────────────────────────────────────────
 function buildHtml(opts: {
   title: string;
   desc: string;
   url: string;
   image?: string;
+  ogType?: string;
   extraHead?: string;
   body: string;
 }): string {
   const img = opts.image || `${SITE}/og-default.png`;
+  const ogType = opts.ogType || "article";
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -309,7 +410,7 @@ function buildHtml(opts: {
   <meta property="og:description" content="${opts.desc}">
   <meta property="og:image" content="${img}">
   <meta property="og:url" content="${opts.url}">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="${ogType}">
   <meta property="og:locale" content="he_IL">
   <meta property="og:site_name" content="המדריך לצרכן">
   <meta name="twitter:card" content="summary_large_image">
@@ -339,20 +440,38 @@ export default async function handler(request: Request) {
   try {
     let html: string | null = null;
 
+    // Insurance category shortcut paths
+    const INSURANCE_SHORTCUTS: Record<string, string> = {
+      "/health-insurance": "health-insurance",
+      "/life-insurance": "life-insurance",
+      "/car-insurance": "car-insurance",
+      "/property-insurance": "property-insurance",
+      "/pension": "pension",
+      "/employer-insurance": "employer-insurance",
+    };
+
     // Route matching
     if (path === "/" || path === "") {
       html = await renderHomepage();
+    } else if (path === "/blog" || path === "/blog/") {
+      html = await renderBlog();
     } else if (path.startsWith("/news/")) {
       const slug = path.replace("/news/", "").replace(/\/$/, "");
       if (slug) html = await renderArticle(slug);
     } else if (path.startsWith("/category/")) {
       const slug = decodeURIComponent(path.replace("/category/", "").replace(/\/$/, ""));
       if (slug) html = await renderCategory(slug);
+    } else if (INSURANCE_SHORTCUTS[path]) {
+      html = await renderCategory(INSURANCE_SHORTCUTS[path]);
     } else if (path === "/glossary" || path === "/glossary/") {
       html = await renderGlossary();
     } else if (path.startsWith("/glossary/")) {
       const slug = path.replace("/glossary/", "").replace(/\/$/, "");
       if (slug) html = await renderGlossary(slug);
+    } else if (!path.startsWith("/admin") && !path.startsWith("/auth") && !path.startsWith("/preview")) {
+      // Try static page (catch-all for /:slug routes)
+      const slug = path.slice(1).replace(/\/$/, "");
+      if (slug) html = await renderStaticPage(slug);
     }
 
     if (html) {

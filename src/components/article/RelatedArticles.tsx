@@ -8,28 +8,35 @@ interface RelatedArticlesProps {
   currentSlug?: string;
   category?: string | null;
   articleId?: string;
+  /** Embedding vector already fetched with the article — avoids an extra DB round-trip */
+  articleEmbedding?: unknown;
 }
 
-const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesProps) => {
+const RelatedArticles = ({ currentSlug, category, articleId, articleEmbedding }: RelatedArticlesProps) => {
   const { data: relatedArticles } = useQuery({
     queryKey: ["related-articles", currentSlug, category, articleId],
+    staleTime: 15 * 60 * 1000, // 15 minutes — related articles rarely change
     queryFn: async () => {
-      // First, try semantic similarity if article has embedding
+      // Try semantic similarity search first
       if (articleId) {
         try {
-          // Get current article's embedding
-          const { data: currentArticle } = await supabase
-            .from("articles")
-            .select("embedding")
-            .eq("id", articleId)
-            .maybeSingle();
+          // Use embedding passed from parent (already fetched with the article).
+          // Only fall back to a separate DB fetch if it wasn't provided.
+          let embedding = articleEmbedding;
+          if (!embedding) {
+            const { data: currentArticle } = await supabase
+              .from("articles")
+              .select("embedding")
+              .eq("id", articleId)
+              .maybeSingle();
+            embedding = currentArticle?.embedding;
+          }
 
-          if (currentArticle?.embedding) {
-            // Use vector similarity search
+          if (embedding) {
             const { data: semanticResults, error: semanticError } = await supabase.rpc(
               "match_articles",
               {
-                query_embedding: currentArticle.embedding,
+                query_embedding: embedding,
                 match_threshold: 0.5,
                 match_count: 3,
                 exclude_slug: currentSlug || null,
@@ -37,12 +44,11 @@ const RelatedArticles = ({ currentSlug, category, articleId }: RelatedArticlesPr
             );
 
             if (!semanticError && semanticResults && semanticResults.length >= 3) {
-              console.log("Using semantic similarity for related articles");
               return semanticResults;
             }
           }
-        } catch (err) {
-          console.log("Semantic search not available, falling back to category-based");
+        } catch {
+          // fall through to category-based fallback
         }
       }
 

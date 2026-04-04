@@ -21,6 +21,11 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
   const wordCount = article.content?.trim().split(/\s+/).length || 0;
   const readingMinutes = Math.max(1, Math.round(wordCount / 200));
 
+  // Truncate content for articleBody (schema limit guidance ~2500 chars)
+  const articleBody = article.content
+    ? article.content.replace(/#{1,6}\s?/g, "").replace(/[*_~`>]/g, "").replace(/\n{2,}/g, " ").trim().slice(0, 2500)
+    : undefined;
+
   const newsArticleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -36,6 +41,7 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
     wordCount,
     timeRequired: `PT${readingMinutes}M`,
     inLanguage: "he",
+    ...(articleBody ? { articleBody } : {}),
     author: {
       "@type": "Person",
       name: article.author_name || "מערכת המדריך",

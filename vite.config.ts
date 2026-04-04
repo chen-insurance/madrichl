@@ -63,7 +63,16 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Strip console.log / debugger statements from production builds
+  esbuild: mode === "production" ? {
+    drop: ["debugger"],
+    pure: ["console.log", "console.debug", "console.info"],
+  } : {},
   build: {
+    // Target modern browsers — smaller output, native ES modules
+    target: "es2020",
+    // Skip gzip size report (speeds up build without affecting output)
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         manualChunks: {

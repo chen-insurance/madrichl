@@ -61,6 +61,24 @@ const GlossaryIndex = () => {
         <meta name="twitter:title" content="מילון מונחים פיננסיים | המדריך לצרכן" />
         <meta name="twitter:description" content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים." />
         <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        {/* DefinedTermSet Structured Data */}
+        {terms && terms.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "DefinedTermSet",
+              name: "מילון מונחים פיננסיים - המדריך לצרכן",
+              description: "מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים.",
+              url: "https://the-guide.co.il/glossary",
+              inLanguage: "he",
+              hasDefinedTerm: terms.map((t) => ({
+                "@type": "DefinedTerm",
+                name: t.term_name,
+                url: `https://the-guide.co.il/glossary/${t.slug}`,
+              })),
+            })}
+          </script>
+        )}
       </Helmet>
 
       <BreadcrumbSchema

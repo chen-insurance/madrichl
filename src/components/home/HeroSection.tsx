@@ -23,6 +23,7 @@ import { Compass } from "lucide-react";
    // Fetch featured article from database (marked as is_featured or most recent)
    const { data: dynamicFeatured } = useQuery({
      queryKey: ["featured-article"],
+     staleTime: 10 * 60 * 1000, // 10 minutes
      queryFn: async () => {
        // First try to get an article marked as featured
        const { data: featured, error: featuredError } = await supabase
