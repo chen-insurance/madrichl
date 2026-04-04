@@ -134,9 +134,11 @@ const Index = () => {
         <meta property="og:url" content="https://the-guide.co.il" />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content={heroArticle?.featured_image || "https://the-guide.co.il/og-default.png"} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={headline} />
         <meta name="twitter:description" content="המדריך לצרכן - המקור המהימן שלך למידע על ביטוח ופיננסים בישראל." />
+        <meta name="twitter:image" content={heroArticle?.featured_image || "https://the-guide.co.il/og-default.png"} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

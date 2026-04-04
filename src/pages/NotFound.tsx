@@ -1,6 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Home, Search } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LeadForm from "@/components/LeadForm";
@@ -16,6 +17,11 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>הדף לא נמצא | המדריך לצרכן</title>
+        <meta name="description" content="העמוד שחיפשת אינו קיים. חזרו לדף הבית של המדריך לצרכן - מגזין ביטוח ופיננסים." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Header />
       
       <main className="flex-1 py-12 md:py-16">

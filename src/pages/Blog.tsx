@@ -108,9 +108,11 @@ const Blog = () => {
         <meta property="og:url" content="https://the-guide.co.il/blog" />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="כל הכתבות | המדריך לצרכן" />
         <meta name="twitter:description" content="כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים - המדריך לצרכן" />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
         {allArticles && allArticles.length > 0 && (
           <script type="application/ld+json">
             {JSON.stringify({

@@ -25,9 +25,49 @@ const Contact = () => {
         <meta property="og:url" content="https://the-guide.co.il/contact" />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="צור קשר | המדריך לצרכן" />
         <meta name="twitter:description" content="צרו קשר עם המדריך לצרכן - מגזין הביטוח והפיננסים המוביל בישראל." />
+        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "המדריך לצרכן",
+            url: "https://the-guide.co.il",
+            logo: "https://the-guide.co.il/logo.png",
+            description: "מגזין ביטוח ופיננסים מוביל בישראל",
+            email: "info@the-guide.co.il",
+            telephone: "*2580",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "תל אביב",
+              addressCountry: "IL",
+            },
+            contactPoint: {
+              "@type": "ContactPoint",
+              telephone: "*2580",
+              email: "info@the-guide.co.il",
+              contactType: "customer service",
+              availableLanguage: "Hebrew",
+              hoursAvailable: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+                  opens: "09:00",
+                  closes: "18:00",
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Friday"],
+                  opens: "09:00",
+                  closes: "13:00",
+                },
+              ],
+            },
+          })}
+        </script>
       </Helmet>
 
       <Header />
