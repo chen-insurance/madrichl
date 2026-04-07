@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-// Served from /public — Netlify Image CDN resizes to 96px WebP at edge
-const logoIcon = "/.netlify/images?url=%2Flogo-icon.png&w=96&h=96&fit=cover&fm=webp&q=90";
+const logoIcon = "/logo-icon.png";
 
 interface MenuItem {
   id: string;
