@@ -334,7 +334,7 @@ const GlobalLeadForm = ({
 
         {/* Insurance Status Radio */}
         <div className="space-y-2.5">
-          <Label className="text-sm font-medium">האם יש לך ביטוח חיים קיים?</Label>
+          <Label className="text-sm font-medium">האם יש לך ביטוח קיים?</Label>
           <RadioGroup
             value={currentStatus}
             onValueChange={setCurrentStatus}

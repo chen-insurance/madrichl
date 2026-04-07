@@ -65,7 +65,7 @@ const Header = () => {
                 className="w-10 h-10 md:w-12 md:h-12 object-contain"
               />
               <div>
-                <h1 className="font-display font-bold text-lg md:text-xl text-foreground">המדריך לצרכן</h1>
+                <span className="font-display font-bold text-lg md:text-xl text-foreground block">המדריך לצרכן</span>
                 <p className="text-xs text-muted-foreground hidden sm:block">מגזין ביטוח ופיננסים</p>
               </div>
             </Link>
@@ -128,7 +128,7 @@ const Header = () => {
                           className="w-10 h-10 object-contain"
                         />
                         <div>
-                          <h1 className="font-display font-bold text-lg text-foreground">המדריך לצרכן</h1>
+                          <span className="font-display font-bold text-lg text-foreground block">המדריך לצרכן</span>
                           <p className="text-xs text-muted-foreground">מגזין ביטוח ופיננסים</p>
                         </div>
                       </Link>
