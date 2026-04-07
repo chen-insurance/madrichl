@@ -205,7 +205,7 @@ const Article = () => {
           property="og:description"
           content={article.seo_description || article.excerpt || ""}
         />
-        <meta property="og:image" content={optimizeImageUrl(article.featured_image || "https://the-guide.co.il/og-default.png", 1200, 85)} />
+        <meta property="og:image" content={optimizeImageUrl(article.featured_image || "https://the-guide.co.il/hero-insurance.webp", 1200, 85)} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://the-guide.co.il/news/${article.slug}`} />
         <meta property="og:site_name" content="המדריך לצרכן" />
@@ -214,7 +214,7 @@ const Article = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.seo_title || article.title} />
         <meta name="twitter:description" content={article.seo_description || article.excerpt || ""} />
-        <meta name="twitter:image" content={optimizeImageUrl(article.featured_image || "https://the-guide.co.il/og-default.png", 1200, 85)} />
+        <meta name="twitter:image" content={optimizeImageUrl(article.featured_image || "https://the-guide.co.il/hero-insurance.webp", 1200, 85)} />
         {/* Canonical */}
         <link rel="canonical" href={`https://the-guide.co.il/news/${article.slug}`} />
       </Helmet>

@@ -6,7 +6,7 @@
  */
 
 const BOT_UA_REGEX =
-  /googlebot|bingbot|yandexbot|duckduckbot|slurp|baiduspider|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|pinterestbot|redditbot|discordbot|ia_archiver/i;
+  /googlebot|google-inspectiontool|googlebot-image|googleother|adsbot-google|bingbot|yandexbot|duckduckbot|slurp|baiduspider|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|pinterestbot|redditbot|discordbot|ia_archiver/i;
 
 const SUPABASE_URL = "https://awxmwvyoellhdhgvxife.supabase.co";
 const SUPABASE_KEY =
@@ -27,6 +27,90 @@ function stripMarkdown(md: string): string {
     .replace(/[*_~`>]/g, "")
     .replace(/\n{2,}/g, "\n")
     .trim();
+}
+
+/** Apply inline markdown formatting (bold, italic, links, code) */
+function inline(text: string): string {
+  let s = escapeHtml(text);
+  // Remove image markdown
+  s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, "");
+  // Bold: **text**
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+  // Italic: *text*
+  s = s.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  // Links: [text](url)
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Inline code: `code`
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  return s;
+}
+
+/**
+ * Convert markdown to structured HTML so Googlebot sees proper
+ * heading hierarchy (H2, H3…), lists, and paragraphs — not a plain text wall.
+ */
+function markdownToHtml(md: string): string {
+  if (!md) return "";
+  const lines = md.split("\n");
+  const out: string[] = [];
+  let inUl = false;
+  let inOl = false;
+
+  const closeList = () => {
+    if (inUl) { out.push("</ul>"); inUl = false; }
+    if (inOl) { out.push("</ol>"); inOl = false; }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    // Headings: # H1  ## H2  ### H3 …
+    const hMatch = line.match(/^(#{1,6})\s+(.*)/);
+    if (hMatch) {
+      closeList();
+      const level = hMatch[1].length;
+      out.push(`<h${level}>${inline(hMatch[2])}</h${level}>`);
+      continue;
+    }
+
+    // Unordered list item: - / * / +
+    const ulMatch = line.match(/^\s*[-*+]\s+(.*)/);
+    if (ulMatch) {
+      if (!inUl) { closeList(); out.push("<ul>"); inUl = true; }
+      out.push(`<li>${inline(ulMatch[1])}</li>`);
+      continue;
+    }
+
+    // Ordered list item: 1. 2. …
+    const olMatch = line.match(/^\s*\d+\.\s+(.*)/);
+    if (olMatch) {
+      if (!inOl) { closeList(); out.push("<ol>"); inOl = true; }
+      out.push(`<li>${inline(olMatch[1])}</li>`);
+      continue;
+    }
+
+    // Blockquote: > text
+    const bqMatch = line.match(/^>\s*(.*)/);
+    if (bqMatch) {
+      closeList();
+      out.push(`<blockquote><p>${inline(bqMatch[1])}</p></blockquote>`);
+      continue;
+    }
+
+    // Empty line
+    if (line.trim() === "") {
+      closeList();
+      continue;
+    }
+
+    // Regular paragraph
+    closeList();
+    out.push(`<p>${inline(line)}</p>`);
+  }
+
+  closeList();
+  return out.join("\n");
 }
 
 /** Extract FAQ items from markdown H3 headings ending with ? */
@@ -86,9 +170,9 @@ async function renderArticle(slug: string): Promise<string | null> {
 
   const title = escapeHtml(a.seo_title || a.title);
   const desc = escapeHtml(a.seo_description || a.excerpt || "");
-  const image = a.featured_image || `${SITE}/og-default.png`;
+  const image = a.featured_image || `${SITE}/hero-insurance.webp`;
   const url = `${SITE}/news/${slug}`;
-  const plainContent = stripMarkdown(a.content || "").slice(0, 5000);
+  const htmlContent = markdownToHtml(a.content || "");
 
   // FAQ structured data: merge manual + auto-detected from H3 questions
   const manualFAQ: Array<{question: string; answer: string}> = 
@@ -156,7 +240,7 @@ async function renderArticle(slug: string): Promise<string | null> {
           ${a.excerpt ? `<p><strong>${escapeHtml(a.excerpt)}</strong></p>` : ""}
           ${a.author_name ? `<p>מאת: ${escapeHtml(a.author_name)}</p>` : ""}
           ${a.category ? `<p>קטגוריה: ${escapeHtml(a.category)}</p>` : ""}
-          <div>${escapeHtml(plainContent)}</div>
+          <div>${htmlContent}</div>
           ${allFAQ.length > 0 ? `<section><h2>שאלות נפוצות</h2>${allFAQ.map((f: any) => `<h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p>`).join("")}</section>` : ""}
         </article>
       </main>
@@ -267,7 +351,7 @@ async function renderGlossary(termSlug?: string): Promise<string | null> {
         <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
         <main>
           <h1>${escapeHtml(t.term_name)}</h1>
-          <div>${stripMarkdown(t.definition_rich_text || "")}</div>
+          <div>${markdownToHtml(t.definition_rich_text || "")}</div>
         </main>
       `,
     });
@@ -346,7 +430,7 @@ async function renderStaticPage(slug: string): Promise<string | null> {
   const title = escapeHtml(p.seo_title || p.title);
   const desc = escapeHtml(p.seo_description || `${p.title} - המדריך לצרכן`);
   const url = `${SITE}/${slug}`;
-  const plainContent = stripMarkdown(p.content || "").slice(0, 3000);
+  const plainContent = markdownToHtml(p.content || "");
 
   const webPageSchema = {
     "@context": "https://schema.org",
@@ -380,7 +464,7 @@ async function renderStaticPage(slug: string): Promise<string | null> {
       <header><nav><a href="${SITE}">המדריך לצרכן</a></nav></header>
       <main>
         <h1>${escapeHtml(p.title)}</h1>
-        <div>${escapeHtml(plainContent)}</div>
+        <div>${plainContent}</div>
       </main>
     `,
   });
@@ -396,7 +480,7 @@ function buildHtml(opts: {
   extraHead?: string;
   body: string;
 }): string {
-  const img = opts.image || `${SITE}/og-default.png`;
+  const img = opts.image || `${SITE}/hero-insurance.webp`;
   const ogType = opts.ogType || "article";
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
