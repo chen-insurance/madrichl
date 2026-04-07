@@ -36,7 +36,7 @@ const RelatedArticles = ({ currentSlug, category, articleId, articleEmbedding }:
             const { data: semanticResults, error: semanticError } = await supabase.rpc(
               "match_articles",
               {
-                query_embedding: embedding,
+                query_embedding: embedding as string,
                 match_threshold: 0.5,
                 match_count: 3,
                 exclude_slug: currentSlug || null,
