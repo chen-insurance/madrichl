@@ -11,23 +11,20 @@
 /** Returns true only for URLs we can actually resize/convert server-side */
 export const canOptimizeUrl = (url: string): boolean => {
   if (!url) return false;
-  return url.includes("supabase.co/storage") || url.includes("images.unsplash.com");
+  // Only Unsplash supports server-side resizing reliably.
+  // Supabase Storage on Lovable Cloud does NOT support image transformations.
+  return url.includes("images.unsplash.com");
 };
 
 export const optimizeImageUrl = (url: string, width: number, quality: number = 75): string => {
   if (!url) return url;
-  // Supabase Storage — supports width / quality / format params
-  if (url.includes("supabase.co/storage")) {
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}width=${width}&quality=${quality}&format=webp`;
-  }
   // Unsplash — rewrite w/h/q params for proper sizing
   if (url.includes("images.unsplash.com")) {
     const base = url.split("?")[0];
     return `${base}?w=${width}&q=${quality}&fm=webp&fit=crop&auto=format`;
   }
-  // For all other sources return the original URL unchanged.
-  // Do NOT generate a srcset for these — every entry would be the same file.
+  // For all other sources (including Supabase Storage) return unchanged.
+  // Supabase Storage on Lovable Cloud does not support image transformations.
   return url;
 };
 
