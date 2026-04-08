@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { optimizeImageUrl } from "@/lib/image-utils";
+import { compressImage } from "@/lib/compress-image";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -71,12 +72,14 @@ const MediaLibrary = ({ onSelect, isModal = false }: MediaLibraryProps) => {
 
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
+      // Compress image client-side before uploading
+      const compressed = await compressImage(file);
+      const fileExt = compressed.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
       const { error } = await supabase.storage
         .from("media")
-        .upload(fileName, file, { cacheControl: "31536000", upsert: false });
+        .upload(fileName, compressed, { cacheControl: "31536000", upsert: false });
 
       if (error) throw error;
 
