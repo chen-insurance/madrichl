@@ -32,7 +32,7 @@ html.highlight-links a {
    All colors MUST be HSL.
 */
 
-/* Fonts are self-hosted via /fonts/fonts.css — no metric overrides needed */
+/* Font metric overrides defined in /fonts/fonts.css for CLS prevention */
 
 @layer base {
   html {
