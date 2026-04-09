@@ -181,9 +181,11 @@ const Index = () => {
           featuredArticle={heroArticle || undefined}
           secondaryArticles={secondaryArticles || undefined}
         />
-        <Suspense fallback={<div className="py-10"><div className="container mx-auto"><div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-64 bg-muted rounded" /></div></div></div>}>
-          <ComparisonTable />
-        </Suspense>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
+          <Suspense fallback={<div style={{ minHeight: 500 }} className="py-10"><div className="container mx-auto"><div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-64 bg-muted rounded" /></div></div></div>}>
+            <ComparisonTable />
+          </Suspense>
+        </div>
         <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
           <CategorySection />
         </div>
