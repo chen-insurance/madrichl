@@ -52,7 +52,7 @@ const Header = () => {
   return (
     <>
       <NavigationSchema items={navItems} />
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-card border-b border-border" style={{ willChange: 'transform' }}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo - Right side in RTL */}
