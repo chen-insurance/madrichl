@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ArticleCard from "@/components/home/ArticleCard";
+import Breadcrumbs from "@/components/article/Breadcrumbs";
+import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -134,7 +136,7 @@ const Blog = () => {
         <meta name="twitter:title" content="כל הכתבות | המדריך לצרכן" />
         <meta name="twitter:description" content="כל הכתבות והמדריכים בנושאי ביטוח, פנסיה ופיננסים - המדריך לצרכן" />
         <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
-        {allArticles && allArticles.length > 0 && (
+        {articles.length > 0 && (
           <script type="application/ld+json">
             {JSON.stringify({
               "@context": "https://schema.org",
@@ -145,9 +147,9 @@ const Blog = () => {
               inLanguage: "he",
               mainEntity: {
                 "@type": "ItemList",
-                itemListElement: allArticles.slice(0, 50).map((a, i) => ({
+                itemListElement: articles.map((a, i) => ({
                   "@type": "ListItem",
-                  position: i + 1,
+                  position: (currentPage - 1) * ARTICLES_PER_PAGE + i + 1,
                   url: `https://the-guide.co.il/news/${a.slug}`,
                   name: a.title,
                 })),
@@ -157,9 +159,15 @@ const Blog = () => {
         )}
       </Helmet>
 
+      <BreadcrumbSchema items={[
+        { name: "ראשי", url: "/" },
+        { name: "כל הכתבות", url: "/blog" },
+      ]} />
+
       <Header />
 
       <main className="container mx-auto px-4 py-12">
+        <Breadcrumbs items={[{ label: "כל הכתבות" }]} />
         {/* Page Header */}
         <div className="mb-10 text-center">
           <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">

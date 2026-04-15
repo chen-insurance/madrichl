@@ -456,3 +456,26 @@ html.highlight-links a {
 .internal-link--glossary:hover::after {
   opacity: 1;
 }
+
+/* Dark mode overrides for rich-text-content hardcoded colors */
+.dark .rich-text-content,
+.dark .ProseMirror {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .rich-text-content h1,
+.dark .ProseMirror h1,
+.dark .rich-text-content h2,
+.dark .ProseMirror h2,
+.dark .rich-text-content h3,
+.dark .ProseMirror h3,
+.dark .rich-text-content strong,
+.dark .ProseMirror strong {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .rich-text-content blockquote,
+.dark .ProseMirror blockquote {
+  color: hsl(var(--muted-foreground)) !important;
+  background: linear-gradient(to left, rgba(217, 119, 6, 0.08), transparent) !important;
+}

@@ -24,6 +24,8 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
   variant = "default",
 }: ArticleCardProps, ref) => {
   const formattedDate = format(new Date(published_at), "dd/MM/yyyy");
+  // Estimate reading time from excerpt (excerpt ≈ 7% of full article, 200 words/min)
+  const estimatedMinutes = Math.max(2, Math.round(excerpt.split(/\s+/).length / 7));
 
   const placeholderImage = "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop";
 
@@ -95,7 +97,11 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
           {excerpt}
         </p>
-        <span className="text-xs text-muted-foreground">{formattedDate}</span>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>{formattedDate}</span>
+          <span>·</span>
+          <span>{estimatedMinutes} דק׳ קריאה</span>
+        </div>
       </div>
     </Link>
   );

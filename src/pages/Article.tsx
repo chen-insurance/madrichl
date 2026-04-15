@@ -22,6 +22,9 @@ import { getReadingTime } from "@/lib/reading-time";
 import { useInternalLinks, useGlossaryLinks, injectInternalLinks } from "@/hooks/useInternalLinks";
 import { extractFAQFromContent } from "@/lib/extract-faq-from-content";
 
+import ReadingProgressBar from "@/components/article/ReadingProgressBar";
+import ShareButtons from "@/components/article/ShareButtons";
+
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
@@ -181,8 +184,11 @@ const Article = () => {
     { name: article.title, url: `/news/${article.slug}` },
   ];
 
+  const articleUrl = `https://the-guide.co.il/news/${article.slug}`;
+
   return (
     <div className="min-h-screen flex flex-col">
+      <ReadingProgressBar />
       <Helmet>
         <title>{article.seo_title || article.title} | המדריך לצרכן</title>
         <meta
@@ -299,6 +305,9 @@ const Article = () => {
 
                 {secondPart && <MarkdownContentWithCTA content={secondPart} />}
               </div>
+
+              {/* Share Buttons */}
+              <ShareButtons url={articleUrl} title={article.title} />
 
               {/* Author Box - E-E-A-T */}
               <Suspense fallback={null}>

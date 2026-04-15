@@ -10,6 +10,7 @@ import { useCustomScripts } from "@/hooks/useCustomScripts";
 import { useThemeSettings } from "@/hooks/useThemeSettings";
 import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import BackToTop from "./components/common/BackToTop";
 
 // Eagerly load the landing/index page for best FCP
 import Index from "./pages/Index";
@@ -132,6 +133,7 @@ const App = () => (
               <ExitIntentPopup />
               <AccessibilityWidget />
             </Suspense>
+            <BackToTop />
           </BrowserRouter>
         </TooltipProvider>
       </AppInitializer>

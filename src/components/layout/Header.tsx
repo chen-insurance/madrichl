@@ -1,15 +1,15 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import NavigationSchema from "@/components/layout/NavigationSchema";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Moon, Sun } from "lucide-react";
 // Logo served from /public
 const logoIcon = "/logo-icon.png";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useTheme } from "@/hooks/useTheme";
 
 // Lazy load SearchDialog - only needed on click
 const SearchDialog = lazy(() => import("@/components/common/SearchDialog"));
@@ -24,6 +24,7 @@ interface MenuItem {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const { isDark, toggle: toggleTheme } = useTheme();
 
   // Fetch header menu from menus table
   const { data: headerMenu } = useQuery({
@@ -83,7 +84,7 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Desktop Search Bar */}
+            {/* Desktop Search + Theme Toggle */}
             <div className="hidden lg:flex items-center gap-3">
               <button
                 onClick={() => setShowSearch(true)}
@@ -92,10 +93,24 @@ const Header = () => {
                 <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <span className="text-sm text-muted-foreground">חפש כתבה או נושא...</span>
               </button>
+              <button
+                onClick={toggleTheme}
+                aria-label={isDark ? "עבור למצב בהיר" : "עבור למצב כהה"}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              >
+                {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+              </button>
             </div>
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-2 lg:hidden">
+              <button
+                onClick={toggleTheme}
+                aria-label={isDark ? "עבור למצב בהיר" : "עבור למצב כהה"}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              >
+                {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+              </button>
               <Button
                 variant="outline"
                 size="icon"
