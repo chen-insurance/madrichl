@@ -14,6 +14,17 @@ import { useState, useMemo } from "react";
 
 const ARTICLES_PER_PAGE = 12;
 
+interface CategoryArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  featured_image: string | null;
+  published_at: string | null;
+  category: string | null;
+  is_published?: boolean;
+}
+
 // Map direct paths to category slugs
 const PATH_TO_SLUG_MAP: Record<string, string> = {
   "/health-insurance": "health-insurance",
@@ -49,9 +60,9 @@ const CategoryArchive = () => {
   });
 
   // Fetch all articles for this category (we'll filter client-side for search)
-  const { data: allArticles, isLoading: articlesLoading } = useQuery({
+  const { data: allArticles, isLoading: articlesLoading, isError: articlesError } = useQuery({
     queryKey: ["category-all-articles", category?.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<CategoryArticle[]> => {
       // First try to get articles via the junction table
       const { data: junctionArticles, error: junctionError } = await supabase
         .from("article_categories")
@@ -64,15 +75,14 @@ const CategoryArchive = () => {
         .eq("category_id", category?.id);
 
       if (!junctionError && junctionArticles && junctionArticles.length > 0) {
-        // Filter and transform junction table results
-        return junctionArticles
-          .map((item) => item.articles)
-          .filter((article: any) => 
-            article.is_published && 
-            new Date(article.published_at) <= new Date()
+        return (junctionArticles
+          .map((item) => item.articles) as CategoryArticle[])
+          .filter((article) =>
+            article.is_published &&
+            new Date(article.published_at ?? 0) <= new Date()
           )
-          .sort((a: any, b: any) => 
-            new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+          .sort((a, b) =>
+            new Date(b.published_at ?? 0).getTime() - new Date(a.published_at ?? 0).getTime()
           );
       }
 
@@ -86,7 +96,7 @@ const CategoryArchive = () => {
         .order("published_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return (data ?? []) as CategoryArticle[];
     },
     enabled: !!category?.id,
   });
@@ -95,10 +105,10 @@ const CategoryArchive = () => {
   const filteredArticles = useMemo(() => {
     if (!allArticles) return [];
     if (!searchQuery.trim()) return allArticles;
-    
+
     const query = searchQuery.toLowerCase();
     return allArticles.filter(
-      (article: any) =>
+      (article) =>
         article.title.toLowerCase().includes(query) ||
         (article.excerpt && article.excerpt.toLowerCase().includes(query))
     );
@@ -246,12 +256,12 @@ const CategoryArchive = () => {
       <main className="container mx-auto px-4 py-12">
         {/* Category Header with SEO Content */}
         <div className="mb-10">
-          <nav className="text-sm text-muted-foreground mb-4">
+          <nav className="text-sm text-muted-foreground mb-4" aria-label="ניווט ארכיון">
             <Link to="/" className="hover:text-accent transition-colors">
               דף הבית
             </Link>
-            <span className="mx-2">/</span>
-            <span className="text-foreground">{category.name}</span>
+            <span className="mx-2" aria-hidden="true">/</span>
+            <span className="text-foreground" aria-current="page">{category.name}</span>
           </nav>
           
           <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
@@ -266,7 +276,7 @@ const CategoryArchive = () => {
 
           {/* Search Bar */}
           <div className="relative max-w-xl mb-4">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
             <Input
               type="text"
               placeholder={`חיפוש ב${category.name}...`}
@@ -283,7 +293,12 @@ const CategoryArchive = () => {
         </div>
 
         {/* Articles Grid */}
-        {articlesLoading ? (
+        {articlesError ? (
+          <div className="text-center py-16">
+            <p className="text-lg text-muted-foreground mb-6">שגיאה בטעינת המאמרים. אנא נסה שוב.</p>
+            <Button onClick={() => window.location.reload()}>נסה שוב</Button>
+          </div>
+        ) : articlesLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-xl" />
@@ -292,7 +307,7 @@ const CategoryArchive = () => {
         ) : paginatedArticles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {paginatedArticles.map((article: any) => (
+              {paginatedArticles.map((article) => (
                 <ArticleCard
                   key={article.id}
                   id={article.id}
@@ -308,25 +323,28 @@ const CategoryArchive = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <nav className="flex justify-center items-center gap-2">
+              <nav className="flex justify-center items-center gap-2" aria-label="ניווט דפים">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  aria-label="עמוד קודם"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
 
                 {getPaginationNumbers().map((page, index) => (
                   <div key={index}>
                     {page === "..." ? (
-                      <span className="px-3 py-2 text-muted-foreground">...</span>
+                      <span className="px-3 py-2 text-muted-foreground" aria-hidden="true">...</span>
                     ) : (
                       <Button
                         variant={currentPage === page ? "default" : "outline"}
                         size="icon"
                         onClick={() => handlePageChange(page as number)}
+                        aria-label={`עמוד ${page}`}
+                        aria-current={currentPage === page ? "page" : undefined}
                       >
                         {page}
                       </Button>
@@ -339,8 +357,9 @@ const CategoryArchive = () => {
                   size="icon"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  aria-label="עמוד הבא"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </nav>
             )}

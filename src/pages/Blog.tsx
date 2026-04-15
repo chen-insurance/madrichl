@@ -17,7 +17,7 @@ const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch all published articles
-  const { data: allArticles, isLoading } = useQuery({
+  const { data: allArticles, isLoading, isError } = useQuery({
     queryKey: ["all-articles"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -93,6 +93,22 @@ const Blog = () => {
     return pages;
   };
 
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-24 text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">שגיאה בטעינת הכתבות</h1>
+          <p className="text-muted-foreground mb-6">
+            לא הצלחנו לטעון את הכתבות. אנא נסה שוב.
+          </p>
+          <Button onClick={() => window.location.reload()}>נסה שוב</Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -150,7 +166,7 @@ const Blog = () => {
 
           {/* Search Bar */}
           <div className="relative max-w-xl mx-auto">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
             <Input
               type="text"
               placeholder="חפש כתבה או נושא..."
@@ -194,25 +210,28 @@ const Blog = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <nav className="flex justify-center items-center gap-2">
+              <nav className="flex justify-center items-center gap-2" aria-label="ניווט דפים">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  aria-label="עמוד קודם"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
 
                 {getPaginationNumbers().map((page, index) => (
                   <div key={index}>
                     {page === "..." ? (
-                      <span className="px-3 py-2 text-muted-foreground">...</span>
+                      <span className="px-3 py-2 text-muted-foreground" aria-hidden="true">...</span>
                     ) : (
                       <Button
                         variant={currentPage === page ? "default" : "outline"}
                         size="icon"
                         onClick={() => handlePageChange(page as number)}
+                        aria-label={`עמוד ${page}`}
+                        aria-current={currentPage === page ? "page" : undefined}
                       >
                         {page}
                       </Button>
@@ -225,8 +244,9 @@ const Blog = () => {
                   size="icon"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  aria-label="עמוד הבא"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </nav>
             )}

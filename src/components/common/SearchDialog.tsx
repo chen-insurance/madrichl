@@ -26,22 +26,30 @@ interface Article {
 
 const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const navigate = useNavigate();
 
   // Reset query when dialog closes
   useEffect(() => {
     if (!open) {
       setQuery("");
+      setDebouncedQuery("");
     }
   }, [open]);
 
+  // Debounce search input by 300ms to avoid querying on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   // Search articles
-  const { data: results, isLoading } = useQuery({
-    queryKey: ["search-articles", query],
+  const { data: results, isLoading, isError } = useQuery({
+    queryKey: ["search-articles", debouncedQuery],
     queryFn: async () => {
-      if (!query.trim() || query.length < 2) return [];
-      
-      const searchQuery = query.toLowerCase();
+      if (!debouncedQuery.trim() || debouncedQuery.length < 2) return [];
+
+      const searchQuery = debouncedQuery.toLowerCase();
       const { data, error } = await supabase
         .from("articles")
         .select("id, title, slug, excerpt, category")
@@ -49,11 +57,11 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
         .or(`title.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%`)
         .order("published_at", { ascending: false })
         .limit(8);
-      
+
       if (error) throw error;
       return data as Article[];
     },
-    enabled: query.length >= 2,
+    enabled: debouncedQuery.length >= 2,
   });
 
   const handleSelect = (slug: string) => {
@@ -76,7 +84,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
         <div className="space-y-4">
           {/* Search Input */}
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
               type="text"
               placeholder="הקלידו מילות חיפוש..."
@@ -84,18 +92,25 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
               onChange={(e) => setQuery(e.target.value)}
               className="pr-10"
               autoFocus
+              aria-label="חיפוש כתבות"
+              aria-autocomplete="list"
             />
           </div>
 
           {/* Results */}
-          <div className="max-h-80 overflow-y-auto">
-            {isLoading && query.length >= 2 && (
+          <div className="max-h-80 overflow-y-auto" role="listbox" aria-label="תוצאות חיפוש">
+            {isError && (
+              <div className="py-8 text-center text-muted-foreground">
+                שגיאה בחיפוש. אנא נסה שוב.
+              </div>
+            )}
+            {!isError && isLoading && query.length >= 2 && (
               <div className="py-8 text-center text-muted-foreground">
                 מחפש...
               </div>
             )}
 
-            {query.length >= 2 && results && results.length > 0 && (
+            {!isError && debouncedQuery.length >= 2 && results && results.length > 0 && (
               <div className="space-y-1">
                 {results.map((article) => (
                   <button
@@ -127,9 +142,9 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
               </div>
             )}
 
-            {query.length >= 2 && results && results.length === 0 && !isLoading && (
-              <div className="py-8 text-center text-muted-foreground">
-                לא נמצאו תוצאות עבור "{query}"
+            {!isError && debouncedQuery.length >= 2 && results && results.length === 0 && !isLoading && (
+              <div className="py-8 text-center text-muted-foreground" role="status">
+                לא נמצאו תוצאות עבור &quot;{debouncedQuery}&quot;
               </div>
             )}
 

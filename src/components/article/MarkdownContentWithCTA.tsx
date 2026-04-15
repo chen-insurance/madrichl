@@ -393,6 +393,8 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
           srcSet={buildSrcSet(imgSrc)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
           alt={alt || ""}
+          width={800}
+          height={450}
           loading="lazy"
           fetchPriority="auto"
           decoding="async"

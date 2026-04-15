@@ -9,6 +9,7 @@ import { useTrafficSource } from "@/hooks/useTrafficSource";
 import { useCustomScripts } from "@/hooks/useCustomScripts";
 import { useThemeSettings } from "@/hooks/useThemeSettings";
 import ScrollToTop from "./components/ScrollToTop";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 // Eagerly load the landing/index page for best FCP
 import Index from "./pages/Index";
@@ -73,6 +74,7 @@ const PageFallback = () => (
 );
 
 const App = () => (
+  <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <AppInitializer>
@@ -135,6 +137,7 @@ const App = () => (
       </AppInitializer>
     </AuthProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

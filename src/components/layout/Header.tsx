@@ -89,7 +89,7 @@ const Header = () => {
                 onClick={() => setShowSearch(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-secondary/50 border border-border rounded-full hover:bg-secondary transition-colors min-w-[200px]"
               >
-                <Search className="h-4 w-4 text-muted-foreground" />
+                <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <span className="text-sm text-muted-foreground">חפש כתבה או נושא...</span>
               </button>
             </div>
