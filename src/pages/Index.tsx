@@ -56,7 +56,7 @@ const Index = () => {
   });
 
   // Fetch latest articles (optionally filtered by pinned categories)
-  const { data: latestArticles } = useQuery({
+  const { data: latestArticles, isLoading: latestLoading } = useQuery({
     queryKey: ["latest-articles", homepageSettings?.pinned_categories],
     queryFn: async () => {
       let query = supabase
@@ -190,7 +190,7 @@ const Index = () => {
           <CategorySection />
         </div>
         <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 800px" }}>
-          <LatestArticles articles={latestArticles || undefined} />
+          <LatestArticles articles={latestArticles || undefined} isLoading={latestLoading} />
         </div>
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,43 +15,49 @@ const ARTICLES_PER_PAGE = 12;
 const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Fetch all published articles
-  const { data: allArticles, isLoading, isError } = useQuery({
-    queryKey: ["all-articles"],
+  // Debounce search — wait 300ms after user stops typing before querying DB
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  // Server-side pagination + search — only fetches the current page from DB
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["articles-paged", currentPage, debouncedSearch],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const from = (currentPage - 1) * ARTICLES_PER_PAGE;
+      const to = from + ARTICLES_PER_PAGE - 1;
+
+      let query = supabase
         .from("articles")
-        .select("id, title, slug, excerpt, featured_image, published_at, category")
+        .select("id, title, slug, excerpt, featured_image, published_at, category", { count: "exact" })
         .eq("is_published", true)
         .lte("published_at", new Date().toISOString())
-        .order("published_at", { ascending: false });
+        .order("published_at", { ascending: false })
+        .range(from, to);
+
+      if (debouncedSearch.trim()) {
+        query = query.or(
+          `title.ilike.%${debouncedSearch.trim()}%,excerpt.ilike.%${debouncedSearch.trim()}%`
+        );
+      }
+
+      const { data, error, count } = await query;
       if (error) throw error;
-      return data;
+      return { articles: data || [], total: count || 0 };
     },
   });
 
-  // Filter articles based on search query
-  const filteredArticles = useMemo(() => {
-    if (!allArticles) return [];
-    if (!searchQuery.trim()) return allArticles;
-    
-    const query = searchQuery.toLowerCase();
-    return allArticles.filter(
-      (article) =>
-        article.title.toLowerCase().includes(query) ||
-        (article.excerpt && article.excerpt.toLowerCase().includes(query))
-    );
-  }, [allArticles, searchQuery]);
-
-  // Paginate filtered results
-  const paginatedArticles = useMemo(() => {
-    const from = (currentPage - 1) * ARTICLES_PER_PAGE;
-    const to = from + ARTICLES_PER_PAGE;
-    return filteredArticles.slice(from, to);
-  }, [filteredArticles, currentPage]);
-
-  const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
+  const articles = data?.articles || [];
+  const totalCount = data?.total || 0;
+  const totalPages = Math.ceil(totalCount / ARTICLES_PER_PAGE);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -60,7 +66,6 @@ const Blog = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
   };
 
   // Generate pagination numbers
@@ -176,10 +181,10 @@ const Blog = () => {
             />
           </div>
 
-          {filteredArticles.length > 0 && (
+          {!isLoading && totalCount > 0 && (
             <p className="text-sm text-muted-foreground mt-4">
-              {filteredArticles.length} כתבות נמצאו
-              {searchQuery && ` עבור "${searchQuery}"`}
+              {totalCount} כתבות נמצאו
+              {debouncedSearch && ` עבור "${debouncedSearch}"`}
             </p>
           )}
         </div>
@@ -191,10 +196,10 @@ const Blog = () => {
               <Skeleton key={i} className="h-80 rounded-xl" />
             ))}
           </div>
-        ) : paginatedArticles.length > 0 ? (
+        ) : articles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {paginatedArticles.map((article) => (
+              {articles.map((article) => (
                 <ArticleCard
                   key={article.id}
                   id={article.id}
@@ -254,12 +259,12 @@ const Blog = () => {
         ) : (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground mb-6">
-              {searchQuery
-                ? `לא נמצאו כתבות התואמות לחיפוש "${searchQuery}"`
+              {debouncedSearch
+                ? `לא נמצאו כתבות התואמות לחיפוש "${debouncedSearch}"`
                 : "אין עדיין כתבות"}
             </p>
-            {searchQuery && (
-              <Button onClick={() => setSearchQuery("")} variant="outline">
+            {debouncedSearch && (
+              <Button onClick={() => { setSearchQuery(""); setDebouncedSearch(""); }} variant="outline">
                 נקה חיפוש
               </Button>
             )}

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +16,7 @@ interface GlossaryTerm {
 }
 
 const GlossaryIndex = () => {
-  const { data: terms, isLoading } = useQuery({
+  const { data: terms, isLoading, isError } = useQuery({
     queryKey: ["glossary-public"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -27,17 +28,18 @@ const GlossaryIndex = () => {
     },
   });
 
-  // Group terms by first letter
-  const groupedTerms = terms?.reduce((acc, term) => {
-    const firstLetter = term.term_name.charAt(0).toUpperCase();
-    if (!acc[firstLetter]) {
-      acc[firstLetter] = [];
-    }
-    acc[firstLetter].push(term);
-    return acc;
-  }, {} as Record<string, GlossaryTerm[]>);
+  // Group terms by first letter — memoized to avoid recalculation on every render
+  const groupedTerms = useMemo(() => {
+    if (!terms) return {} as Record<string, GlossaryTerm[]>;
+    return terms.reduce((acc, term) => {
+      const firstLetter = term.term_name.charAt(0).toUpperCase();
+      if (!acc[firstLetter]) acc[firstLetter] = [];
+      acc[firstLetter].push(term);
+      return acc;
+    }, {} as Record<string, GlossaryTerm[]>);
+  }, [terms]);
 
-  const letters = groupedTerms ? Object.keys(groupedTerms).sort() : [];
+  const letters = useMemo(() => Object.keys(groupedTerms).sort(), [groupedTerms]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -120,9 +122,13 @@ const GlossaryIndex = () => {
             </div>
           )}
 
-          {isLoading ? (
+          {isError ? (
+            <div className="text-center py-12 text-muted-foreground" role="status">
+              שגיאה בטעינת המילון. אנא רענן את הדף.
+            </div>
+          ) : isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
+              <Loader2 className="w-8 h-8 animate-spin text-accent" aria-label="טוען..." />
             </div>
           ) : (
             <div className="space-y-8">

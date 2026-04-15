@@ -1,6 +1,8 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import ArticleCard from "./ArticleCard";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft } from "lucide-react";
 
 interface Article {
@@ -14,9 +16,10 @@ interface Article {
 
 interface LatestArticlesProps {
   articles?: Article[];
+  isLoading?: boolean;
 }
 
-const LatestArticles = ({ articles }: LatestArticlesProps) => {
+const LatestArticles = ({ articles, isLoading = false }: LatestArticlesProps) => {
   // Demo data
   const demoArticles: Article[] = [
     {
@@ -91,6 +94,22 @@ const LatestArticles = ({ articles }: LatestArticlesProps) => {
           </Link>
         </div>
 
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-card rounded-xl overflow-hidden">
+                <Skeleton className="w-full aspect-video" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-4/5" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayArticles.map((article, index) => (
             <div
@@ -102,6 +121,7 @@ const LatestArticles = ({ articles }: LatestArticlesProps) => {
             </div>
           ))}
         </div>
+        )}
 
         <div className="mt-8 text-center md:hidden">
           <Link to="/blog">
@@ -115,4 +135,4 @@ const LatestArticles = ({ articles }: LatestArticlesProps) => {
   );
 };
 
-export default LatestArticles;
+export default memo(LatestArticles);

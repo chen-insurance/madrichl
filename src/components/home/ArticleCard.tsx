@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import OptimizedImage from "@/components/common/OptimizedImage";
@@ -103,4 +103,4 @@ const ArticleCard = forwardRef<HTMLAnchorElement, ArticleCardProps>(({
 
 ArticleCard.displayName = "ArticleCard";
 
-export default ArticleCard;
+export default memo(ArticleCard);

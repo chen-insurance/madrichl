@@ -1,9 +1,9 @@
- import { ArrowLeft } from "lucide-react";
-import { Compass } from "lucide-react";
- import { Link } from "react-router-dom";
- import OptimizedImage from "@/components/common/OptimizedImage";
- import { useQuery } from "@tanstack/react-query";
- import { supabase } from "@/integrations/supabase/client";
+import { memo } from "react";
+import { ArrowLeft, Compass } from "lucide-react";
+import { Link } from "react-router-dom";
+import OptimizedImage from "@/components/common/OptimizedImage";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
  
  interface FeaturedArticle {
    id: string;
@@ -184,4 +184,4 @@ import { Compass } from "lucide-react";
    );
  };
  
- export default HeroSection;
+export default memo(HeroSection);
