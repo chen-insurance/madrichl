@@ -3,13 +3,17 @@ import { Helmet } from "react-helmet-async";
 interface ArticleSchemaProps {
   article: {
     title: string;
+    seo_title?: string | null;
+    seo_description?: string | null;
     excerpt?: string | null;
     featured_image?: string | null;
+    image_alt_text?: string | null;
     published_at?: string | null;
     updated_at: string;
     author_name?: string | null;
     slug: string;
     content?: string | null;
+    category?: string | null;
   };
 }
 
@@ -27,6 +31,8 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
     ? article.content.replace(/#{1,6}\s?/g, "").replace(/[*_~`>]/g, "").replace(/\n{2,}/g, " ").trim().slice(0, 2500)
     : undefined;
 
+  const imageUrl = article.featured_image || `${siteUrl}/hero-insurance.webp`;
+
   const newsArticleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -34,14 +40,21 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
       "@type": "WebPage",
       "@id": `${siteUrl}/news/${article.slug}`,
     },
-    headline: article.title,
-    description: article.excerpt || "",
-    image: article.featured_image || `${siteUrl}/placeholder.svg`,
+    headline: article.seo_title || article.title,
+    description: article.seo_description || article.excerpt || "",
+    image: {
+      "@type": "ImageObject",
+      url: imageUrl,
+      width: 1200,
+      height: 675,
+      caption: article.image_alt_text || article.seo_title || article.title,
+    },
     datePublished: article.published_at || article.updated_at,
     dateModified: article.updated_at,
     wordCount,
     timeRequired: `PT${readingMinutes}M`,
     inLanguage: "he",
+    ...(article.category ? { articleSection: article.category } : {}),
     ...(articleBody ? { articleBody } : {}),
     author: {
       "@type": "Person",
@@ -54,6 +67,8 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
       logo: {
         "@type": "ImageObject",
         url: logoUrl,
+        width: 200,
+        height: 60,
       },
     },
   };

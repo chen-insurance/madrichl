@@ -216,11 +216,11 @@ const CategoryArchive = () => {
         <meta property="og:url" content={`https://the-guide.co.il/category/${slug}`} />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
-        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        <meta property="og:image" content="https://the-guide.co.il/hero-insurance.webp" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${category.name} | המדריך לצרכן`} />
         <meta name="twitter:description" content={category.description || `כל המאמרים בקטגוריית ${category.name}`} />
-        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        <meta name="twitter:image" content="https://the-guide.co.il/hero-insurance.webp" />
         {allArticles && allArticles.length > 0 && (
           <script type="application/ld+json">
             {JSON.stringify({

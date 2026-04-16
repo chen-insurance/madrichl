@@ -90,7 +90,7 @@ export function injectInternalLinks(
     const escapedTitle = article.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
     // Use non-word-char boundaries instead of \b for Hebrew support
-    const regex = new RegExp(`(?<=[\\s>،.,:;]|^)(${escapedTitle})(?=[\\s<،.,:;?!]|$)`, "i");
+    const regex = new RegExp(`(?<=[\\s>،.,:;("]|^)(${escapedTitle})(?=[\\s<،.,:;?!")']|$)`, "i");
 
     const match = result.match(regex);
     if (match && match.index !== undefined) {
@@ -117,7 +117,7 @@ export function injectInternalLinks(
       result = result.substring(0, match.index) + replacement + result.substring(match.index + linkText.length);
       linked.add(article.slug);
 
-      if (linked.size >= 5) break;
+      if (linked.size >= 8) break;
     }
   }
 
@@ -131,7 +131,7 @@ export function injectInternalLinks(
     if (!resultLower.includes(term.term_name.toLowerCase())) continue;
 
     const escapedTerm = term.term_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(`(?<=[\\s>،.,:;]|^)(${escapedTerm})(?=[\\s<،.,:;?!]|$)`, "i");
+    const regex = new RegExp(`(?<=[\\s>،.,:;("]|^)(${escapedTerm})(?=[\\s<،.,:;?!")']|$)`, "i");
 
     const match = result.match(regex);
     if (match && match.index !== undefined) {

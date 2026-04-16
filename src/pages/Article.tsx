@@ -49,7 +49,7 @@ const Article = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("*")
+        .select("*, categories!category_id(slug, name)")
         .eq("slug", slug)
         .eq("is_published", true)
         .maybeSingle();
@@ -173,14 +173,16 @@ const Article = () => {
 
   // Breadcrumb data for UI and Schema
   const categoryLabel = article.category || "חדשות";
+  // Use the joined category slug when available; fall back to the legacy encoded-name URL
+  const categorySlug = (article as any).categories?.slug || encodeURIComponent(categoryLabel);
   const breadcrumbItems = [
-    { label: categoryLabel, href: `/category/${encodeURIComponent(categoryLabel)}` },
+    { label: categoryLabel, href: `/category/${categorySlug}` },
     { label: article.title },
   ];
 
   const breadcrumbSchemaItems = [
     { name: "ראשי", url: "/" },
-    { name: categoryLabel, url: `/category/${encodeURIComponent(categoryLabel)}` },
+    { name: categoryLabel, url: `/category/${categorySlug}` },
     { name: article.title, url: `/news/${article.slug}` },
   ];
 

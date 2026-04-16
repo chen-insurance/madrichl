@@ -57,12 +57,12 @@ const GlossaryIndex = () => {
         <meta property="og:url" content="https://the-guide.co.il/glossary" />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
-        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        <meta property="og:image" content="https://the-guide.co.il/hero-insurance.webp" />
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="מילון מונחים פיננסיים | המדריך לצרכן" />
         <meta name="twitter:description" content="מילון מונחים פיננסיים מקיף - הסברים ברורים למונחי ביטוח, פנסיה, השקעות ופיננסים אישיים." />
-        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        <meta name="twitter:image" content="https://the-guide.co.il/hero-insurance.webp" />
         {/* DefinedTermSet Structured Data */}
         {terms && terms.length > 0 && (
           <script type="application/ld+json">

@@ -109,11 +109,11 @@ const StaticPage = () => {
           <meta property="og:url" content={`https://the-guide.co.il/${slug}`} />
           <meta property="og:site_name" content="המדריך לצרכן" />
           <meta property="og:locale" content="he_IL" />
-          <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+          <meta property="og:image" content="https://the-guide.co.il/hero-insurance.webp" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
           <meta name="twitter:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
-          <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+          <meta name="twitter:image" content="https://the-guide.co.il/hero-insurance.webp" />
           {!isTherapistsPage && heroImageUrl && (
             <link
               rel="preload"
@@ -198,11 +198,11 @@ const StaticPage = () => {
         <meta property="og:url" content={`https://the-guide.co.il/${slug}`} />
         <meta property="og:site_name" content="המדריך לצרכן" />
         <meta property="og:locale" content="he_IL" />
-        <meta property="og:image" content="https://the-guide.co.il/og-default.png" />
+        <meta property="og:image" content="https://the-guide.co.il/hero-insurance.webp" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={page.seo_title || `${page.title} | המדריך לצרכן`} />
         <meta name="twitter:description" content={page.seo_description || `${page.title} - המדריך לצרכן`} />
-        <meta name="twitter:image" content="https://the-guide.co.il/og-default.png" />
+        <meta name="twitter:image" content="https://the-guide.co.il/hero-insurance.webp" />
       </Helmet>
 
       <Header />
