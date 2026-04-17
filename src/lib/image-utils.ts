@@ -2,29 +2,41 @@
  * Shared image optimization utilities.
  * Adds width, quality, and WebP format params to supported CDN URLs.
  *
- * Supported:  Supabase Storage, Unsplash
- * Unsupported: Google Storage, other external CDNs — returned unchanged.
- *              Call `canOptimizeUrl` before generating a srcset to avoid
- *              sending the same full-size URL for every breakpoint.
+ * Supported:  Supabase Storage (via /render/image/), Unsplash
+ * Unsupported: external CDNs (manuscdn, google) — returned unchanged.
  */
+
+const SUPABASE_PUBLIC_OBJECT = "/storage/v1/object/public/";
+const SUPABASE_RENDER_IMAGE = "/storage/v1/render/image/public/";
+
+const isSupabaseStorage = (url: string): boolean =>
+  url.includes(".supabase.co") && url.includes(SUPABASE_PUBLIC_OBJECT);
+
+const isUnsplash = (url: string): boolean => url.includes("images.unsplash.com");
 
 /** Returns true only for URLs we can actually resize/convert server-side */
 export const canOptimizeUrl = (url: string): boolean => {
   if (!url) return false;
-  // Only Unsplash supports server-side resizing reliably.
-  // Supabase Storage on Lovable Cloud does NOT support image transformations.
-  return url.includes("images.unsplash.com");
+  return isUnsplash(url) || isSupabaseStorage(url);
 };
 
 export const optimizeImageUrl = (url: string, width: number, quality: number = 75): string => {
   if (!url) return url;
+
   // Unsplash — rewrite w/h/q params for proper sizing
-  if (url.includes("images.unsplash.com")) {
+  if (isUnsplash(url)) {
     const base = url.split("?")[0];
     return `${base}?w=${width}&q=${quality}&fm=webp&fit=crop&auto=format`;
   }
-  // For all other sources (including Supabase Storage) return unchanged.
-  // Supabase Storage on Lovable Cloud does not support image transformations.
+
+  // Supabase Storage — use the render/image endpoint for on-the-fly resizing
+  if (isSupabaseStorage(url)) {
+    const transformed = url
+      .split("?")[0]
+      .replace(SUPABASE_PUBLIC_OBJECT, SUPABASE_RENDER_IMAGE);
+    return `${transformed}?width=${width}&quality=${quality}&resize=contain`;
+  }
+
   return url;
 };
 
