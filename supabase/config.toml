@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.manage-article]
 verify_jwt = false
+
+[functions.update-financial-tracks]
+verify_jwt = false

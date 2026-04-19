@@ -1,3 +1,6 @@
+[build]
+  functions = "netlify/functions"
+
 # Default: no cache for HTML pages + security headers
 # stale-while-revalidate lets CDN serve instantly while fetching fresh copy in bg
 [[headers]]

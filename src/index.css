@@ -457,6 +457,117 @@ html.highlight-links a {
   opacity: 1;
 }
 
+/* ═══════════════════════════════════════════════════════
+   ARTICLE CONTENT — Enhanced UI Components
+   ═══════════════════════════════════════════════════════ */
+
+/* Tables — full financial-magazine styling */
+.rich-text-content table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 2rem 0 !important;
+  font-size: 0.95em !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 12px -2px rgba(34, 56, 120, 0.10) !important;
+  display: table !important;
+}
+
+.rich-text-content th {
+  background: hsl(220 45% 18%) !important;
+  color: hsl(45 100% 94%) !important;
+  font-weight: 700 !important;
+  padding: 0.8rem 1rem !important;
+  text-align: right !important;
+  font-size: 0.875em !important;
+  letter-spacing: 0.01em !important;
+  border: none !important;
+}
+
+.rich-text-content td {
+  padding: 0.7rem 1rem !important;
+  text-align: right !important;
+  border-bottom: 1px solid hsl(210 20% 92%) !important;
+  color: #374151 !important;
+  vertical-align: middle !important;
+}
+
+.rich-text-content tr:nth-child(even) td {
+  background: hsl(210 20% 98%) !important;
+}
+
+.rich-text-content tr:last-child td {
+  border-bottom: none !important;
+}
+
+.rich-text-content tr:hover td {
+  background: hsl(38 85% 55% / 0.06) !important;
+  transition: background 0.15s ease !important;
+}
+
+/* Mobile table scroll */
+@media (max-width: 640px) {
+  .rich-text-content table {
+    font-size: 0.85em !important;
+  }
+  .rich-text-content th,
+  .rich-text-content td {
+    padding: 0.55rem 0.65rem !important;
+  }
+}
+
+/* HR — elegant section divider */
+.rich-text-content hr {
+  border: none !important;
+  height: 2px !important;
+  background: linear-gradient(
+    to left,
+    transparent,
+    hsl(38 85% 55% / 0.5) 20%,
+    hsl(220 45% 30% / 0.3) 80%,
+    transparent
+  ) !important;
+  margin: 2.5rem 0 !important;
+}
+
+/* H2 — right-side accent bar (RTL) */
+.rich-text-content h2 {
+  border-right: 4px solid hsl(38 85% 55%) !important;
+  padding-right: 0.85rem !important;
+}
+
+/* H3 — subtle accent color */
+.rich-text-content h3 {
+  color: hsl(220 45% 22%) !important;
+}
+
+/* "ראו גם" callout — the hr+p+p pattern at end of articles */
+.rich-text-content hr + p + p,
+.rich-text-content hr ~ p:last-child {
+  background: linear-gradient(to left, hsl(210 25% 97%), hsl(38 85% 55% / 0.06)) !important;
+  border: 1px solid hsl(38 85% 55% / 0.2) !important;
+  border-radius: 0.6rem !important;
+  padding: 0.85rem 1.1rem !important;
+  font-size: 0.95em !important;
+  max-width: 100% !important;
+}
+
+/* Bullet-point paragraphs (TipTap format: •<span>text</span>) */
+.rich-text-content p:has(> span:first-child):not(:has(strong)):not(:has(a)) {
+  /* handled below via :first-child text check */
+}
+
+/* Make TipTap bullet paragraphs look like list items */
+.rich-text-content p > span:first-child {
+  display: inline !important;
+}
+
+/* Strong inside bullet paragraphs */
+.rich-text-content p > strong:first-child + span,
+.rich-text-content p > strong > span {
+  font-weight: inherit !important;
+}
+
 /* Dark mode overrides for rich-text-content hardcoded colors */
 .dark .rich-text-content,
 .dark .ProseMirror {
