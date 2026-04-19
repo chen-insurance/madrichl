@@ -44,12 +44,15 @@ const providerColors: Record<string, string> = {
   "מיטב": "bg-indigo-100 text-indigo-800 border-indigo-200",
 };
 
+const DEFAULT_VISIBLE = 8;
+
 const ComparisonTable = () => {
   const [sortField, setSortField] = useState<SortField>("ytd_return");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
+  const [showAll, setShowAll] = useState(false);
 
   const { data: tracks = [], isLoading } = useQuery({
     queryKey: ["financial-tracks"],
@@ -98,6 +101,9 @@ const ComparisonTable = () => {
       ? (aVal as number) - (bVal as number)
       : (bVal as number) - (aVal as number);
   });
+
+  const visibleTracks = showAll ? sortedTracks : sortedTracks.slice(0, DEFAULT_VISIBLE);
+  const hiddenCount = sortedTracks.length - DEFAULT_VISIBLE;
 
   const formatReturn = (value: number | null) => {
     if (value === null) return "—";
@@ -169,7 +175,7 @@ const ComparisonTable = () => {
           <Button
             variant={filterType === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setFilterType("all")}
+            onClick={() => { setFilterType("all"); setShowAll(false); }}
           >
             הכל
           </Button>
@@ -178,7 +184,7 @@ const ComparisonTable = () => {
               key={type}
               variant={filterType === type ? "default" : "outline"}
               size="sm"
-              onClick={() => setFilterType(type)}
+              onClick={() => { setFilterType(type); setShowAll(false); }}
             >
               {type}
             </Button>
@@ -208,7 +214,7 @@ const ComparisonTable = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedTracks.map((track, index) => (
+                {visibleTracks.map((track, index) => (
                   <TableRow
                     key={track.id}
                     className={index % 2 === 0 ? "bg-background" : "bg-muted/20"}
@@ -251,10 +257,40 @@ const ComparisonTable = () => {
             </Table>
           </div>
 
+          {!showAll && hiddenCount > 0 && (
+            <div className="px-4 py-4 border-t border-border text-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAll(true)}
+                className="gap-2"
+              >
+                הצג עוד {hiddenCount} מסלולים
+              </Button>
+            </div>
+          )}
+          {showAll && (
+            <div className="px-4 py-4 border-t border-border text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAll(false)}
+                className="text-muted-foreground"
+              >
+                הצג פחות
+              </Button>
+            </div>
+          )}
+
           <div className="px-4 py-3 bg-muted/30 border-t border-border text-xs text-muted-foreground text-center">
             עודכן לאחרונה:{" "}
-            {tracks[0]?.last_updated
-              ? new Date(tracks[0].last_updated).toLocaleDateString("he-IL")
+            {tracks.length > 0
+              ? new Date(
+                  tracks.reduce((latest, t) =>
+                    t.last_updated > latest ? t.last_updated : latest,
+                    tracks[0].last_updated
+                  )
+                ).toLocaleDateString("he-IL")
               : "—"}
           </div>
         </div>

@@ -21,16 +21,30 @@ const cors = {
 // Maps (name, type) patterns to Yahoo Finance symbols.
 // YTD return is calculated as: (currentPrice - yearStart) / yearStart * 100
 const SYMBOL_MAP: { namePattern: string; symbol: string }[] = [
-  { namePattern: 'S&P 500',          symbol: '^GSPC'     },
-  { namePattern: 'נאסד"ק 100',       symbol: '^NDX'      },
-  { namePattern: 'נאסדק 100',        symbol: '^NDX'      },
-  { namePattern: 'מניות ישראל',      symbol: '^TA125.TA' },
-  { namePattern: 'ת"א 125',          symbol: '^TA125.TA' },
-  { namePattern: 'ת"א 35',           symbol: '^TA35.TA'  },
-  { namePattern: 'אג"ח ממשלתי',      symbol: 'TLT'       }, // US Long Treasury ETF as proxy
-  { namePattern: 'אג"ח',             symbol: 'AGG'       }, // Aggregate bond ETF as proxy
-  { namePattern: 'כללי',             symbol: '^GSPC'     }, // General tracks ~ S&P 500
-  { namePattern: 'מניות חו"ל',       symbol: '^MSCI'     },
+  // ── מדדים ספציפיים (specific first) ──────────────────────────
+  { namePattern: 'S&P 500',                   symbol: '^GSPC'     },
+  { namePattern: 'נאסד"ק 100',                symbol: '^NDX'      },
+  { namePattern: 'נאסדק 100',                 symbol: '^NDX'      },
+  { namePattern: 'ת"א 125',                   symbol: '^TA125.TA' },
+  { namePattern: 'ת"א 35',                    symbol: '^TA35.TA'  },
+  { namePattern: 'מניות ישראל',               symbol: '^TA125.TA' },
+  { namePattern: 'MSCI World',                symbol: 'ACWI'      },
+  { namePattern: 'מניות עולמי',               symbol: 'ACWI'      },
+  { namePattern: 'עולמי',                     symbol: 'ACWI'      },
+  { namePattern: 'שווקים מתפתחים',            symbol: 'VWO'       },
+  { namePattern: 'מתפתחים',                   symbol: 'VWO'       },
+  // ── אג"ח ──────────────────────────────────────────────────────
+  { namePattern: 'אג"ח ממשלתי',               symbol: 'IEF'       }, // Mid-term gov bond ETF
+  { namePattern: 'אגח ממשלתי',                symbol: 'IEF'       },
+  { namePattern: 'אג"ח',                      symbol: 'AGG'       }, // Aggregate bond ETF
+  // ── שמרני / פרישה (before כללי to match first) ───────────────
+  { namePattern: 'לגיל פרישה',                symbol: 'AOK'       }, // Conservative 30/70
+  { namePattern: 'שמרני',                     symbol: 'AOK'       },
+  // ── מסלולי מניות כלליים ───────────────────────────────────────
+  { namePattern: 'מסלול מניות',               symbol: '^GSPC'     },
+  { namePattern: 'מניות',                     symbol: '^GSPC'     },
+  // ── כללי (general balanced) ───────────────────────────────────
+  { namePattern: 'כללי',                      symbol: 'AOR'       }, // 60/40 balanced ETF
 ];
 
 function resolveSymbol(trackName: string): string | null {
