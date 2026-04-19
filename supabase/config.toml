@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.serve-sitemap]
 verify_jwt = false
+
+[functions.manage-article]
+verify_jwt = false
