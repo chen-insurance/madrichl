@@ -272,13 +272,19 @@ const Article = () => {
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground pb-6 border-b border-border">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pb-6 border-b border-border">
                   {article.published_at && (
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       <span>
                         {format(new Date(article.published_at), "dd/MM/yyyy")}
                       </span>
+                    </div>
+                  )}
+                  {article.updated_at && article.published_at &&
+                    new Date(article.updated_at).getTime() - new Date(article.published_at).getTime() > 86400000 && (
+                    <div className="flex items-center gap-1 text-accent font-medium">
+                      <span>עודכן: {format(new Date(article.updated_at), "dd/MM/yyyy")}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
