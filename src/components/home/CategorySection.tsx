@@ -76,7 +76,7 @@ const CategorySection = () => {
               className="group bg-card rounded-xl p-5 text-center shadow-soft hover:shadow-medium hover:-translate-y-1 transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className="w-14 h-14 mx-auto mb-4 bg-secondary rounded-xl flex items-center justify-center group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+              <div className="w-14 h-14 mx-auto mb-4 bg-secondary rounded-xl flex items-center justify-center group-hover:bg-accent/90 dark:group-hover:bg-accent/70 group-hover:text-accent-foreground transition-colors">
                 <category.icon className="w-7 h-7" />
               </div>
               <h3 className="font-display font-semibold text-foreground mb-1">

@@ -362,7 +362,7 @@ html.highlight-links a {
 
 .rich-text-content strong, .ProseMirror strong {
   font-weight: 700 !important;
-  color: #111827 !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 .rich-text-content blockquote, .ProseMirror blockquote {
@@ -488,12 +488,12 @@ html.highlight-links a {
   padding: 0.7rem 1rem !important;
   text-align: right !important;
   border-bottom: 1px solid hsl(210 20% 92%) !important;
-  color: #374151 !important;
+  color: hsl(var(--foreground)) !important;
   vertical-align: middle !important;
 }
 
 .rich-text-content tr:nth-child(even) td {
-  background: hsl(210 20% 98%) !important;
+  background: hsl(var(--muted) / 0.4) !important;
 }
 
 .rich-text-content tr:last-child td {
@@ -501,7 +501,7 @@ html.highlight-links a {
 }
 
 .rich-text-content tr:hover td {
-  background: hsl(38 85% 55% / 0.06) !important;
+  background: hsl(var(--accent) / 0.07) !important;
   transition: background 0.15s ease !important;
 }
 
@@ -544,8 +544,8 @@ html.highlight-links a {
 /* "ראו גם" callout — the hr+p+p pattern at end of articles */
 .rich-text-content hr + p + p,
 .rich-text-content hr ~ p:last-child {
-  background: linear-gradient(to left, hsl(210 25% 97%), hsl(38 85% 55% / 0.06)) !important;
-  border: 1px solid hsl(38 85% 55% / 0.2) !important;
+  background: hsl(var(--muted) / 0.5) !important;
+  border: 1px solid hsl(var(--accent) / 0.2) !important;
   border-radius: 0.6rem !important;
   padding: 0.85rem 1.1rem !important;
   font-size: 0.95em !important;
@@ -585,8 +585,22 @@ html.highlight-links a {
   color: hsl(var(--foreground)) !important;
 }
 
+.dark .rich-text-content p,
+.dark .ProseMirror p {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .rich-text-content td {
+  border-bottom-color: hsl(var(--border)) !important;
+}
+
 .dark .rich-text-content blockquote,
 .dark .ProseMirror blockquote {
   color: hsl(var(--muted-foreground)) !important;
   background: linear-gradient(to left, rgba(217, 119, 6, 0.08), transparent) !important;
+}
+
+/* ComparisonTable dark mode — table header */
+.dark .rich-text-content th {
+  background: hsl(220 45% 25%) !important;
 }

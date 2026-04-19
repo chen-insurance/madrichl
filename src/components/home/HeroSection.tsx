@@ -159,16 +159,16 @@ import { supabase } from "@/integrations/supabase/client";
               {/* Explore All Card */}
               <Link
                 to="/blog"
-                className="group relative flex flex-col justify-end bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl p-6 shadow-medium hover:shadow-strong transition-all duration-300 overflow-hidden flex-1"
+                className="group relative flex flex-col justify-end rounded-xl p-6 shadow-medium hover:shadow-strong transition-all duration-300 overflow-hidden flex-1 bg-gradient-to-br from-[hsl(220_45%_20%)] via-[hsl(220_50%_15%)] to-[hsl(220_50%_12%)] dark:from-[hsl(220_35%_16%)] dark:via-[hsl(220_35%_13%)] dark:to-[hsl(220_40%_10%)]"
               >
                 {/* Large Watermark Icon */}
-                <Compass className="absolute -left-6 -bottom-6 w-36 h-36 text-primary-foreground/10 group-hover:text-primary-foreground/15 transition-colors duration-500 rotate-12" />
-                
+                <Compass className="absolute -left-6 -bottom-6 w-36 h-36 text-white/10 group-hover:text-white/15 transition-colors duration-500 rotate-12" />
+
                 {/* Decorative accent line */}
-                <div className="absolute top-0 right-0 w-1 h-full bg-accent/60 rounded-l-full" />
-                
+                <div className="absolute top-0 right-0 w-1 h-full bg-accent/50 rounded-l-full" />
+
                 <div className="relative z-10 text-right">
-                  <h3 className="font-display font-bold text-primary-foreground text-lg md:text-xl leading-tight mb-3 group-hover:text-white transition-colors">
+                  <h3 className="font-display font-bold text-white/90 text-lg md:text-xl leading-tight mb-3 group-hover:text-white transition-colors">
                     לא מצאתם מה שחיפשתם?
                   </h3>
                   <p className="text-accent font-medium text-sm md:text-base flex items-center justify-end gap-2 group-hover:gap-3 transition-all">
