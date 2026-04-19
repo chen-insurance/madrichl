@@ -104,7 +104,7 @@ const Article = () => {
   // (redirect check only fires when article === null, so normal pages skip it entirely)
   if (isLoading || isRedirectLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
         <main className="flex-1 py-8 md:py-12">
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -142,7 +142,7 @@ const Article = () => {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -189,7 +189,7 @@ const Article = () => {
   const articleUrl = `https://the-guide.co.il/news/${article.slug}`;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <ReadingProgressBar />
       <Helmet>
         <title>{article.seo_title || article.title} | המדריך לצרכן</title>
