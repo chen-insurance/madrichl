@@ -41,9 +41,24 @@ const Header = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Normalize a menu URL: strip same-origin prefix, ensure leading slash for internal paths
+  const normalizeUrl = (url: string): string => {
+    if (!url) return "/";
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname === "the-guide.co.il" || parsed.hostname === window.location.hostname) {
+        return parsed.pathname + parsed.search + parsed.hash;
+      }
+      return url; // keep external URLs as-is
+    } catch {
+      // Not a full URL — treat as relative path
+      return url.startsWith("/") ? url : `/${url}`;
+    }
+  };
+
   // Build navigation items from menu or fallback to defaults
   const navItems = headerMenu && headerMenu.length > 0
-    ? headerMenu.map((item) => ({ label: item.label, href: item.url }))
+    ? headerMenu.map((item) => ({ label: item.label, href: normalizeUrl(item.url) }))
     : [
         { label: "ראשי", href: "/" },
         { label: "כל הכתבות", href: "/blog" },
