@@ -15,42 +15,42 @@ const CategorySection = () => {
     {
       id: "life",
       title: "ביטוח חיים",
-      description: "פוליסות חיים, ריסק ועוד",
+      description: "כמה תשלמו? השוו מחירים",
       icon: Shield,
       href: "/life-insurance",
     },
     {
       id: "health",
       title: "ביטוח בריאות",
-      description: "בריאות, סיעודי ונסיעות",
+      description: "מושלם, מקיף או סיעוד?",
       icon: Heart,
       href: "/health-insurance",
     },
     {
       id: "car",
       title: "ביטוח רכב",
-      description: "חובה, מקיף וצד ג׳",
+      description: "חסכו על חובה ומקיף",
       icon: Car,
       href: "/car-insurance",
     },
     {
       id: "property",
-      title: "ביטוח רכוש",
-      description: "דירה, עסק ותכולה",
+      title: "ביטוח דירה",
+      description: "הגנו על הנכס שלכם",
       icon: Building2,
       href: "/property-insurance",
     },
     {
       id: "pension",
-      title: "פנסיה",
-      description: "קרנות פנסיה וגמל",
+      title: "פנסיה וגמל",
+      description: "בדקו את תשואות המסלול",
       icon: PiggyBank,
       href: "/pension",
     },
     {
       id: "employers",
-      title: "ביטוח מעסיקים",
-      description: "אחריות מקצועית ועובדים",
+      title: "אחריות מקצועית",
+      description: "הגנה לעצמאים ולעסקים",
       icon: Users,
       href: "/employer-insurance",
     },
@@ -61,10 +61,10 @@ const CategorySection = () => {
       <div className="container mx-auto">
         <div className="text-center mb-10">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-            עיינו לפי קטגוריה
+            באיזה תחום תרצו לחסוך?
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            מצאו את המידע שאתם מחפשים לפי תחום הביטוח הרלוונטי
+            בחרו קטגוריה וגלו מדריכים, השוואות ועצות מקצועיות
           </p>
         </div>
 

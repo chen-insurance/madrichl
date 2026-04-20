@@ -253,13 +253,13 @@ const LifeInsuranceCalc = () => {
           </div>
 
           {/* Result Display */}
-          <div className="bg-secondary/50 rounded-xl p-6 text-center space-y-2">
-            <p className="text-sm text-muted-foreground">מחיר חודשי משוער</p>
+          <div className="bg-secondary/50 rounded-xl p-5 text-center space-y-1">
+            <p className="text-sm text-muted-foreground">מחיר חודשי משוער בשוק הפתוח</p>
             <p className="text-4xl font-bold text-accent">
               {formatCurrency(monthlyPrice)}
             </p>
             <p className="text-xs text-muted-foreground">
-              לכיסוי של {formatNumber(coverage)} ₪
+              לכיסוי של {formatNumber(coverage)} ₪ • שנתי: {formatCurrency(monthlyPrice * 12)}
             </p>
           </div>
 
@@ -284,11 +284,11 @@ const LifeInsuranceCalc = () => {
             size="lg"
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6"
           >
-            קבל הצעת מחיר לביטוח חיים
+            בדוק האם אתה משלם יותר מדי — חינם
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
-            * המחירים הם הערכה בלבד ועשויים להשתנות בהתאם לתנאי הפוליסה
+            * המחיר הוא הערכה לפי ממוצע שוק. המחיר הסופי נקבע לפי מצב בריאות ותנאי הפוליסה.
           </p>
         </CardContent>
       </Card>

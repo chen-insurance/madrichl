@@ -8,6 +8,8 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import LatestArticles from "@/components/home/LatestArticles";
 import CategorySection from "@/components/home/CategorySection";
+import { Link } from "react-router-dom";
+import { TrendingDown, ShieldCheck, Clock, Star } from "lucide-react";
 
 
 // Lazy load heavy below-fold components (ComparisonTable pulls in Dialog, LeadForm, zod, react-hook-form)
@@ -181,6 +183,31 @@ const Index = () => {
           featuredArticle={heroArticle || undefined}
           secondaryArticles={secondaryArticles || undefined}
         />
+
+        {/* Trust strip */}
+        <div className="bg-primary text-cream py-4">
+          <div className="container mx-auto">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-sm">
+              <div className="flex items-center gap-2">
+                <TrendingDown className="w-4 h-4 text-accent shrink-0" />
+                <span>חיסכון ממוצע של 30% על הביטוח</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-accent shrink-0" />
+                <span>+2,500 ישראלים כבר חסכו איתנו</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-accent shrink-0" />
+                <span>חזרה תוך שעה — ללא התחייבות</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-accent shrink-0" />
+                <span>מעל 10 שנות ניסיון בשוק הביטוח</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
           <Suspense fallback={<div style={{ minHeight: 500 }} className="py-10"><div className="container mx-auto"><div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-64 bg-muted rounded" /></div></div></div>}>
             <ComparisonTable />

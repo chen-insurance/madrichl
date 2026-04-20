@@ -19,7 +19,11 @@ const ArticleSidebar = ({ currentSlug, articleContent }: ArticleSidebarProps) =>
       {/* Lead Form - Hidden on mobile, shown only on desktop */}
       <div className="hidden lg:block">
         <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse" />}>
-          <GlobalLeadForm variant="compact" />
+          <GlobalLeadForm
+            variant="compact"
+            title="בדיקת ביטוח חינם"
+            subtitle="השאירו פרטים ונציג יחזור אליכם תוך שעה"
+          />
         </Suspense>
       </div>
 

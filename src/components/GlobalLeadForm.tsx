@@ -48,8 +48,8 @@ interface GlobalLeadFormProps {
 }
 
 const GlobalLeadForm = ({
-  title = "השאירו פרטים",
-  subtitle = "ונציג יחזור אליכם תוך 24 שעות",
+  title = "השאירו פרטים — בדיקה חינם",
+  subtitle = "מעל 2,500 ישראלים כבר חסכו על הביטוח שלהם. נציג יחזור אליכם תוך שעה.",
   sourceUrl,
   prefilledContext,
   onSuccess,
@@ -379,7 +379,7 @@ const GlobalLeadForm = ({
 
         {/* Footer */}
         <p className="text-xs text-muted-foreground text-center pt-1">
-          ללא התחייבות • שירות חינם • מאובטח
+          ✓ ללא התחייבות &nbsp;•&nbsp; ✓ שירות חינם &nbsp;•&nbsp; ✓ פרטיות מלאה
         </p>
       </form>
     </div>
