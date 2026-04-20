@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import QuizWidget from "@/components/quiz/QuizWidget";
 import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
 import MortgageCalculatorWidget from "@/components/calculators/MortgageCalculatorWidget";
+import CarInsuranceCalc from "@/components/calculators/CarInsuranceCalc";
 
 // Lazy-load heavy below-fold components to reduce main thread work
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
@@ -63,7 +64,7 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
     const matches = normalizedContent.match(regex) || [];
     return matches
       .map((m) => m.replace(/\{\{|\}\}/g, ""))
-      .filter((s) => !s.startsWith("quiz_") && s !== "insurance_calculator");
+      .filter((s) => !s.startsWith("quiz_") && s !== "insurance_calculator" && s !== "mortgage_calculator" && s !== "car_calculator" && s !== "lead_form");
   }, [normalizedContent]);
 
   // Split content by all shortcodes (for Markdown rendering path)
@@ -77,6 +78,9 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
       }
       if (part === "{{mortgage_calculator}}") {
         return { type: "mortgage_calculator" as const };
+      }
+      if (part === "{{car_calculator}}") {
+        return { type: "car_calculator" as const };
       }
       if (part === "{{lead_form}}") {
         return { type: "lead_form" as const };
@@ -158,7 +162,15 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
           </div>
         );
       }
-      
+
+      if (part === "{{car_calculator}}") {
+        return (
+          <div key={key} className="my-8 not-prose">
+            <CarInsuranceCalc />
+          </div>
+        );
+      }
+
       if (part === "{{lead_form}}") {
         return (
           <div key={key} className="my-8 not-prose">
@@ -222,6 +234,14 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
             return (
               <div className="my-8 not-prose">
                 <MortgageCalculatorWidget />
+              </div>
+            );
+          }
+
+          if (dataWidget === "{{car_calculator}}") {
+            return (
+              <div className="my-8 not-prose">
+                <CarInsuranceCalc />
               </div>
             );
           }
@@ -420,6 +440,14 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
           return (
             <div key={`mortgage-${index}`} className="my-8 not-prose">
               <MortgageCalculatorWidget />
+            </div>
+          );
+        }
+
+        if (part.type === "car_calculator") {
+          return (
+            <div key={`car-${index}`} className="my-8 not-prose">
+              <CarInsuranceCalc />
             </div>
           );
         }

@@ -9,6 +9,7 @@ import { Calculator, Home, Heart, Shield } from "lucide-react";
 
 const LifeInsuranceCalc = lazy(() => import("@/components/calculators/LifeInsuranceCalc"));
 const MortgageCalculatorWidget = lazy(() => import("@/components/calculators/MortgageCalculatorWidget"));
+const CarInsuranceCalc = lazy(() => import("@/components/calculators/CarInsuranceCalc"));
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -118,6 +119,10 @@ const Calculators = () => {
             <a href="#mortgage-calc" className="text-sm font-medium text-accent hover:underline flex items-center gap-1">
               <Home className="w-4 h-4" /> משכנתא
             </a>
+            <span className="text-muted-foreground">·</span>
+            <a href="#car-calc" className="text-sm font-medium text-accent hover:underline flex items-center gap-1">
+              <Heart className="w-4 h-4" /> ביטוח רכב
+            </a>
           </div>
         </div>
 
@@ -187,6 +192,29 @@ const Calculators = () => {
               רוצים ללמוד עוד?{" "}
               <Link to="/news/mortgage-home-insurance-guide-2026" className="text-accent hover:underline">
                 קראו את המדריך לביטוח משכנתא ודירה
+              </Link>
+            </p>
+          </section>
+
+          {/* Car Insurance Calculator */}
+          <section id="car-calc">
+            <div className="mb-6">
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+                מחשבון ביטוח רכב
+              </h2>
+              <p className="text-muted-foreground">
+                חשב את עלות ביטוח הרכב לפי גיל הנהג, שנות ותק, שנת הרכב ושוויו — וגלה כמה אפשר לחסוך.
+              </p>
+            </div>
+            <div className="max-w-xl">
+              <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
+                <CarInsuranceCalc />
+              </Suspense>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              רוצים ללמוד עוד?{" "}
+              <Link to="/news/car-insurance-price-guide-2026" className="text-accent hover:underline">
+                קראו את מדריך מחירי ביטוח רכב 2026
               </Link>
             </p>
           </section>
