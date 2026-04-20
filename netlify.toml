@@ -83,6 +83,25 @@
   function = "bot-prerender"
   path = "/*"
 
+# Legacy/GSC URL redirects — permanent 301
+[[redirects]]
+  from = "/therapists-liability-insurance"
+  to = "/news/comprehensive-guide-liability-insurance-therapists"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/life-insurance-calc"
+  to = "/calculators"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/Life_Insurance_Calc"
+  to = "/calculators"
+  status = 301
+  force = true
+
 # SPA fallback - must be last
 [[redirects]]
   from = "/*"
