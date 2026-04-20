@@ -34,13 +34,18 @@ const Footer = () => {
 
   // Fallback links if no menu configured
   const defaultCol1 = [
-    { label: "ביטוח חיים", url: "/category/life-insurance" },
-    { label: "ביטוח בריאות", url: "/category/health-insurance" },
-    { label: "פנסיה", url: "/category/pension" },
+    { label: "ביטוח חיים", url: "/life-insurance" },
+    { label: "ביטוח בריאות", url: "/health-insurance" },
+    { label: "ביטוח דירה", url: "/property-insurance" },
+    { label: "ביטוח רכב", url: "/car-insurance" },
+    { label: "פנסיה וגמל", url: "/pension" },
+    { label: "אחריות מקצועית", url: "/employer-insurance" },
   ];
 
   const defaultCol2 = [
-    { label: "אודות", url: "/about" },
+    { label: "כל הכתבות", url: "/blog" },
+    { label: "מחשבוני ביטוח", url: "/calculators" },
+    { label: "מילון מונחים", url: "/glossary" },
     { label: "צור קשר", url: "/contact" },
   ];
 
@@ -98,7 +103,7 @@ const Footer = () => {
 
           {/* Column 2 */}
           <div>
-            <h3 className="font-display font-semibold text-lg mb-4">החברה</h3>
+            <h3 className="font-display font-semibold text-lg mb-4">כלים ומשאבים</h3>
             <ul className="space-y-2">
               {col2Links.map((link, index) => (
                 <li key={`col2-${index}`}>
