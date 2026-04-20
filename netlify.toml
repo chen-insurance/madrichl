@@ -71,10 +71,10 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
-# Proxy sitemap.xml to Edge Function
+# Sitemap — handled by Netlify Function (dynamic, from Supabase)
 [[redirects]]
   from = "/sitemap.xml"
-  to = "https://awxmwvyoellhdhgvxife.supabase.co/functions/v1/serve-sitemap"
+  to = "/.netlify/functions/sitemap"
   status = 200
   force = true
 
