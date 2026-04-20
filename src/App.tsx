@@ -26,6 +26,7 @@ const CategoryArchive = lazy(() => import("./pages/CategoryArchive"));
 const StaticPage = lazy(() => import("./pages/StaticPage"));
 const GlossaryIndex = lazy(() => import("./pages/GlossaryIndex"));
 const GlossaryTerm = lazy(() => import("./pages/GlossaryTerm"));
+const Calculators = lazy(() => import("./pages/Calculators"));
 
 // Lazy load admin pages
 const ArticlesList = lazy(() => import("./pages/admin/ArticlesList"));
@@ -119,6 +120,8 @@ const App = () => (
                 <Route path="/admin/glossary" element={<Glossary />} />
                 <Route path="/admin/media" element={<Media />} />
                 <Route path="/admin/settings" element={<Settings />} />
+                {/* Calculators */}
+                <Route path="/calculators" element={<Calculators />} />
                 {/* Glossary pages */}
                 <Route path="/glossary" element={<GlossaryIndex />} />
                 <Route path="/glossary/:slug" element={<GlossaryTerm />} />

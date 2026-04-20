@@ -62,6 +62,7 @@ const Header = () => {
     : [
         { label: "ראשי", href: "/" },
         { label: "כל הכתבות", href: "/blog" },
+        { label: "מחשבוני ביטוח", href: "/calculators" },
         { label: "צור קשר", href: "/contact" },
       ];
 
