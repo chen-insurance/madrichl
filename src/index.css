@@ -1,5 +1,11 @@
 @tailwind base;
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 /* Accessibility Mode Styles */
 html.text-lg-mode {
   font-size: 1.125rem;
