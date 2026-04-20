@@ -27,6 +27,7 @@ const StaticPage = lazy(() => import("./pages/StaticPage"));
 const GlossaryIndex = lazy(() => import("./pages/GlossaryIndex"));
 const GlossaryTerm = lazy(() => import("./pages/GlossaryTerm"));
 const Calculators = lazy(() => import("./pages/Calculators"));
+const WhatsAppButton = lazy(() => import("./components/common/WhatsAppButton"));
 
 // Lazy load admin pages
 const ArticlesList = lazy(() => import("./pages/admin/ArticlesList"));
@@ -137,6 +138,9 @@ const App = () => (
               <AccessibilityWidget />
             </Suspense>
             <BackToTop />
+            <Suspense fallback={null}>
+              <WhatsAppButton />
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </AppInitializer>
