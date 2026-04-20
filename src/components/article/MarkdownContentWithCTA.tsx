@@ -10,6 +10,7 @@ import QuizWidget from "@/components/quiz/QuizWidget";
 import LifeInsuranceCalc from "@/components/calculators/LifeInsuranceCalc";
 import MortgageCalculatorWidget from "@/components/calculators/MortgageCalculatorWidget";
 import CarInsuranceCalc from "@/components/calculators/CarInsuranceCalc";
+import DisabilityInsuranceCalc from "@/components/calculators/DisabilityInsuranceCalc";
 
 // Lazy-load heavy below-fold components to reduce main thread work
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
@@ -64,7 +65,7 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
     const matches = normalizedContent.match(regex) || [];
     return matches
       .map((m) => m.replace(/\{\{|\}\}/g, ""))
-      .filter((s) => !s.startsWith("quiz_") && s !== "insurance_calculator" && s !== "mortgage_calculator" && s !== "car_calculator" && s !== "lead_form");
+      .filter((s) => !s.startsWith("quiz_") && s !== "insurance_calculator" && s !== "mortgage_calculator" && s !== "car_calculator" && s !== "disability_calculator" && s !== "lead_form");
   }, [normalizedContent]);
 
   // Split content by all shortcodes (for Markdown rendering path)
@@ -81,6 +82,9 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
       }
       if (part === "{{car_calculator}}") {
         return { type: "car_calculator" as const };
+      }
+      if (part === "{{disability_calculator}}") {
+        return { type: "disability_calculator" as const };
       }
       if (part === "{{lead_form}}") {
         return { type: "lead_form" as const };
@@ -167,6 +171,14 @@ const MarkdownContentWithCTA = ({ content, skipFirstImage = false }: MarkdownCon
         return (
           <div key={key} className="my-8 not-prose">
             <CarInsuranceCalc />
+          </div>
+        );
+      }
+
+      if (part === "{{disability_calculator}}") {
+        return (
+          <div key={key} className="my-8 not-prose">
+            <DisabilityInsuranceCalc />
           </div>
         );
       }

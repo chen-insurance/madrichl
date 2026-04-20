@@ -5,11 +5,12 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BreadcrumbSchema from "@/components/article/BreadcrumbSchema";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calculator, Home, Heart, Shield } from "lucide-react";
+import { Calculator, Home, Heart, Shield, ShieldAlert } from "lucide-react";
 
 const LifeInsuranceCalc = lazy(() => import("@/components/calculators/LifeInsuranceCalc"));
 const MortgageCalculatorWidget = lazy(() => import("@/components/calculators/MortgageCalculatorWidget"));
 const CarInsuranceCalc = lazy(() => import("@/components/calculators/CarInsuranceCalc"));
+const DisabilityInsuranceCalc = lazy(() => import("@/components/calculators/DisabilityInsuranceCalc"));
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -68,10 +69,10 @@ const Calculators = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>מחשבוני ביטוח חינמיים | המדריך לצרכן</title>
+        <title>מחשבוני ביטוח חינמיים 2026 | המדריך לצרכן</title>
         <meta
           name="description"
-          content="מחשבוני ביטוח חינמיים: מחשבון ביטוח חיים, מחשבון ביטוח משכנתא ועוד. חשב את עלות הביטוח שלך בשניות וגלה כמה אתה יכול לחסוך."
+          content="מחשבוני ביטוח חינמיים 2026: ביטוח חיים, משכנתא, רכב, אובדן כושר עבודה. חשב את עלות הביטוח שלך בשניות וגלה כמה אתה יכול לחסוך."
         />
         <link rel="canonical" href="https://the-guide.co.il/calculators" />
         <meta property="og:title" content="מחשבוני ביטוח חינמיים | המדריך לצרכן" />
@@ -122,6 +123,10 @@ const Calculators = () => {
             <span className="text-muted-foreground">·</span>
             <a href="#car-calc" className="text-sm font-medium text-accent hover:underline flex items-center gap-1">
               <Heart className="w-4 h-4" /> ביטוח רכב
+            </a>
+            <span className="text-muted-foreground">·</span>
+            <a href="#disability-calc" className="text-sm font-medium text-accent hover:underline flex items-center gap-1">
+              <ShieldAlert className="w-4 h-4" /> א.כ.ע
             </a>
           </div>
         </div>
@@ -218,6 +223,29 @@ const Calculators = () => {
               </Link>
             </p>
           </section>
+
+          {/* Disability Insurance Calculator */}
+          <section id="disability-calc">
+            <div className="mb-6">
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+                מחשבון פער ביטוח אובדן כושר עבודה
+              </h2>
+              <p className="text-muted-foreground">
+                גלו כמה הפנסיה מכסה ומה הפער שנשאר לא מכוסה — ומה עולה לסגור אותו.
+              </p>
+            </div>
+            <div className="max-w-xl">
+              <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
+                <DisabilityInsuranceCalc />
+              </Suspense>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              רוצים ללמוד עוד?{" "}
+              <Link to="/news/disability-insurance-guide-2026" className="text-accent hover:underline">
+                קראו את המדריך המלא לביטוח אובדן כושר עבודה 2026
+              </Link>
+            </p>
+          </section>
         </div>
 
         {/* FAQ */}
@@ -242,6 +270,8 @@ const Calculators = () => {
               { label: "מדריך ביטוח דירה 2026", slug: "home-insurance-guide-2026" },
               { label: "ביטוח בריאות פרטי", slug: "not-mushlam" },
               { label: "מדריך פנסיה מקיף", slug: "pension-complete-guide-israel-2026" },
+              { label: "ביטוח אובדן כושר עבודה 2026", slug: "disability-insurance-guide-2026" },
+              { label: "ביטוח מחלות קשות 2026", slug: "critical-illness-insurance-guide-2026" },
             ].map((link) => (
               <Link
                 key={link.slug}
