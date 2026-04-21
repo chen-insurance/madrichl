@@ -50,6 +50,26 @@ serve(async (req) => {
       });
     }
 
+    if (action === "upsert-glossary") {
+      const { term } = body;
+      const { data, error } = await supabase
+        .from("glossary_terms")
+        .upsert(term, { onConflict: "slug" })
+        .select("id, slug, term_name")
+        .single();
+
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ success: true, term: data }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Unknown action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
