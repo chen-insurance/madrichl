@@ -5,49 +5,24 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-
-interface TOCItem {
-  id: string;
-  text: string;
-  level: number;
-}
+import { parseHeadings } from "./TableOfContents";
 
 interface MobileTableOfContentsProps {
   content: string | null;
 }
 
 const MobileTableOfContents = ({ content }: MobileTableOfContentsProps) => {
-  const [tocItems, setTocItems] = useState<TOCItem[]>([]);
+  const [tocItems, setTocItems] = useState<ReturnType<typeof parseHeadings>>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (!content) return;
-
-    // Parse markdown headers (## Header)
-    const headerRegex = /^(#{2,3})\s+(.+)$/gm;
-    const items: TOCItem[] = [];
-    let match;
-
-    while ((match = headerRegex.exec(content)) !== null) {
-      const level = match[1].length;
-      const text = match[2].trim();
-      const id = text
-        .replace(/[^\w\u0590-\u05FF\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-
-      items.push({ id, text, level });
-    }
-
-    setTocItems(items);
+    setTocItems(parseHeadings(content));
   }, [content]);
 
   const handleClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setIsOpen(false);
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setIsOpen(false);
   };
 
   if (tocItems.length === 0) return null;
@@ -58,21 +33,15 @@ const MobileTableOfContents = ({ content }: MobileTableOfContentsProps) => {
         <CollapsibleTrigger className="w-full flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
             <List className="w-5 h-5 text-accent" />
-            <span className="font-display font-bold text-foreground">
-              מה בכתבה?
-            </span>
+            <span className="font-display font-bold text-foreground">מה בכתבה?</span>
           </div>
-          {isOpen ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
-          )}
+          {isOpen ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
         </CollapsibleTrigger>
         <CollapsibleContent className="px-4 pb-4">
           <nav>
             <ol className="space-y-2">
-              {tocItems.map((item, index) => (
-                <li key={index}>
+              {tocItems.map((item, i) => (
+                <li key={i}>
                   <button
                     onClick={() => handleClick(item.id)}
                     className={`text-sm text-right w-full hover:text-accent transition-colors ${

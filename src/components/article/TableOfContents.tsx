@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { List, ChevronDown, ChevronUp } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,75 +16,53 @@ interface TableOfContentsProps {
   content: string | null;
 }
 
+function parseHeadings(content: string): TOCItem[] {
+  const items: TOCItem[] = [];
+  // Match <h2> and <h3> in TipTap HTML format
+  const re = /<h([23])[^>]*>(?:<[^>]+>)*([^<]+)(?:<\/[^>]+>)*<\/h[23]>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content)) !== null) {
+    const text = m[2].trim();
+    if (!text) continue;
+    const id = "toc-" + text.replace(/[^\w֐-׿\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
+    items.push({ id, text, level: parseInt(m[1]) });
+  }
+  return items;
+}
+
 const TableOfContents = ({ content }: TableOfContentsProps) => {
   const [tocItems, setTocItems] = useState<TOCItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("");
-  const isMobile = useIsMobile();
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (!content) return;
+    setTocItems(parseHeadings(content));
+  }, [content]);
 
-    // Parse markdown headers (## Header)
-    const headerRegex = /^(#{2,3})\s+(.+)$/gm;
-    const items: TOCItem[] = [];
-    let match;
-
-    while ((match = headerRegex.exec(content)) !== null) {
-      const level = match[1].length; // 2 for ##, 3 for ###
-      const text = match[2].trim();
-      // Create a URL-friendly ID
-      const id = text
-        .replace(/[^\w\u0590-\u05FF\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-
-      items.push({ id, text, level });
-    }
-
-    setTocItems(items);
-
-    // After items are set, observe headers for active state
+  useEffect(() => {
+    if (tocItems.length === 0) return;
     const timer = setTimeout(() => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-
+      observerRef.current?.disconnect();
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveId(entry.target.id);
-            }
-          });
+          entries.forEach((e) => { if (e.isIntersecting) setActiveId(e.target.id); });
         },
         { rootMargin: "-20% 0% -70% 0%" }
       );
-
-      items.forEach((item) => {
-        const element = document.getElementById(item.id);
-        if (element) {
-          observerRef.current?.observe(element);
-        }
+      tocItems.forEach(({ id }) => {
+        const el = document.getElementById(id);
+        if (el) observerRef.current?.observe(el);
       });
     }, 500);
-
-    return () => {
-      clearTimeout(timer);
-      observerRef.current?.disconnect();
-    };
-  }, [content]);
+    return () => { clearTimeout(timer); observerRef.current?.disconnect(); };
+  }, [tocItems]);
 
   const handleClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActiveId(id);
-      if (isMobile) {
-        setIsOpen(false);
-      }
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveId(id);
+    setIsOpen(false);
   };
 
   if (tocItems.length === 0) return null;
@@ -93,8 +70,8 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
   const tocList = (
     <nav>
       <ol className="space-y-2">
-        {tocItems.map((item, index) => (
-          <li key={index}>
+        {tocItems.map((item, i) => (
+          <li key={i}>
             <button
               onClick={() => handleClick(item.id)}
               className={`text-sm text-right w-full hover:text-accent transition-colors ${
@@ -109,40 +86,11 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
     </nav>
   );
 
-  // Mobile: Collapsible box
-  if (isMobile) {
-    return (
-      <div className="bg-card rounded-xl shadow-soft border border-border mb-6">
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger className="w-full flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <List className="w-5 h-5 text-accent" />
-              <span className="font-display font-bold text-foreground">
-                מה בכתבה?
-              </span>
-            </div>
-            {isOpen ? (
-              <ChevronUp className="w-5 h-5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="px-4 pb-4">
-            {tocList}
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-    );
-  }
-
-  // Desktop: Regular card (sidebar handles sticky)
   return (
     <div className="bg-card rounded-xl p-5 shadow-soft border border-border">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border">
         <List className="w-5 h-5 text-accent" />
-        <h3 className="font-display font-bold text-lg text-foreground">
-          תוכן עניינים
-        </h3>
+        <h3 className="font-display font-bold text-lg text-foreground">תוכן עניינים</h3>
       </div>
       {tocList}
     </div>
@@ -150,3 +98,4 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
 };
 
 export default TableOfContents;
+export { parseHeadings };

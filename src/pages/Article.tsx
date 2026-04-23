@@ -27,6 +27,7 @@ import ShareButtons from "@/components/article/ShareButtons";
 
 // Lazy-load below-fold / heavy components (zod, react-hook-form, accordion, RPC calls)
 const ArticleSidebar = lazy(() => import("@/components/article/ArticleSidebar"));
+const StickyMobileCTA = lazy(() => import("@/components/article/StickyMobileCTA"));
 const GlobalLeadForm = lazy(() => import("@/components/GlobalLeadForm"));
 const RelatedArticles = lazy(() => import("@/components/article/RelatedArticles"));
 const FAQSection = lazy(() => import("@/components/article/FAQSection"));
@@ -95,6 +96,18 @@ const Article = () => {
 
   // Auto-detect FAQ from content H3 questions
   const autoFAQ = useMemo(() => extractFAQFromContent(article?.content || ""), [article?.content]);
+
+  // Inject IDs into rendered h2/h3 so TOC anchor links work
+  useEffect(() => {
+    if (!article?.content) return;
+    const articleEl = document.querySelector(".article-content");
+    if (!articleEl) return;
+    articleEl.querySelectorAll("h2, h3").forEach((el) => {
+      const text = el.textContent?.trim() || "";
+      const id = "toc-" + text.replace(/[^\w֐-׿\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
+      el.id = id;
+    });
+  }, [article?.content, linkedContent]);
 
   if (redirect) {
     return <Navigate to={`/news/${redirect.new_slug}`} replace />;
@@ -367,6 +380,10 @@ const Article = () => {
       </main>
 
       <Footer />
+
+      <Suspense fallback={null}>
+        <StickyMobileCTA />
+      </Suspense>
     </div>
   );
 };
