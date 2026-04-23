@@ -73,11 +73,42 @@ const ArticleSchema = ({ article }: ArticleSchemaProps) => {
     },
   };
 
+  // Extract FAQ pairs from h3+p patterns in HTML content
+  const faqItems = (() => {
+    if (!article.content) return [];
+    const pairs: { q: string; a: string }[] = [];
+    const h3Regex = /<h3[^>]*><span>([^<]+)<\/span><\/h3>\s*<p[^>]*><span>([^<]+)<\/span><\/p>/g;
+    let match;
+    while ((match = h3Regex.exec(article.content)) !== null) {
+      const q = match[1].trim();
+      const a = match[2].trim();
+      if (q.endsWith("?") || q.includes("\u05d4\u05d0\u05dd") || q.includes("\u05d0\u05d9\u05da") || q.includes("\u05de\u05d4") || q.includes("\u05db\u05de\u05d4") || q.includes("\u05de\u05ea\u05d9")) {
+        pairs.push({ q, a });
+      }
+    }
+    return pairs.slice(0, 10);
+  })();
+
+  const faqSchema = faqItems.length >= 2 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  } : null;
+
   return (
     <Helmet>
       <script type="application/ld+json">
         {JSON.stringify(newsArticleSchema)}
       </script>
+      {faqSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      )}
     </Helmet>
   );
 };
