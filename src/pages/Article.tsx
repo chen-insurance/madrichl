@@ -197,6 +197,7 @@ const Article = () => {
           name="description"
           content={article.seo_description || article.excerpt || ""}
         />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         {/* Preload featured image for LCP */}
         {article.featured_image && (
           <link

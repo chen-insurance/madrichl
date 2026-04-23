@@ -325,6 +325,7 @@ const CategoryArchive = () => {
           name="description"
           content={category.description || `כל המאמרים בקטגוריית ${category.name} - המדריך לצרכן`}
         />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <link rel="canonical" href={`https://the-guide.co.il/category/${slug}`} />
         <meta property="og:title" content={`${category.name} | המדריך לצרכן`} />
         <meta property="og:description" content={category.description || `כל המאמרים בקטגוריית ${category.name} - המדריך לצרכן`} />

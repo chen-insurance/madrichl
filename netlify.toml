@@ -83,10 +83,16 @@
   function = "bot-prerender"
   path = "/*"
 
-# Legacy/GSC URL redirects — permanent 301
+# Legacy/GSC URL redirects ï¿½ permanent 301
 [[redirects]]
   from = "/therapists-liability-insurance"
   to = "/news/comprehensive-guide-liability-insurance-therapists"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/mortgage-insurance-trap"
+  to = "/news/life-insurance-mortgage-guide-2026"
   status = 301
   force = true
 

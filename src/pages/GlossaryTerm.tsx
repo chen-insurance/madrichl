@@ -102,6 +102,7 @@ const GlossaryTerm = () => {
             `הגדרת המונח ${term.term_name} במילון המונחים הפיננסי`
           }
         />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <link
           rel="canonical"
           href={`https://the-guide.co.il/glossary/${term.slug}`}
